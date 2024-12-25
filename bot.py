@@ -23,7 +23,7 @@ storage = MemoryStorage()
 bot = Bot(token=config.tg_bot.token)
 dp = Dispatcher(storage=storage)
 
-ADMIN_ID = []
+ADMIN_ID = [842589261]
 
 dp = Dispatcher()
 
@@ -31,8 +31,23 @@ dp = Dispatcher()
 user_router = Router()
 admin_router = Router()
 
+# состония
 class FSMFillForm(StatesGroup):
     fill_photo = State()
+
+# тестовая бд-словарь
+battle_tb = {}
+
+# функция для проверки подписки
+# chat_mem = await bot.get_chat_member(chat_id=Channel_id,
+# user_id=message.from_user.id)
+
+def check_sub_channel(chat_mem) -> bool:
+    print(chat_mem['status'])
+    if chat_mem['status'] !='left':
+        return True
+    else:
+        return False
 
 # Фильтр для определения администратора
 def is_admin(message: Message) -> bool:
@@ -42,25 +57,26 @@ def is_admin(message: Message) -> bool:
 user_router.message.filter(lambda message: not is_admin(message))
 admin_router.message.filter(is_admin)
 
-
-# хэндлер для канала
+# -----------
+# хэндлеры для канала
 @user_router.channel_post()
 async def send_message(message: MessageOriginChannel):
     await bot.send_message(chat_id=message.chat.id, text = 'Привет!')
+# -----------
 
-
+#-----------
 # Команды для пользователей
-@user_router.message(Command("start"))
+@user_router.message(CommandStart() ,StateFilter(default_state))
 async def cmd_start(message: Message):
-    await message.answer("Привет! Отправь мне /battl для участия в баттле")
+    await message.answer("Привет! Отправь мне /battle для участия в баттле")
 
 
-@dp.message(Command(commands='cancel'))
+@dp.message(Command(commands='cancel'),StateFilter(default_state))
 async def process_cancel_command(message: Message):
     await message.answer(
         text='Отменять нечего. Вы регистрации на баттл\n\n'
              'Чтобы перейти к заполнению анкеты - '
-             'отправьте команду /battl'
+             'отправьте команду /battle'
     )
 
 
@@ -69,19 +85,15 @@ async def process_cancel_command_state(message: Message, state: FSMContext):
     await message.answer(
         text='Вы вышли из регистрации на баттл\n\n'
              'Чтобы снова перейти к заполнению анкеты - '
-             'отправьте команду /battl'
+             'отправьте команду /battle'
     )
     
     await state.clear()
     
     
-@user_router.message(Command("battle"))
-async def cmd_help(message: Message):
-    await message.answer("Отправь мне свое фото для баттла.")
     
     
-    
-@user_router.message(Command("battle"))
+@user_router.message(Command("battle"),StateFilter(default_state))
 async def cmd_help(message: Message, state: FSMContext):
     await message.answer("Отправь мне свое фото для баттла.")
     await state.set_state(FSMFillForm.fill_photo)
@@ -98,7 +110,7 @@ async def process_photo_sent(message: Message,
         photo_unique_id=largest_photo.file_unique_id,
         photo_id=largest_photo.file_id
     )
-    #!!!! запрос в бд !!!!
+    #!!!! запрос в бд на добавление в батл !!!!
     await message.answer(
         text='Спасибо!\n\nОжидайте сообщения о начале раунда'
     )
@@ -111,14 +123,22 @@ async def warning_not_photo(message: Message):
              'ваше фото\n\nЕсли вы хотите прервать '
              'заполнение анкеты - отправьте команду /cancel'
     )
+# ---------------
 
 
+
+#-------------- 
 # Команды для администратора
 @admin_router.message(Command("admin"))
 async def cmd_admin(message: Message):
     await message.answer("Привет, админ! Ты в админской панели.")
+# --------------
 
+
+
+# --------
 # Обработка всех остальных сообщений
+
 @user_router.message()
 async def echo(message: Message):
     await message.answer(f"Вы сказали: {message.text}")
@@ -126,6 +146,7 @@ async def echo(message: Message):
 @admin_router.message()
 async def admin_echo(message: Message):
     await message.answer(f"Админ сказал: {message.text}")
+# -------------
 
 # Регистрируем роутеры в диспетчере
 dp.include_router(admin_router)
