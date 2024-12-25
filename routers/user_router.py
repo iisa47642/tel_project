@@ -56,6 +56,7 @@ async def support(message: Message, state: FSMContext):
 
 @user_router.message(lambda message: message.text == "Профиль", StateFilter(default_state))
 async def profile(message: Message, state: FSMContext):
+    
     await message.answer(
         text=
         f"ID: {message.from_user.id}\n"+

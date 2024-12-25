@@ -4,20 +4,17 @@ from aiogram.filters import StateFilter, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
 from aiogram.fsm.storage.memory import MemoryStorage
+from middlewares.middlewares import UserCheckMiddleware
 from aiogram.types import Message, PhotoSize
 from config.config import load_config
-import asyncio
-import logging
-import os
 from routers import admin_router
 from routers import user_router
 from states.user_states import FSMFillForm
 from database.db import *
-from aiogram import BaseMiddleware
-from typing import Callable, Dict, Any, Awaitable
-import sqlite3
-async def on_startup():
-    await create_tables()
+
+import asyncio
+import logging
+import os
 
 
 dirname = os.path.dirname(__file__)
@@ -44,24 +41,6 @@ dp.include_router(
     user_router.user_router
 )
 
-class UserCheckMiddleware(BaseMiddleware):
-    async def __call__(
-        self,
-        handler: Callable[[Message, Dict[str, Any]], Awaitable[Any]],
-        event: Message,
-        data: Dict[str, Any]
-    ) -> Any:
-        user_id = event.from_user.id
-        conn = sqlite3.connect('bot_database.db')
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM users WHERE user_id=?", (user_id,))
-        existing_user = cursor.fetchone()
-
-        if not existing_user and event.text != '/start':
-            await event.answer("Пожалуйста, используйте команду /start, чтобы начать работу с ботом.")
-            return
-
-        return await handler(event, data)
 
 
 
@@ -122,7 +101,7 @@ async def main():
         level=logging.INFO,
         format='%(asctime)s - %(levelname)s - %(message)s'
     )
-    await on_startup()
+    await create_tables()
     # Запускаем бота
     await dp.start_polling(bot)
 
