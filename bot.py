@@ -10,10 +10,13 @@ from config.config import load_config
 import asyncio
 import logging
 import os
-
 from routers import admin_router
 from routers import user_router
 from states.user_states import FSMFillForm
+from database.db import create_tables
+
+async def on_startup():
+    await create_tables()
 
 dirname = os.path.dirname(__file__)
 filename = os.path.join(dirname, 'config/config.env')
@@ -94,7 +97,7 @@ async def main():
         level=logging.INFO,
         format='%(asctime)s - %(levelname)s - %(message)s'
     )
-
+    await on_startup()
     # Запускаем бота
     await dp.start_polling(bot)
 
