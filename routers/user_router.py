@@ -35,8 +35,8 @@ async def send_message(message: MessageOriginChannel):
 # Команды для пользователей
 @user_router.message(CommandStart() ,StateFilter(default_state))
 async def cmd_start(message: Message):
-    await create_user(message.from_user.id, "user")
     await message.reply("Привет! Отправь мне /battle для участия в баттле",reply_markup=main_user_kb)
+    await create_user(message.from_user.id, "user")
 
 
 @user_router.message(Command("battle"), StateFilter(default_state))
