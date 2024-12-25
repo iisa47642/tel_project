@@ -5,7 +5,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
 from aiogram.fsm.storage.memory import MemoryStorage
 from middlewares.middlewares import UserCheckMiddleware
-from aiogram.types import Message, PhotoSize
+from aiogram.types import Message
 from config.config import load_config
 from routers import admin_router
 from routers import user_router
@@ -64,31 +64,6 @@ async def process_cancel_command_state(message: Message, state: FSMContext):
     await state.clear()
 
 
-@dp.message(StateFilter(FSMFillForm.fill_photo),
-            F.photo[-1].as_('largest_photo'))
-async def process_photo_sent(message: Message,
-                             state: FSMContext,
-                             largest_photo: PhotoSize):
-    await state.update_data(
-        photo_unique_id=largest_photo.file_unique_id,
-        photo_id=largest_photo.file_id
-    )
-    # !!!! запрос в бд на добавление в батл !!!!
-    await message.answer(
-        text='Спасибо!\n\nОжидайте сообщения о начале раунда'
-    )
-    await create_user_in_batl()
-
-    await state.clear()
-
-
-@dp.message(StateFilter(FSMFillForm.fill_photo))
-async def warning_not_photo(message: Message):
-    await message.answer(
-        text='Пожалуйста, на этом шаге отправьте '
-             'ваше фото\n\nЕсли вы хотите прервать '
-             'заполнение анкеты - отправьте команду /cancel'
-    )
 
 
 # ---------------

@@ -98,8 +98,8 @@ async def delete_user(user_id: int):
 # -------------------- запросы к таблице текущего баттла
 async def create_user_in_batl(user_id, photo_id, role):
      async with sq.connect("bot_database.db") as db:
-        async with db.execute(f"SELECT 1 FROM battle WHERE user_id == '{user_id}'").fetchone() as cursor:
-            user = cursor.fetchone()
+        async with db.execute(f"SELECT 1 FROM battle WHERE user_id == '{user_id}'") as cursor:
+            user = await cursor.fetchone()
             if not user:
                 await cursor.execute("INSERT INTO battle VALUES(?, ?, ?, ?)", (user_id,photo_id,0,role))
                 await db.commit()
