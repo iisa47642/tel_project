@@ -2,7 +2,9 @@ from aiogram import Router, Bot
 from aiogram.filters import Command
 from aiogram.types import Message
 
+import keyboards
 from filters.isAdmin import is_admin
+from keyboards.admin_keyboards import *
 
 admin_router = Router()
 admin_router.message.filter(is_admin)
@@ -15,7 +17,7 @@ def setup_router(dp, bot: Bot):
 
 @admin_router.message(Command("admin"))
 async def cmd_admin(message: Message):
-    await message.answer("Привет, админ! Ты в админской панели.")
+    await message.answer("Привет, админ! Ты в админской панели.", reply_markup=main_admin_kb)
 
 
 @admin_router.message(lambda message: message.text == "Назад")

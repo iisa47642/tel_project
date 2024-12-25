@@ -56,11 +56,11 @@ class UserCheckMiddleware(BaseMiddleware):
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM users WHERE user_id=?", (user_id,))
         existing_user = cursor.fetchone()
-        
+
         if not existing_user and event.text != '/start':
             await event.answer("Пожалуйста, используйте команду /start, чтобы начать работу с ботом.")
             return
-        
+
         return await handler(event, data)
 
 
