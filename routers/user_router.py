@@ -4,8 +4,13 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
 from aiogram.types import Message, MessageOriginChannel
 
+from keyboards.user_keyboards import main_user_kb, vote_user_kb, support_user_kb
+from keyboards.admin_keyboards import *
+
+
 from states.user_states import FSMFillForm
 from filters.isAdmin import is_admin
+from keyboards import user_keyboards
 
 _bot: Bot = None  # Placeholder for the bot instance
 
@@ -29,7 +34,7 @@ async def send_message(message: MessageOriginChannel):
 # Команды для пользователей
 @user_router.message(CommandStart() ,StateFilter(default_state))
 async def cmd_start(message: Message):
-    await message.answer("Привет! Отправь мне /battle для участия в баттле")
+    await message.reply("Привет! Отправь мне /battle для участия в баттле",reply_markup=support_user_kb)
 
 
 @user_router.message(Command("battle"), StateFilter(default_state))
