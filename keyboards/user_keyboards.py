@@ -4,13 +4,12 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMar
 
 main_user_kb = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text="Поддержка",url="https://www.google.com/")],
+        [KeyboardButton(text="Поддержка")],
         [KeyboardButton(text="Принять участие")],
         [KeyboardButton(text="Получить голоса"),KeyboardButton(text="Профиль")]
     ],
     resize_keyboard=True
 )
-
 
 #######################     InlineKeyboards          ##########################################
 
