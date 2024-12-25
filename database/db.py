@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 # -------------------- Функция для создания таблиц
 async def create_tables():
-    global db, cursor
+    # global db, cursor
     db = sq.connect("bot_database.db")
     cursor = db.cursor()    
     # Создание таблицы пользователей
@@ -45,13 +45,15 @@ async def create_tables():
     ''')
 
     db.commit()
-    db.close()
     print("База данных успешно создана!")
 
 
 
 async def create_user(user_id, role):
-    user = cursor.execute(f"SELECT 1 FROM users WHERE user_id == '{user_id}'").fetchone()
+    db = sq.connect("bot_database.db")
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM users WHERE user_id=?", (user_id,))
+    user = cursor.fetchone()
     if not user:
         cursor.execute("INSERT INTO users VALUES(?, ?, ?, ?, ?, ?, ?, ?)", (user_id,0,0,0,0,0,role,0))
         db.commit()
@@ -99,6 +101,8 @@ async def delete_user(user_id: int):
 
 # -------------------- запросы к таблице текущего баттла
 async def create_user_in_batl(user_id, photo_id, role):
+    db = sq.connect("bot_database.db")
+    cursor = db.cursor()
     user = cursor.execute(f"SELECT 1 FROM battle WHERE user_id == '{user_id}'").fetchone()
     if not user:
         cursor.execute("INSERT INTO battle VALUES(?, ?, ?, ?)", (user_id,photo_id,0,role))
@@ -134,6 +138,8 @@ async def delete_user_in_batl(user_id):
          
 # ---------------- запросы к таблице заявок на текущий батл
 async def create_application(user_id, photo_id):
+    db = sq.connect("bot_database.db")
+    cursor = db.cursor()
     user = cursor.execute(f"SELECT 1 FROM application WHERE user_id == '{user_id}'").fetchone()
     if not user:
         cursor.execute("INSERT INTO application VALUES(?, ?)", (user_id,photo_id))

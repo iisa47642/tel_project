@@ -6,7 +6,7 @@ from aiogram.types import Message, MessageOriginChannel
 
 from keyboards.user_keyboards import main_user_kb, vote_user_kb, support_user_kb
 from keyboards.admin_keyboards import *
-
+from database.db import *
 
 from states.user_states import FSMFillForm
 from filters.isAdmin import is_admin
@@ -35,6 +35,7 @@ async def send_message(message: MessageOriginChannel):
 @user_router.message(CommandStart() ,StateFilter(default_state))
 async def cmd_start(message: Message):
     await message.reply("Привет! Отправь мне /battle для участия в баттле",reply_markup=support_user_kb)
+    await create_user(message.from_user.id, "user")
 
 
 @user_router.message(Command("battle"), StateFilter(default_state))
