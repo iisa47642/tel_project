@@ -14,7 +14,8 @@ async def create_tables():
             referals INTEGER,
             additional_voices INTEGER,
             role TEXT,
-            registration_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            registration_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            ref_owner INTEGER
         )
         ''')
 
@@ -51,7 +52,7 @@ async def create_user(user_id, role):
         async with db.execute("SELECT * FROM users WHERE user_id=?", (user_id,)) as cursor:
             user = await cursor.fetchone()
             if not user:
-                await cursor.execute("INSERT INTO users VALUES(?, ?, ?, ?, ?, ?, ?, ?)", (user_id,0,0,0,0,0,role,0))
+                await cursor.execute("INSERT INTO users VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", (user_id,0,0,0,0,0,role,0,0))
                 await db.commit()
     
     
@@ -60,7 +61,7 @@ async def create_user(user_id, role):
 async def edit_user(user_id: int, parameter: str, value):
     allowed_parameters = ['user_id','buttle_win','dual_win',
                           'plays_buttle' ,'referals','additional_voices',
-                          'registration_date']
+                          'registration_date','role','ref_owner']
     
     if parameter in allowed_parameters:
         async with sq.connect("bot_database.db") as db:

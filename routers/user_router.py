@@ -34,17 +34,23 @@ async def send_message(message: MessageOriginChannel):
 #-----------
 # Команды для пользователей
 @user_router.message(CommandStart() ,StateFilter(default_state))
-async def cmd_start(message: Message,state: FSMContext,bot: Bot,command: Command = None):
-    # декодируем рефералку и получаем айди владельца рефералки
-    if command:
-        args = command.args
-        reference = decode_payload(args)
-        print(reference)
+async def cmd_start(message: Message,state: FSMContext,command: Command):
+    # декод рефералки и добавление реферала в бд
+    args = message.text.split()[1] if len(message.text.split()) > 1 else None
+    if args:
+            payload = decode_payload(args)
+            referrer_id = int(payload)
+            user_id = message.from_user.id
+            await create_user(user_id, "user")
+            if user_id != referrer_id:
+                await edit_user(user_id, 'ref_owner', referrer_id)
+    else:
+        await create_user(message.from_user.id, "user")
     await message.reply("Привет! Отправь мне /battle для участия в баттле",reply_markup=main_user_kb)
-    await create_user(message.from_user.id, "user")
 
 
 @user_router.message(Command("battle"), StateFilter(default_state))
+@user_router.message(F.text=="Принять участие",StateFilter(default_state))
 async def cmd_battle(message: Message, state: FSMContext):
     await message.answer("Отправь мне свое фото для баттла.")
     await state.set_state(FSMFillForm.fill_photo)
@@ -108,12 +114,15 @@ async def profile(message: Message, state: FSMContext):
         f"Дополнительные голоса: {additional_voices}\n"
         f"Приглашенных рефералов: {referals}"
     )
-
-# хендлер для создания ссылок 
-@user_router.message(Command('ref'))
+    
+# хендлер для создания рефералок 
+@user_router.message(lambda message: message.text == "Получить голоса", StateFilter(default_state))
 async def mt_referal_menu (message: Message, state: FSMContext, bot: Bot):
     link = await create_start_link(bot,str(message.from_user.id), encode=True)
-    print(link)
+    await message.answer(
+        text=f"Ваша реферальная ссылка {link}"
+    )
+
 
 
 @user_router.message()
