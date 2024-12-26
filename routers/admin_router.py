@@ -65,14 +65,26 @@ async def photo_moderation(message: Message):
 @admin_router.callback_query(lambda query: query.data == "Принять")
 async def apply(message: Message):
     await message.answer(text="ok", reply_markup=mailing_admin_kb)
+    application = await select_all_applications()[0]
+    user_id = application[0]
+    photo_id = application[1]
+    await create_user_in_batl(user_id,photo_id)
+    await delete_application(user_id)
 
 @admin_router.callback_query(lambda query: query.data == "Отклонить")
 async def decline(message: Message):
     await message.answer(text="ok", reply_markup=mailing_admin_kb)
+    application = await select_all_applications()[0]
+    user_id = application[0]
+    await delete_application(user_id)
 
 @admin_router.callback_query(lambda query: query.data == "Забанить")
 async def ban(message: Message):
     await message.answer(text="ok", reply_markup=mailing_admin_kb)
+    application = await select_all_applications()[0]
+    user_id = application[0]
+    await edit_user(user_id,'is_ban',1)
+    await delete_application()
 
 
 ####################################                    Статистика                      #################################
