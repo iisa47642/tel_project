@@ -1,6 +1,6 @@
 from aiogram.types import Message
 
-ADMIN_ID = []
+ADMIN_ID = [1270990667]
 # 842589261,1270990667
 
 def is_admin(message: Message) -> bool:

@@ -1,5 +1,4 @@
-from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
-
+from aiogram.types import KeyboardButton, ReplyKeyboardMarkup, InlineKeyboardMarkup, InlineKeyboardButton
 
 #######################     ReplyKeyBoards          ##########################################
 
@@ -13,14 +12,14 @@ main_admin_kb = ReplyKeyboardMarkup(
     resize_keyboard=True
 )
 
-photo_moderation_admin_kb = ReplyKeyboardMarkup(
-    keyboard=[
-        [KeyboardButton(text="Принять"), KeyboardButton(text="Отклонить")],
-        [KeyboardButton(text="Забанить")],
-        [KeyboardButton(text="Назад")]
-    ],
-    resize_keyboard=True
-)
+# photo_moderation_admin_kb = ReplyKeyboardMarkup(
+#     keyboard=[
+#         [KeyboardButton(text="Принять"), KeyboardButton(text="Отклонить")],
+#         [KeyboardButton(text="Забанить")],
+#         [KeyboardButton(text="Назад")]
+#     ],
+#     resize_keyboard=True
+# )
 
 mailing_admin_kb = ReplyKeyboardMarkup(
     keyboard=[
@@ -53,3 +52,13 @@ tune_battle_admin_kb = ReplyKeyboardMarkup(
 
 
 #######################     InlineKeyboards          ##########################################
+
+
+photo_moderation_admin_kb = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [InlineKeyboardButton(text="Принять",callback_data="Принять"), InlineKeyboardButton(text="Отклонить",callback_data="Отклонить")],
+        [InlineKeyboardButton(text="Забанить",callback_data="Забанить")],
+    ],
+    resize_keyboard=True
+)
+
