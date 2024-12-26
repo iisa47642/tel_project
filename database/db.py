@@ -1,6 +1,7 @@
 # database/database.py
 import aiosqlite as sq
 
+
 # -------------------- Функция для создания таблиц
 async def create_tables():
     async with sq.connect("bot_database.db") as db:
