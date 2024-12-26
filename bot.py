@@ -4,7 +4,7 @@ from aiogram.filters import StateFilter, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
 from aiogram.fsm.storage.memory import MemoryStorage
-from middlewares.middlewares import ModeMiddleware, UserCheckMiddleware, allowed_in_modes
+from middlewares.middlewares import ModeMiddleware, UserCheckMiddleware
 from aiogram.types import Message
 from config.config import load_config
 from routers import admin_router
@@ -70,11 +70,8 @@ async def process_cancel_command_state(message: Message, state: FSMContext):
 
 
 async def main():
+    dp.update.outer_middleware(ModeMiddleware())
     user_router.user_router.message.middleware(UserCheckMiddleware())
-    user_router.user_router.message.middleware(ModeMiddleware())
-    user_router.user_router.callback_query.middleware(ModeMiddleware())
-    user_router.user_router.inline_query.middleware(ModeMiddleware())
-    user_router.user_router.chat_join_request.middleware(ModeMiddleware())
 
     logging.basicConfig(
         level=logging.INFO,
