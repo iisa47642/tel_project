@@ -7,6 +7,7 @@ from aiogram.utils.deep_linking import create_start_link, decode_payload
 from database.db import *
 from keyboards.user_keyboards import main_user_kb, vote_user_kb, support_user_kb
 from keyboards.admin_keyboards import *
+from middlewares.middlewares import allowed_in_modes
 
 
 from states.user_states import FSMFillForm
@@ -34,6 +35,7 @@ async def send_message(message: MessageOriginChannel):
 #-----------
 # Команды для пользователей
 @user_router.message(CommandStart() ,StateFilter(default_state))
+@allowed_in_modes(2)
 async def cmd_start(message: Message,state: FSMContext,command: Command):
     # декод рефералки и добавление реферала в бд
     args = message.text.split()[1] if len(message.text.split()) > 1 else None
