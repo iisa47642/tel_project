@@ -43,7 +43,6 @@ dp.include_router(
 
 
 
-
 @dp.message(Command(commands='cancel'), StateFilter(default_state))
 async def process_cancel_command(message: Message):
     await message.answer(

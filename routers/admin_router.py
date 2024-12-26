@@ -1,4 +1,4 @@
-from aiogram import Router, Bot
+from aiogram import Router, Bot, F
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
@@ -19,6 +19,10 @@ def setup_router(dp, bot: Bot):
     global _bot
     _bot = bot
 
+
+#####################################               Общее                          ##########################################
+
+
 @admin_router.message(Command("admin"),StateFilter(default_state))
 async def cmd_admin(message: Message):
     await message.answer("Привет, админ! Ты в админской панели.", reply_markup=main_admin_kb)
@@ -27,6 +31,8 @@ async def cmd_admin(message: Message):
 @admin_router.message(lambda message: message.text == "Назад")
 async def photo_moderation(message: Message):
     await message.answer(text="Назад",reply_markup=main_admin_kb)
+
+#########################                       Модерация фотографий                ##########################################
 
 @admin_router.message(lambda message: message.text == "Модерация фотографий")
 async def photo_moderation(message: Message):
@@ -69,6 +75,9 @@ async def ban(message: Message):
     await message.answer(text="ok", reply_markup=mailing_admin_kb)
 
 
+####################################                    Статистика                      #################################
+
+
 @admin_router.message(lambda message: message.text == "Статистика")
 async def statistics(message: Message):
     await message.answer(text=
@@ -76,6 +85,9 @@ async def statistics(message: Message):
                          f"Количество отправленных фотографий: \n"+
                          f"Количество активных участников баттла: \n"
                          , reply_markup=main_admin_kb)
+
+
+####################################                    Рассылка                      #################################
 
 
 @admin_router.message(lambda message: message.text == "Рассылка")
@@ -125,48 +137,62 @@ async def enter_duration_of_round(message: Message, state: FSMContext):
     await message.answer(text="Введите продолжительность раунда",reply_markup=tune_battle_admin_kb)
     await state.set_state(FSMFillForm.fill_duration_of_battle)
 
-#TODO add validation
-@admin_router.message(StateFilter(FSMFillForm.fill_duration_of_battle))
+
+@admin_router.message(StateFilter(FSMFillForm.fill_duration_of_battle),F.text.regexp(r"^\d+$"))
 async def get_duration_of_round(message: Message, state: FSMContext):
     await message.answer(text="Данные получены",reply_markup=tune_battle_admin_kb)
     await state.set_state(default_state)
 
+@admin_router.message(StateFilter(FSMFillForm.fill_duration_of_battle))
+async def get_duration_of_round_invalid(message: Message):
+    await message.answer(text="Вы ввели неверные данные. Пожалуйста, попробуйте снова.",reply_markup=tune_battle_admin_kb)
 
 
 @admin_router.message(lambda message: message.text == "Сумма приза",StateFilter(default_state))
-async def enter_duration_of_round(message: Message, state: FSMContext):
+async def enter_amount_of_prize(message: Message, state: FSMContext):
     await message.answer(text="Введите сумму приза",reply_markup=tune_battle_admin_kb)
     await state.set_state(FSMFillForm.fill_amount_of_prize)
 
-#TODO add validation
-@admin_router.message(StateFilter(FSMFillForm.fill_amount_of_prize))
-async def get_duration_of_round(message: Message, state: FSMContext):
+@admin_router.message(StateFilter(FSMFillForm.fill_amount_of_prize),F.text.regexp(r"^\d+$"))
+async def get_amount_of_prize(message: Message, state: FSMContext):
     await message.answer(text="Данные получены",reply_markup=tune_battle_admin_kb)
     await state.set_state(default_state)
+
+@admin_router.message(StateFilter(FSMFillForm.fill_amount_of_prize))
+async def get_amount_of_prize_invalid(message: Message):
+    await message.answer(text="Вы ввели неверные данные. Пожалуйста, попробуйте снова.",reply_markup=tune_battle_admin_kb)
+
 
 
 @admin_router.message(lambda message: message.text == "Минимальное количество голосов",StateFilter(default_state))
-async def enter_duration_of_round(message: Message, state: FSMContext):
+async def enter_minimal_number_of_votes(message: Message, state: FSMContext):
     await message.answer(text="Введите минимальное количество голосов",reply_markup=tune_battle_admin_kb)
     await state.set_state(FSMFillForm.fill_minimal_number_of_votes)
 
-#TODO add validation
-@admin_router.message(StateFilter(FSMFillForm.fill_minimal_number_of_votes))
-async def get_duration_of_round(message: Message, state: FSMContext):
+@admin_router.message(StateFilter(FSMFillForm.fill_minimal_number_of_votes),F.text.regexp(r"^\d+$"))
+async def get_minimal_number_of_votes(message: Message, state: FSMContext):
     await message.answer(text="Данные получены",reply_markup=tune_battle_admin_kb)
     await state.set_state(default_state)
+
+@admin_router.message(StateFilter(FSMFillForm.fill_minimal_number_of_votes))
+async def get_minimal_number_of_votes_invalid(message: Message):
+    await message.answer(text="Вы ввели неверные данные. Пожалуйста, попробуйте снова.",reply_markup=tune_battle_admin_kb)
 
 
 @admin_router.message(lambda message: message.text == "Интервал между раундами",StateFilter(default_state))
-async def enter_duration_of_round(message: Message, state: FSMContext):
+async def enter_interval_between_rounds(message: Message, state: FSMContext):
     await message.answer(text="Введите интервал между раундами",reply_markup=tune_battle_admin_kb)
     await state.set_state(FSMFillForm.fill_interval_between_battles)
 
-#TODO add validation
-@admin_router.message(StateFilter(FSMFillForm.fill_interval_between_battles))
-async def get_duration_of_round(message: Message, state: FSMContext):
+@admin_router.message(StateFilter(FSMFillForm.fill_interval_between_battles),F.text.regexp(r"^\d+$"))
+async def get_interval_between_rounds(message: Message, state: FSMContext):
     await message.answer(text="Данные получены",reply_markup=tune_battle_admin_kb)
     await state.set_state(default_state)
+
+@admin_router.message(StateFilter(FSMFillForm.fill_interval_between_battles))
+async def get_interval_between_rounds_invalid(message: Message):
+    await message.answer(text="Вы ввели неверные данные. Пожалуйста, попробуйте снова.",reply_markup=tune_battle_admin_kb)
+
 
 #@admin_router.message()
 
