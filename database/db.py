@@ -15,7 +15,8 @@ async def create_tables():
             additional_voices INTEGER,
             role TEXT,
             registration_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            ref_owner INTEGER
+            ref_owner INTEGER,
+            is_ban INTEGER
         )
         ''')
 
@@ -52,7 +53,7 @@ async def create_user(user_id, role):
         async with db.execute("SELECT * FROM users WHERE user_id=?", (user_id,)) as cursor:
             user = await cursor.fetchone()
             if not user:
-                await cursor.execute("INSERT INTO users VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", (user_id,0,0,0,0,0,role,0,0))
+                await cursor.execute("INSERT INTO users VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (user_id,0,0,0,0,0,role,0,0,0))
                 await db.commit()
     
     
@@ -183,4 +184,12 @@ async def get_user(user_id: int):
 async def get_all_users():
     async with sq.connect("bot_database.db") as db:
         async with db.execute('SELECT * FROM users') as cursor:
+            return await cursor.fetchall()
+
+# -----------------
+# возвращает список заявок
+
+async def select_all_applications():
+    async with sq.connect("bot_database.db") as db:
+        async with db.execute('SELECT * FROM application') as cursor:
             return await cursor.fetchall()

@@ -69,6 +69,4 @@ class ModeMiddleware(BaseMiddleware):
 
         # Добавляем текущий режим в data для использования в фильтре
         data['current_mode'] = current_mode
-        print(current_mode)
-        print("Middleware call")
         return await handler(event, data)
