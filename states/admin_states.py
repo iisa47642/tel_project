@@ -7,3 +7,6 @@ class FSMFillForm(StatesGroup):
     fill_interval_between_battles = State()
     fill_id_of_new_admin = State()
     fill_id_of_old_admin = State()
+    fill_message_for_all = State()
+    fill_message_for_moder = State()
+    fill_message_for_user_on_battle = State()

@@ -51,8 +51,13 @@ async def cmd_start(message: Message,state: FSMContext,command: Command):
 @user_router.message(Command("battle"), StateFilter(default_state))
 @user_router.message(F.text=="Принять участие",StateFilter(default_state))
 async def cmd_battle(message: Message, state: FSMContext):
-    await message.answer("Отправь мне свое фото для баттла.")
-    await state.set_state(FSMFillForm.fill_photo)
+    user_id = message.from_user.id
+    application = await select_application(user_id)
+    if not application:
+        await message.answer("Отправь мне свое фото для баттла.")
+        await state.set_state(FSMFillForm.fill_photo)
+    else:
+        await message.answer("Вы уже зарегистрированы на баттл")
 
 
 

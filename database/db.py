@@ -43,6 +43,16 @@ async def create_tables():
             photo_id INTEGER PRIMARY KEY
         )
         ''')
+        
+        await db.execute('''
+        CREATE TABLE IF NOT EXISTS battle_settings (
+            round_duration INTEGER,
+            prize_amount INTEGER,
+            min_vote_total INTEGER,
+            round_interval INTEGER,
+            time_of_run INTEGER
+        )
+        ''')
 
         await db.commit()
         print("База данных успешно создана!")
@@ -132,6 +142,13 @@ async def delete_user_in_batl(user_id):
                 await db.execute("DELETE FROM battle WHERE user_id = ?", (user_id,))
                 await db.commit()
          
+async def delete_users_in_batl():
+    async with sq.connect("bot_database.db") as db:
+        # Проверяем, существует ли пользователь
+            
+            # Удаляем пользователей
+        await db.execute("DELETE FROM battle", )
+        await db.commit()
          
 # ---------------- запросы к таблице заявок на текущий батл
 async def create_application(user_id, photo_id):
@@ -157,7 +174,7 @@ async def edite_application(user_id):
                     await db.commit()
 
 
-async def delete_application(user_id):
+async def delete_application(user_id: int):
     async with sq.connect("bot_database.db") as db:
         # Проверяем, существует ли пользователь
         async with db.execute("SELECT user_id FROM application WHERE user_id = ?", (user_id,)) as cursor:
@@ -168,6 +185,34 @@ async def delete_application(user_id):
             # Удаляем пользователя
                 await db.execute("DELETE FROM application WHERE user_id = ?", (user_id,))
                 await db.commit()
+
+
+async def delete_applications():
+    async with sq.connect("bot_database.db") as db:
+        # Проверяем, существует ли пользователь
+            
+            # Удаляем пользователей
+        await db.execute("DELETE FROM application", )
+        await db.commit()
+        
+# изменение настроек
+async def edit_battle_settings(parameter: str, value):
+    allowed_parameters = ['round_duration','prize_amount',
+            'min_vote_total','round_interval', 'time_of_run']
+    
+    if parameter in allowed_parameters:
+        async with sq.connect("bot_database.db") as db:
+                    # Формируем SQL-запрос динамически
+                async with db.execute("SELECT * FROM battle_settings") as cursor:
+                    existing = await cursor.fetchall()
+                    if not existing:
+                        await db.execute("INSERT INTO battle_settings VALUES(?, ?, ?, ?, ?)", (7200,1000,5,1800,50400))
+                        await db.commit()
+                            
+                    query = f"UPDATE battle_settings SET {parameter} = ?"
+                    await db.execute(query, (value,))
+                    await db.commit()
+                        
 
 # -------------- Selects
 
@@ -194,3 +239,33 @@ async def select_all_applications():
     async with sq.connect("bot_database.db") as db:
         async with db.execute('SELECT * FROM application') as cursor:
             return await cursor.fetchall()
+        
+        
+# возвращает конкретную заявку
+async def select_application(user_id: int):
+    async with sq.connect("bot_database.db") as db:
+        async with db.execute('SELECT * FROM application WHERE user_id = ?', (user_id,)) as cursor:
+            existing_user = await cursor.fetchone()
+            if existing_user:
+                return existing_user
+            return False
+        
+        
+# возвращает всех участников баттла
+async def select_all_battle():
+    async with sq.connect("bot_database.db") as db:
+        async with db.execute('SELECT * FROM battle') as cursor:
+            return await cursor.fetchall()
+        
+# настройки баттла
+async def select_battle_settings():
+    async with sq.connect("bot_database.db") as db:
+        async with db.execute('SELECT * FROM battle_settings') as cursor:
+            flag = await cursor.fetchall()
+            if not flag:
+                await db.execute("INSERT INTO battle_settings VALUES(?, ?, ?, ?, ?)", (7200,1000,5,1800,50400))
+                await db.commit()
+                # Делаем новый SELECT после вставки
+                async with db.execute('SELECT * FROM battle_settings') as new_cursor:
+                    return (await new_cursor.fetchall())[0]
+            return flag[0]
