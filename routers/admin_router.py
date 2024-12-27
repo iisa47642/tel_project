@@ -1,3 +1,5 @@
+import re
+
 from aiogram import Router, Bot, F
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
@@ -249,35 +251,37 @@ async def get_duration_of_round(message: Message, state: FSMContext):
 async def battle_moderation(message: Message):
     await message.answer(text="Настройка баттла",reply_markup=tune_battle_admin_kb)
 
-@admin_router.message(lambda message: message.text == "Текущие настройки баттла",StateFilter(default_state))
+@admin_router.message(lambda message: message.text == "Текущие настройки",StateFilter(default_state))
 async def current_battle_settings(message: Message):
     settings = await select_battle_settings()
     print(settings)
-    round_duration = settings[0]
+    round_duration = settings[0]//60
     prize_amount = settings[1]
     min_vote_total = settings[2]
-    round_interval = settings[3]
+    round_interval = settings[3]//60
+    start_time = settings[4]
+    hours = start_time // 3600
+    minutes = (start_time % 3600) // 60
     await message.answer(text=
-                        f"Текущие настройки баттла: \n" 
-                        f"Продолжительность раунда: {round_duration}\n"+
+                        f"Текущие настройки баттла: \n\n" 
+                        f"Продолжительность раунда: {round_duration} мин\n"+
                         f"Сумма приза: {prize_amount}\n"+
                         f"Минимальное количество голосов: {min_vote_total}\n"+
-                        f"Интервал между раундами: {round_interval}",
+                        f"Интервал между раундами: {round_interval} мин\n"+
+                        f"Время начала баттла: {hours:02d}:{minutes:02d} ",
                          reply_markup=tune_battle_admin_kb)
 
 
 @admin_router.message(lambda message: message.text == "Продолжительность раунда",StateFilter(default_state))
 async def enter_duration_of_round(message: Message, state: FSMContext):
-    await message.answer(text="Введите продолжительность раунда в формате hour:min",reply_markup=back_admin_kb)
+    await message.answer(text="Введите продолжительность раунда в минутах",reply_markup=back_admin_kb)
     await state.set_state(FSMFillForm.fill_duration_of_battle)
 
 
 @admin_router.message(StateFilter(FSMFillForm.fill_duration_of_battle),F.text.regexp(r"^\d+$"))
 async def get_duration_of_round(message: Message, state: FSMContext):
-    txt = message.text
-    hours = int(txt[:2])
-    minutes = int(txt[2:])
-    seconds = hours * 3600 + minutes * 60
+    minutes = int(message.text)
+    seconds = minutes * 60
     parametr = 'round_duration'
     await edit_battle_settings(parametr, seconds)
     await message.answer(text="Данные получены",reply_markup=tune_battle_admin_kb)
@@ -332,10 +336,8 @@ async def enter_interval_between_rounds(message: Message, state: FSMContext):
 
 @admin_router.message(StateFilter(FSMFillForm.fill_interval_between_battles),F.text.regexp(r"^\d+$"))
 async def get_interval_between_rounds(message: Message, state: FSMContext):
-    txt = message.text
-    hours = int(txt[:2])
-    minutes = int(txt[2:])
-    seconds = hours * 3600 + minutes * 60
+    minutes = int(message.text)
+    seconds = minutes * 60
     parametr = 'round_interval'
     await edit_battle_settings(parametr, seconds)
     await message.answer(text="Данные получены",reply_markup=tune_battle_admin_kb)
@@ -343,6 +345,27 @@ async def get_interval_between_rounds(message: Message, state: FSMContext):
 
 @admin_router.message(StateFilter(FSMFillForm.fill_interval_between_battles))
 async def get_interval_between_rounds_invalid(message: Message):
+    await message.answer(text="Вы ввели неверные данные. Пожалуйста, попробуйте снова.",reply_markup=back_admin_kb)
+
+
+
+@admin_router.message(lambda message: message.text == "Время начала баттла",StateFilter(default_state))
+async def enter_start_time_of_battle(message: Message, state: FSMContext):
+    await message.answer(text="Введите время начала баттла по МСК в формате hh:mm",reply_markup=back_admin_kb)
+    await state.set_state(FSMFillForm.fill_start_time_of_battle)
+
+@admin_router.message(StateFilter(FSMFillForm.fill_start_time_of_battle),F.text.regexp(r'^([01]?[0-9]|2[0-3]):([0-5][0-9])$'))
+async def get_start_time_of_battle(message: Message, state: FSMContext):
+    match = re.match(r'^([01]?[0-9]|2[0-3]):([0-5][0-9])$', message.text)
+    hours, minutes = map(int, match.groups())
+    seconds = hours * 60 * 60 + minutes * 60
+    parametr = 'time_of_run'
+    await edit_battle_settings(parametr, seconds)
+    await message.answer(text="Данные получены",reply_markup=tune_battle_admin_kb)
+    await state.clear()
+
+@admin_router.message(StateFilter(FSMFillForm.fill_start_time_of_battle))
+async def get_start_time_of_battle_invalid(message: Message):
     await message.answer(text="Вы ввели неверные данные. Пожалуйста, попробуйте снова.",reply_markup=back_admin_kb)
 
 
