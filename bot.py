@@ -4,13 +4,14 @@ from aiogram.filters import StateFilter, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
 from aiogram.fsm.storage.memory import MemoryStorage
-from middlewares.middlewares import ModeMiddleware, UserCheckMiddleware
+from middlewares.middlewares import ModeMiddleware, ThrottlingMiddleware, UserCheckMiddleware
 from aiogram.types import Message
 from config.config import load_config
 from routers import admin_router
 from routers import user_router
 from states.user_states import FSMFillForm
 from database.db import *
+from tasks import scheduler_manager
 
 import asyncio
 import logging
@@ -21,7 +22,8 @@ dirname = os.path.dirname(__file__)
 filename = os.path.join(dirname, 'config/config.env')
 config = load_config(filename)
 
-
+async def on_shutdown(dp):
+    scheduler_manager.shutdown()
 
 # Инициализация бота и диспетчера с хранилищем состояний
 bot = Bot(token=config.tg_bot.token)
@@ -69,6 +71,7 @@ async def process_cancel_command_state(message: Message, state: FSMContext):
 
 
 async def main():
+    dp.message.middleware(ThrottlingMiddleware())
     dp.update.outer_middleware(ModeMiddleware())
     user_router.user_router.message.middleware(UserCheckMiddleware())
 
@@ -78,7 +81,14 @@ async def main():
     )
     await create_tables()
     # Запускаем бота
-    await dp.start_polling(bot)
+    scheduler_manager.setup(bot)  # Настраиваем планировщик
+    scheduler_manager.start()
+    
+    try:
+        await dp.start_polling(bot)  # 1
+    finally:
+        await bot.session.close()    # 2
+        scheduler_manager.shutdown()  # 3
 
 
 if __name__ == "__main__":
