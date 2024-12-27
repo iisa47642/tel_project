@@ -32,7 +32,7 @@ async def send_message(message: MessageOriginChannel):
 # -----------
 #-----------
 # Команды для пользователей
-@user_router.message(mode_filter(2),CommandStart() ,StateFilter(default_state))
+@user_router.message(mode_filter(1),CommandStart() ,StateFilter(default_state))
 async def cmd_start(message: Message,state: FSMContext,command: Command):
     # декод рефералки и добавление реферала в бд
     args = message.text.split()[1] if len(message.text.split()) > 1 else None
