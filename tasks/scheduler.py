@@ -19,9 +19,9 @@ class SchedulerManager:
         self.scheduler.add_job(
             self.task_manager.mode_1_task,
             trigger='cron',
-            hour='*',
+            hour='*/1',
             minute='*',
-            second='*/5',
+            second='*',
             name='Mode 1 Task'
         )
 

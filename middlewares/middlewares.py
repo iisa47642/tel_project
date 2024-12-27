@@ -6,7 +6,6 @@ from aiogram.types import Message, CallbackQuery, TelegramObject
 from database.db import get_user
 from datetime import datetime, time, timedelta
 import pytz
-# from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import logging
 
 _bot: Bot = None  # Placeholder for the bot instance
@@ -36,11 +35,11 @@ def get_current_mode() -> int:
 
 
 class ThrottlingMiddleware(BaseMiddleware):
-    def init(self, limit=0.3):
+    def __init__(self, limit=0.3):
         self.rate_limit = limit
         self.user_timeouts = {}
 
-    async def call(
+    async def __call__(
         self,
         handler: Callable[[Message, Dict[str, Any]], Awaitable[Any]],
         event: Message,
