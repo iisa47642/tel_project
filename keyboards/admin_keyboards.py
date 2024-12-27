@@ -50,6 +50,13 @@ tune_battle_admin_kb = ReplyKeyboardMarkup(
     resize_keyboard=True
 )
 
+back_admin_kb = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton(text="Назад")]
+    ],
+    resize_keyboard=True
+)
+
 
 #######################     InlineKeyboards          ##########################################
 
