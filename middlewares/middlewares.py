@@ -35,7 +35,7 @@ def get_current_mode() -> int:
 
 
 class ThrottlingMiddleware(BaseMiddleware):
-    def __init__(self, limit=0.3):
+    def __init__(self, limit=0.75):
         self.rate_limit = limit
         self.user_timeouts = {}
 
@@ -50,7 +50,6 @@ class ThrottlingMiddleware(BaseMiddleware):
         if user_id in self.user_timeouts:
             last_time = self.user_timeouts[user_id]
             if datetime.now() - last_time < timedelta(seconds=self.rate_limit):
-                await asyncio.sleep(0.2)
                 return
 
         self.user_timeouts[user_id] = datetime.now()

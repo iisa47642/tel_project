@@ -82,7 +82,7 @@ async def main():
     await create_tables()
     # Запускаем бота
     scheduler_manager.setup(bot)  # Настраиваем планировщик
-    scheduler_manager.start()
+    #scheduler_manager.start()
     
     try:
         await dp.start_polling(bot)  # 1
