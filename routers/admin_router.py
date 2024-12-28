@@ -1,3 +1,4 @@
+import os
 import re
 
 from aiogram import Router, Bot, F
@@ -6,11 +7,14 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
 from aiogram.types import Message, CallbackQuery
 
+from config.config import load_config
 import keyboards
 from filters.isAdmin import is_admin
 from keyboards.admin_keyboards import *
 from database.db import *
 from states.admin_states import FSMFillForm
+
+
 
 admin_router = Router()
 admin_router.message.filter(is_admin)
@@ -21,6 +25,37 @@ def setup_router(dp, bot: Bot):
     global _bot
     _bot = bot
 
+async def gen_mode_aplic(application):
+    if application:
+        user_id = application[0][0]
+        user = await get_user(user_id)
+        
+        buttle_win = user[1]
+        dual_win = user[2]
+        plays_buttle = user[3]
+        referals = user[4]
+        additional_voices = user[5]
+
+        #select photo by user_id
+        
+        photo_id = application[0][1]
+
+
+        
+        photo=photo_id,
+        caption=f"ID: {user_id}\n" + f"Ник: @{await get_username_by_id(user_id)}\n" +f"Выйгранных фотобатлов: {buttle_win} \n" + f"Общее число фотобатлов: {plays_buttle} \n" + f"Выйгранных дуэлей: {dual_win}\n\n" + f"Дополнительные голоса: {additional_voices}\n" f"Приглашенных рефералов: {referals}"
+        reply_markup=photo_moderation_admin_kb
+        return (photo[0],caption,reply_markup)
+
+
+async def get_username_by_id(user_id: int):
+    """Получает никнейм пользователя по его ID."""
+    try:
+        chat = await _bot.get_chat(user_id)
+        return chat.username
+    except Exception as e:
+        print(f"Ошибка при получении информации о пользователе: {e}")
+        return None
 
 #####################################               Общее                          ##########################################
 
@@ -39,35 +74,13 @@ async def photo_moderation(message: Message, state: FSMContext):
 
 @admin_router.message(lambda message: message.text == "Модерация фотографий")
 async def photo_moderation(message: Message):
-    user = await get_user(message.from_user.id)
-
-    buttle_win = user[1]
-    dual_win = user[2]
-    plays_buttle = user[3]
-    referals = user[4]
-    additional_voices = user[5]
-
-    #select photo by user_id
     application = (await select_all_applications())
     if application:
-        application = application[0]
-        
-        photo_id = application[1]
-
-
-        await message.answer_photo(
-            photo=photo_id,
-            caption=
-            f"ID: {message.from_user.id}\n" +
-            f"Ник: @{message.from_user.username}\n" +
-            f"Выйгранных фотобатлов: {buttle_win} \n" +
-            f"Общее число фотобатлов: {plays_buttle} \n" +
-            f"Выйгранных дуэлей: {dual_win}\n\n" +
-            f"Дополнительные голоса: {additional_voices}\n"
-            f"Приглашенных рефералов: {referals}",
-            reply_markup=photo_moderation_admin_kb
-        )
-        
+        values = await gen_mode_aplic(application)
+        photo = values[0]
+        caption = values[1]
+        reply_markup = values[2]
+        await message.answer_photo(photo=photo,caption=caption, reply_markup=reply_markup)
     else:
         await message.answer(text = 'Заявок нет')
 
@@ -76,6 +89,7 @@ async def photo_moderation(message: Message):
 async def apply(call: CallbackQuery):
     await call.answer(text="ok", reply_markup=mailing_admin_kb)
     application = (await select_all_applications())
+    all_application = application
     delMessage = 0 if len(application) > 1 else 1
     if len(application) != 0:
         application = application[0]
@@ -85,7 +99,14 @@ async def apply(call: CallbackQuery):
             await _bot.send_message(call.from_user.id, "Заявки закончились")
             await call.message.delete()
         await create_user_in_batl(user_id,photo_id, 'user')
+        
         await delete_application(user_id)
+        # /////
+        values = await gen_mode_aplic(all_application[1:])
+        photo = values[0]
+        caption = values[1]
+        reply_markup = values[2]
+        await call.message.edit_caption(photo = photo,caption=caption, reply_markup=reply_markup)
     else:
         await _bot.send_message(call.from_user.id, "Заявки закончились")
     
@@ -95,6 +116,7 @@ async def apply(call: CallbackQuery):
 async def decline(call: CallbackQuery):
     await   call.answer(text="ok", reply_markup=mailing_admin_kb)
     application = (await select_all_applications())
+    all_application = application
     delMessage = 0 if len(application) > 1 else 1
     if len(application) != 0:
         application = application[0]
@@ -103,6 +125,11 @@ async def decline(call: CallbackQuery):
             await _bot.send_message(call.from_user.id, "Заявки закончились")
             await call.message.delete()
         await delete_application(user_id)
+        values = await gen_mode_aplic(all_application[1:])
+        photo = values[0]
+        caption = values[1]
+        reply_markup = values[2]
+        await call.message.edit_caption(photo = photo,caption=caption, reply_markup=reply_markup)
     else:
         await _bot.send_message(call.from_user.id, "Заявки закончились")
 
@@ -111,6 +138,7 @@ async def decline(call: CallbackQuery):
 async def ban(call: CallbackQuery):
     await call.answer(text="ok", reply_markup=mailing_admin_kb)
     application = (await select_all_applications())
+    all_application = application
     delMessage = 0 if len(application) > 1 else 1
     if len(application) != 0:
         application = application[0]
@@ -120,6 +148,11 @@ async def ban(call: CallbackQuery):
             await call.message.delete()
         await edit_user(user_id,'is_ban',1)
         await delete_application(user_id)
+        values = await gen_mode_aplic(all_application[1:])
+        photo = values[0]
+        caption = values[1]
+        reply_markup = values[2]
+        await call.message.edit_caption(photo = photo,caption=caption, reply_markup=reply_markup)
     else:
         await _bot.send_message(call.from_user.id, "Заявки закончились")
 

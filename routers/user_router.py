@@ -47,9 +47,12 @@ async def cmd_start(message: Message,state: FSMContext,command: Command):
 async def cmd_battle(message: Message, state: FSMContext):
     user_id = message.from_user.id
     application = await select_application(user_id)
-    if not application:
+    user_on_battle = await select_user_on_battle(user_id)
+    if not application and not user_on_battle:
         await message.answer("Отправь мне свое фото для баттла.")
         await state.set_state(FSMFillForm.fill_photo)
+    elif application:
+        await message.answer("Ваша завка уже находиться на рассмотрении")
     else:
         await message.answer("Вы уже зарегистрированы на баттл")
 

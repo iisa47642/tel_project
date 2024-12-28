@@ -284,6 +284,15 @@ async def select_all_battle():
         async with db.execute('SELECT * FROM battle') as cursor:
             return await cursor.fetchall()
         
+# возвращает одного участника баттла   
+async def select_user_on_battle(user_id):
+    async with sq.connect("bot_database.db") as db:
+        async with db.execute('SELECT * FROM application WHERE user_id = ?', (user_id,)) as cursor:
+            existing_user = await cursor.fetchone()
+            if existing_user:
+                return existing_user
+            return False
+        
 # настройки баттла
 async def select_battle_settings():
     async with sq.connect("bot_database.db") as db:
