@@ -19,8 +19,8 @@ class SchedulerManager:
         self.scheduler.add_job(
             self.task_manager.start_battle,
             trigger='cron',
-            hour=4, 
-            minute=6,
+            hour=10, 
+            minute=54,
             name='Start Battle'
         )
 
