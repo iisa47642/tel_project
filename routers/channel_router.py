@@ -169,6 +169,7 @@ async def process_vote(callback: CallbackQuery):
     Обрабатывает голосование пользователей.
     """
 
+    #TODO check if subscribed before getting by uID
     uID = callback.from_user.id
     member=await _bot.get_chat_member(user_id=uID,chat_id=-1002298527034)
 
