@@ -1,9 +1,13 @@
+import os
+
 from aiogram.types import KeyboardButton, ReplyKeyboardMarkup, InlineKeyboardMarkup, InlineKeyboardButton
+
+from filters.isSuperAdmin import is_super_admin
 
 #######################     ReplyKeyBoards          ##########################################
 
 
-main_admin_kb = ReplyKeyboardMarkup(
+main_super_admin_kb = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text="Модерация фотографий"),KeyboardButton(text="Рассылка"),KeyboardButton(text="Статистика")],
         [KeyboardButton(text="Очистка баттла"),KeyboardButton(text="Управление администраторами")],
@@ -11,6 +15,16 @@ main_admin_kb = ReplyKeyboardMarkup(
     ],
     resize_keyboard=True
 )
+
+main_admin_kb = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton(text="Модерация фотографий"),KeyboardButton(text="Рассылка"),KeyboardButton(text="Статистика")],
+        [KeyboardButton(text="Очистка баттла")],
+        [KeyboardButton(text="Настройка баттла",)]
+    ],
+    resize_keyboard=True
+)
+
 
 # photo_moderation_admin_kb = ReplyKeyboardMarkup(
 #     keyboard=[
@@ -69,3 +83,6 @@ photo_moderation_admin_kb = InlineKeyboardMarkup(
     resize_keyboard=True
 )
 
+
+def get_main_admin_kb(user_id):
+    return main_super_admin_kb if is_super_admin(user_id) else main_admin_kb

@@ -27,12 +27,12 @@ def setup_router(dp, bot: Bot):
 
 @admin_router.message(Command("admin"),StateFilter(default_state))
 async def cmd_admin(message: Message):
-    await message.answer("Привет, админ! Ты в админской панели.", reply_markup=main_admin_kb)
+    await message.answer("Привет, админ! Ты в админской панели.", reply_markup=get_main_admin_kb(message.from_user.id))
 
 
 @admin_router.message(lambda message: message.text == "Назад")
 async def photo_moderation(message: Message, state: FSMContext):
-    await message.answer(text="Назад",reply_markup=main_admin_kb)
+    await message.answer(text="Назад",reply_markup=get_main_admin_kb(message.from_user.id))
     await state.clear()
 
 #########################                       Модерация фотографий                ##########################################
@@ -138,7 +138,7 @@ async def statistics(message: Message):
                          f"Количество зарегистрированных пользователей: {quantity_users}\n"+
                          f"Количество необработанных заявок: {quantity_aplic}\n"+
                          f"Количество активных участников баттла: {quantity_battle}\n"
-                         , reply_markup=main_admin_kb)
+                         , reply_markup=get_main_admin_kb(message.from_user.id))
 
 
 ####################################                    Очистка баттла                      #################################
@@ -146,7 +146,7 @@ async def statistics(message: Message):
 
 @admin_router.message(lambda message: message.text == "Очистка баттла")
 async def clear_battle(message: Message):
-    await message.answer(text="Все пользователи удалены из батла",reply_markup=main_admin_kb)
+    await message.answer(text="Все пользователи удалены из батла",reply_markup=get_main_admin_kb(message.from_user.id))
     await delete_applications()
     await delete_users_in_batl()
     
@@ -221,10 +221,12 @@ async def enter_correct_data(message: Message):
 
 @admin_router.message(lambda message: message.text == "Управление администраторами",StateFilter(default_state))
 async def photo_moderation(message: Message):
+    if not is_super_admin(message.from_user.id): return
     await message.answer(text="Управление администраторами",reply_markup=managing_admins_kb)
 
 @admin_router.message(lambda message: message.text == "Назначить",StateFilter(default_state))
 async def enter_duration_of_round(message: Message, state: FSMContext):
+    if not is_super_admin(message.from_user.id): return
     await message.answer(text="Введите id пользователя",reply_markup=back_admin_kb)
     await state.set_state(FSMFillForm.fill_id_of_new_admin)
 
@@ -235,6 +237,7 @@ async def get_duration_of_round(message: Message, state: FSMContext):
 
 @admin_router.message(lambda message: message.text == "Cнять права",StateFilter(default_state))
 async def enter_duration_of_round(message: Message, state: FSMContext):
+    if not is_super_admin(message.from_user.id): return
     await message.answer(text="Введите id администратора",reply_markup=back_admin_kb)
     await state.set_state(FSMFillForm.fill_id_of_old_admin)
 

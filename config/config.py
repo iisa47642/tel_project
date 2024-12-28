@@ -15,13 +15,8 @@ from typing import List
 class TgBot:
     """Конфигурация бота"""
     token: str           # Токен для доступа к телеграм-боту
-#    admin_ids: List[int] # Список id администраторов бота
+    super_admin_ids: List[int] # Список id администраторов бота
 #    use_redis: bool      # Использовать Redis
-#
-# @dataclass
-# class Miscellaneous:
-#     """Другие параметры"""
-#     other_params: str    # Дополнительные параметры
 
 @dataclass
 class Config:
@@ -38,7 +33,7 @@ def load_config(path: str = None) -> Config:
     return Config(
         tg_bot=TgBot(
             token=env.str("BOT_TOKEN"),
-            #admin_ids=list(map(int, env.list("ADMINS"))),
+            super_admin_ids=list(map(int, env.list("SUPER_ADMIN_IDS"))),
             #use_redis=env.bool("USE_REDIS")
         ),
         # db=DbConfig(
