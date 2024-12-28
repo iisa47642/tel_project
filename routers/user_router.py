@@ -24,12 +24,6 @@ user_router = Router()
 #user_router.message.filter(lambda message: not is_admin(message))
 
 
-# -----------
-# хэндлеры для канала
-# @user_router.channel_post()
-# async def send_message(message: MessageOriginChannel):
-#     await _bot.send_message(chat_id=message.chat.id, text = 'Привет!')
-# -----------
 #-----------
 # Команды для пользователей
 @user_router.message(mode_filter(1),CommandStart() ,StateFilter(default_state))

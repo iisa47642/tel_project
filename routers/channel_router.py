@@ -30,9 +30,10 @@ async def send_pair(bot: Bot, channel_id: int, participant1, participant2):
     """
     Отправляет пару участников в канал.
     """
+    # эта параша работает нормально, но выглядит неправильно, надо править
     media = [
         InputMediaPhoto(media=participant1['photo_id'], caption=f"Участник №{participant1['user_id']} и " + f"Участник №{participant2['user_id']}"),
-        InputMediaPhoto(media=participant2['photo_id'], caption=f"Участник №{participant2['user_id']}")
+        InputMediaPhoto(media=participant2['photo_id'], caption=f"")
     ]
     media_message = await bot.send_media_group(channel_id, media)
     
