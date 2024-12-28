@@ -33,6 +33,7 @@ async def create_tables():
         CREATE TABLE IF NOT EXISTS battle (
             user_id INTEGER PRIMARY KEY,
             photo_id TEXT,
+            is_participant,
             points INTEGER,
             role TEXT
         )
@@ -52,6 +53,11 @@ async def create_tables():
             round_interval INTEGER,
             time_of_run INTEGER
         )
+        ''')
+        await db.execute('''
+            CREATE TABLE IF NOT EXISTS channel_messages (
+                message_id INTEGER PRIMARY KEY
+            )
         ''')
 
         await db.commit()
@@ -109,12 +115,14 @@ async def delete_user(user_id: int):
 
 
 # -------------------- запросы к таблице текущего баттла
+
+# посм
 async def create_user_in_batl(user_id, photo_id, role):
      async with sq.connect("bot_database.db") as db:
         async with db.execute(f"SELECT 1 FROM battle WHERE user_id == '{user_id}'") as cursor:
             user = await cursor.fetchone()
             if not user:
-                await cursor.execute("INSERT INTO battle VALUES(?, ?, ?, ?)", (user_id,photo_id,0,role))
+                await cursor.execute("INSERT INTO battle VALUES(?, ?, ?, ?, ?)", (user_id,photo_id,1,0,role,))
                 await db.commit()
     
     
@@ -213,6 +221,25 @@ async def edit_battle_settings(parameter: str, value):
                     await db.execute(query, (value,))
                     await db.commit()
                         
+# messages
+
+async def save_message_ids(message_ids: list):
+    async with sq.connect("bot_database.db") as db:
+        await db.executemany("INSERT INTO channel_messages (message_id) VALUES (?)", 
+                             [(msg_id,) for msg_id in message_ids])
+        await db.commit()
+
+async def get_message_ids():
+    async with sq.connect("bot_database.db") as db:
+        cursor = await db.execute("SELECT message_id FROM channel_messages")
+        return [row[0] for row in await cursor.fetchall()]
+
+async def clear_message_ids():
+    async with sq.connect("bot_database.db") as db:
+        await db.execute("DELETE FROM channel_messages")
+        await db.commit()
+
+
 
 # -------------- Selects
 
@@ -269,3 +296,52 @@ async def select_battle_settings():
                 async with db.execute('SELECT * FROM battle_settings') as new_cursor:
                     return (await new_cursor.fetchall())[0]
             return flag[0]
+# -------- для баттла
+
+async def set_user_as_participant(user_id: int):
+    async with sq.connect("bot_database.db") as db:
+        await db.execute("UPDATE battle SET is_participant = 1 WHERE user_id = ?", (user_id,))
+        await db.commit()
+# 
+async def get_participants():
+    async with sq.connect("bot_database.db") as db:
+        cursor = await db.execute("SELECT user_id, photo_id FROM battle WHERE is_participant = 1")
+        participants = await cursor.fetchall()
+        return [{'user_id': p[0], 'photo_id': p[1]} for p in participants]
+# 
+async def update_points(user_id: int):
+    async with sq.connect("bot_database.db") as db:
+        await db.execute("UPDATE battle SET points = points + 1 WHERE user_id = ?", (user_id,))
+        await db.commit()
+# 
+async def get_round_results(min_votes_for_single: int):
+    async with sq.connect("bot_database.db") as db:
+        cursor = await db.execute("SELECT user_id, points FROM battle WHERE is_participant = 1")
+        participants = await cursor.fetchall()
+        
+        results = []
+        for i in range(0, len(participants), 2):
+            if i + 1 < len(participants):
+                results.append([
+                    {'user_id': participants[i][0], 'votes': participants[i][1]},
+                    {'user_id': participants[i+1][0], 'votes': participants[i+1][1]}
+                ])
+            else:
+                results.append([
+                    {'user_id': participants[i][0], 'votes': participants[i][1]}
+                ])
+        
+        return results
+# 
+
+async def remove_losers(losers: list):
+    print(losers)
+    async with sq.connect("bot_database.db") as db:
+        cursor = await db.cursor()
+        for user_id in losers:
+            await cursor.execute("DELETE FROM battle WHERE user_id = ?", (user_id,))
+        await db.commit()
+
+
+
+

@@ -26,9 +26,9 @@ user_router = Router()
 
 # -----------
 # хэндлеры для канала
-@user_router.channel_post()
-async def send_message(message: MessageOriginChannel):
-    await _bot.send_message(chat_id=message.chat.id, text = 'Привет!')
+# @user_router.channel_post()
+# async def send_message(message: MessageOriginChannel):
+#     await _bot.send_message(chat_id=message.chat.id, text = 'Привет!')
 # -----------
 #-----------
 # Команды для пользователей

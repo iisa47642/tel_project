@@ -7,7 +7,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from middlewares.middlewares import ModeMiddleware, ThrottlingMiddleware, UserCheckMiddleware
 from aiogram.types import Message
 from config.config import load_config
-from routers import admin_router
+from routers import admin_router, channel_router
 from routers import user_router
 from states.user_states import FSMFillForm
 from database.db import *
@@ -33,6 +33,7 @@ dp = Dispatcher(storage=storage)
 
 admin_router.setup_router(dp, bot)
 user_router.setup_router(dp, bot)
+channel_router.setup_router(dp,bot)
 
 # Подключаем роутер формы
 dp.include_router(
@@ -42,7 +43,9 @@ dp.include_router(
 dp.include_router(
     user_router.user_router
 )
-
+dp.include_router(
+    channel_router.channel_router
+)
 
 
 @dp.message(Command(commands='cancel'), StateFilter(default_state))
@@ -82,7 +85,7 @@ async def main():
     await create_tables()
     # Запускаем бота
     scheduler_manager.setup(bot)  # Настраиваем планировщик
-    #scheduler_manager.start()
+    scheduler_manager.start()
     
     try:
         await dp.start_polling(bot)  # 1

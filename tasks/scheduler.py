@@ -2,7 +2,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from aiogram import Bot
 import pytz
 from typing import Optional
-from .task_handlers import TaskManager
+from tasks.task_handlers import TaskManager
 
 class SchedulerManager:
     def __init__(self):
@@ -15,42 +15,15 @@ class SchedulerManager:
         self.task_manager.bot = bot
         self.scheduler.timezone = self.timezone
 
-        # Задачи режима 1
+        # Задача для запуска баттла
         self.scheduler.add_job(
-            self.task_manager.mode_1_task,
+            self.task_manager.start_battle,
             trigger='cron',
-            hour='*/1',
-            minute='*',
-            second='*',
-            name='Mode 1 Task'
+            hour=4, 
+            minute=6,
+            name='Start Battle'
         )
 
-        # Задачи режима 2
-        self.scheduler.add_job(
-            self.task_manager.mode_2_task,
-            trigger='cron',
-            hour='14-15',
-            minute='*/30',
-            name='Mode 2 Task'
-        )
-
-        # Задачи режима 3
-        self.scheduler.add_job(
-            self.task_manager.mode_3_task,
-            trigger='cron',
-            hour='16-17',
-            minute=15,
-            name='Mode 3 Task'
-        )
-
-        # Общие задачи
-        self.scheduler.add_job(
-            self.task_manager.general_task,
-            trigger='cron',
-            hour='*/2',  # Каждые 2 часа
-            minute=0,
-            name='General Task'
-        )
 
     def start(self):
         """Запуск планировщика"""
@@ -68,13 +41,16 @@ class SchedulerManager:
         except Exception as e:
             print(f"Error shutting down scheduler: {e}")
 
-def reschedule_task(self, task_id: str, new_trigger: dict):
+    def reschedule_task(self, task_id: str, new_trigger: dict):
+        """Изменение расписания задачи"""
         try:
             self.scheduler.reschedule_job(task_id, trigger='cron', **new_trigger)
             print(f"Task {task_id} rescheduled successfully to: {new_trigger}")
         except Exception as e:
             print(f"Error rescheduling task {task_id}: {e}")
 
+# Создание экземпляра SchedulerManager
+scheduler_manager = SchedulerManager()
 
 # пример использования
 # scheduler_manager.reschedule_task(
