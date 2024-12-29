@@ -165,6 +165,49 @@ async def check_subscription(user_id: int) -> bool:
         return False
 
 
+# async def imitate_vote(
+#         self,
+#         message_id: int = 0,
+#         voted_id: int = 10,
+#         where_vote: str = "right",
+#         chat_id: int = -1002298527034,
+#         fake_user_id: int = 1270990667
+# ):
+#     # Create fake callback data (same format as real votes)
+#     callback_data = f"voT:{voted_id}:{where_vote}"
+#
+#     # Create fake callback query
+#     fake_callback = CallbackQuery(
+#         id=f"fake_blalblal",
+#         from_user=types.User(
+#             id=fake_user_id,
+#             is_bot=False,
+#             first_name="User"
+#         ),
+#         message=types.Message(
+#             message_id=message_id,
+#             chat=types.Chat(
+#                 id=chat_id,
+#                 type="public"
+#             ),
+#             date=datetime.now(),
+#             from_user=types.User(
+#                 id=_bot.id,
+#                 is_bot=True,
+#                 first_name="Bot"
+#             )
+#         ),
+#         chat_instance=str(chat_id),
+#         data=callback_data
+#     )
+#
+#     # Emit fake callback query to handler
+#     await channel_router.callback_query.trigger(fake_callback)
+#
+# @channel_router.callback_query(F.data.startswith("voT:"))
+# async def qqq(callback: CallbackQuery):
+#     print("ajdklasjdasl")
+
 @channel_router.callback_query(F.data.startswith("vote:"))
 async def process_vote(callback: CallbackQuery):
     keyboard = await make_keyboard(callback)
@@ -172,30 +215,40 @@ async def process_vote(callback: CallbackQuery):
     Обрабатывает голосование пользователей.
     """
 
+#    await imitate_vote(3423)
+
     #TODO check if subscribed before getting by uID
     uID = callback.from_user.id
-    mID = callback.message.message_id
-    member=await _bot.get_chat_member(user_id=uID,chat_id=-1002298527034)
-
-    user=await get_user(uID)
-    number_of_additional_votes=user[5]
-    # allowed_number_of_votes=number_of_additional_votes+1
-
-    # {uID:{mID:clicks}}
-
-    if uID not in user_clicks:
-        user_clicks[uID]={}
-        if mID not in user_clicks[uID]:
-            user_clicks[uID][mID]=0
-    elif mID not in user_clicks[uID]:
-        user_clicks[uID][mID] = 0
-
     if await check_subscription(uID):
+        mID = callback.message.message_id
+        member=await _bot.get_chat_member(user_id=uID,chat_id=-1002298527034)
+
+        number_of_additional_votes=0
+        user=0
+        user = await get_user(uID)
+        if user == False :
+            number_of_additional_votes=0
+        else:
+            number_of_additional_votes=user[5]
+
+        # allowed_number_of_votes=number_of_additional_votes+1
+
+        # {uID:{mID:clicks}}
+
+        if uID not in user_clicks:
+            user_clicks[uID]={}
+            if mID not in user_clicks[uID]:
+                user_clicks[uID][mID]=0
+        elif mID not in user_clicks[uID]:
+            user_clicks[uID][mID] = 0
+
         if user_clicks.get(uID) is not None and user_clicks.get(uID).get(mID) is not None and user_clicks[uID][mID] == 1 and member.status not in ["creator", "administrator"]:
             if number_of_additional_votes > 0:
                 user_id = int(callback.data.split(':')[1]) # the one who is voted
                 await update_points(user_id)
-                await edit_user(user,'additional_voices',number_of_additional_votes-1)
+                number_of_additional_votes-=1
+                await edit_user(uID,'additional_voices',number_of_additional_votes)
+                await callback.message.edit_reply_markup(reply_markup=keyboard)
                 await callback.answer("Ваш голос учтен!")
             else:
                 await callback.answer("Вы уже проголосовали")
