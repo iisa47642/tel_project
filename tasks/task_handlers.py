@@ -1,7 +1,11 @@
 # tasks/task_handlers.py
+import os
+
 from aiogram import Bot
 from typing import Optional
 import asyncio
+
+from config.config import load_config
 from routers.channel_router import send_battle_pairs, end_round, announce_winner, delete_previous_messages
 from database.db import get_participants, remove_losers, save_message_ids, delete_users_in_batl
 
@@ -9,7 +13,7 @@ class TaskManager:
     def __init__(self):
         self.admin_id: int = 842589261
         self._bot: Optional[Bot] = None
-        self.channel_id: int = -1002298527034
+        self.channel_id: int = -1002298527034 #self.load_channel_id()
         self.round_duration: int = 15
         self.break_duration: int = 30
         self.min_votes_for_single: int = 2  # Минимум голосов для одиночного участника
@@ -21,6 +25,12 @@ class TaskManager:
     @bot.setter
     def bot(self, bot: Bot):
         self._bot = bot
+
+    def load_channel_id(self):
+        dirname = os.path.dirname(__file__)
+        filename = os.path.abspath(os.path.join(dirname, '..', 'config/config.env'))
+        config = load_config(filename)
+        return config.tg_bot.channel_id
 
     async def start_battle(self):
         round_number = 1

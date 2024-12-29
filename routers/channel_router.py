@@ -1,6 +1,9 @@
-from aiogram import Bot, Router, F
+from datetime import datetime
+
+from aiogram import Bot, Router, F, types
 from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, InputMediaPhoto
-from database.db import get_participants, update_points, get_round_results, get_message_ids, clear_message_ids
+from database.db import get_participants, update_points, get_round_results, get_message_ids, clear_message_ids, \
+    get_user, edit_user
 
 _bot: Bot = None  # Placeholder for the bot instance
 
@@ -9,7 +12,7 @@ def setup_router(dp, bot: Bot):
     _bot = bot
     
 channel_router = Router()
-user_clicks = {}
+user_clicks = {0:{}}
 
 async def send_battle_pairs(bot: Bot, channel_id: int):
     """
@@ -171,19 +174,37 @@ async def process_vote(callback: CallbackQuery):
 
     #TODO check if subscribed before getting by uID
     uID = callback.from_user.id
+    mID = callback.message.message_id
     member=await _bot.get_chat_member(user_id=uID,chat_id=-1002298527034)
 
+    user=await get_user(uID)
+    number_of_additional_votes=user[5]
+    # allowed_number_of_votes=number_of_additional_votes+1
+
+    # {uID:{mID:clicks}}
+
     if uID not in user_clicks:
-        user_clicks[uID] = 0
+        user_clicks[uID]={}
+        if mID not in user_clicks[uID]:
+            user_clicks[uID][mID]=0
+    elif mID not in user_clicks[uID]:
+        user_clicks[uID][mID] = 0
 
     if await check_subscription(uID):
-        if user_clicks.get(uID) is not None and user_clicks[uID] == 1 and member.status not in ["creator", "administrator"]:
-            await callback.answer("Вы уже проголосовали")
+        if user_clicks.get(uID) is not None and user_clicks.get(uID).get(mID) is not None and user_clicks[uID][mID] == 1 and member.status not in ["creator", "administrator"]:
+            if number_of_additional_votes > 0:
+                user_id = int(callback.data.split(':')[1]) # the one who is voted
+                await update_points(user_id)
+                await edit_user(user,'additional_voices',number_of_additional_votes-1)
+                await callback.answer("Ваш голос учтен!")
+            else:
+                await callback.answer("Вы уже проголосовали")
         else:
-            user_clicks[uID] += 1
+            user_clicks[uID][mID] += 1
             await callback.message.edit_reply_markup(reply_markup=keyboard)
             user_id = int(callback.data.split(':')[1])
             await update_points(user_id)
             await callback.answer("Ваш голос учтен!")
     else:
         await callback.answer("Для использования бота подпишитесь на канал")
+

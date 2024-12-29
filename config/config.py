@@ -16,6 +16,7 @@ class TgBot:
     """Конфигурация бота"""
     token: str           # Токен для доступа к телеграм-боту
     super_admin_ids: List[int] # Список id администраторов бота
+    channel_id: int
 #    use_redis: bool      # Использовать Redis
 
 @dataclass
@@ -34,6 +35,7 @@ def load_config(path: str = None) -> Config:
         tg_bot=TgBot(
             token=env.str("BOT_TOKEN"),
             super_admin_ids=list(map(int, env.list("SUPER_ADMIN_IDS"))),
+            channel_id=int(env.str("CHANNEL_ID")),
             #use_redis=env.bool("USE_REDIS")
         ),
         # db=DbConfig(
