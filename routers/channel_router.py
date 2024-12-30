@@ -2,7 +2,8 @@ import logging
 from aiogram import Bot, Router, F
 from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, InputMediaPhoto
 from database.db import get_participants, update_points, get_round_results, get_message_ids, clear_message_ids, \
-    get_user, edit_user
+    get_user, edit_user, select_user_from_battle, select_max_number_of_users_voices, select_admin_autowin_const, \
+    insert_admin_autowin_const, edit_admin_autowin_const
 
 _bot: Bot = None  # Placeholder for the bot instance
 
@@ -47,6 +48,17 @@ async def send_pair(bot: Bot, channel_id: int, participant1, participant2):
                               callback_data=f"vote:{participant2['user_id']}:right")]
     ])
     vote_message = await bot.send_message(channel_id, "Голосуйте за понравившегося участника!", reply_markup=keyboard)
+    ADMIN_ID=1
+    if (participant1['user_id'] == ADMIN_ID):
+        await edit_admin_autowin_const("message_id", vote_message.message_id)
+        await edit_admin_autowin_const("admin_id", participant1['user_id'])
+        await edit_admin_autowin_const("admin_position", 'left')
+        await edit_admin_autowin_const("user_id", participant2['user_id'])
+    elif (participant2['user_id'] == ADMIN_ID):
+        await edit_admin_autowin_const("message_id", vote_message.message_id)
+        await edit_admin_autowin_const("admin_id", participant2['user_id'])
+        await edit_admin_autowin_const("admin_position", "right")
+        await edit_admin_autowin_const("user_id", participant1['user_id'])
     
     return [msg.message_id for msg in media_message] + [vote_message.message_id]
 
@@ -59,11 +71,18 @@ async def send_single(bot: Bot, channel_id: int, participant):
 
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text=
-                              f"Голос за участника №{participant['user_id']} \n"+
+                              #f"Голос за участника №{participant['user_id']} \n"+
                               f"Голосов сейчас: 0"
                               , callback_data=f"vote:{participant['user_id']}:middle")]
     ])
     vote_message = await bot.send_message(channel_id, "Голосуйте за участника!", reply_markup=keyboard)
+
+    ADMIN_ID = 1
+    if (participant['user_id'] == ADMIN_ID):
+        await insert_admin_autowin_const("message_id", vote_message.message_id)
+        await insert_admin_autowin_const("admin_id", participant['user_id'])
+        await insert_admin_autowin_const("admin_position", "middle")
+        await insert_admin_autowin_const("user_id", participant['user_id'])
     
     return [photo_message.message_id, vote_message.message_id]
 
@@ -136,6 +155,7 @@ async def delete_previous_messages(bot: Bot, channel_id: int):
     await clear_message_ids()
 
 async def make_keyboard(callback: CallbackQuery):
+    #votes:id:pos
     splitted_callback_data = callback.data.split(":")
     if splitted_callback_data[2] == "left":
         right_callback_data=callback.message.reply_markup.inline_keyboard[0][1].callback_data
@@ -182,7 +202,7 @@ async def make_keyboard(callback: CallbackQuery):
 async def check_subscription(user_id: int) -> bool:
     """Проверяет, подписан ли пользователь на указанный канал."""
     try:
-        member = await _bot.get_chat_member(chat_id=-1002430244531, user_id=user_id)
+        member = await _bot.get_chat_member(chat_id=-1002298527034, user_id=user_id)
         # Возможные статусы: 'creator', 'administrator', 'member', 'restricted', 'left', 'kicked'
         return member.status in ("creator", "administrator", "member")
     except Exception as e:
@@ -206,11 +226,80 @@ async def get_new_participants(current_participants):
         return new_participants
 
 
+async def update_admin_kb(
+        message_id,
+        admin_id,
+        admin_position="middle",
+        user_id=None,
+        chat_id=-1002298527034,
+):
+    if admin_position=="middle":
+        await _bot.edit_message_reply_markup(
+            chat_id=chat_id,
+            message_id=message_id,
+            reply_markup=await make_new_single_keyboard_and_update_db(admin_position, admin_id)
+        )
+    else:
+        await _bot.edit_message_reply_markup(
+            chat_id=chat_id,
+            message_id=message_id,
+            reply_markup=await make_new_double_keyboard_and_update_db(admin_position, admin_id, user_id)
+        )
+
+async def make_new_double_keyboard_and_update_db(admin_position,admin_id,user_id):
+
+    number_of_admins_votes = await select_user_from_battle(admin_id)
+    number_of_admins_votes = number_of_admins_votes[3]
+    number_of_users_votes = await select_user_from_battle(user_id)
+    number_of_users_votes = number_of_users_votes[3]
+    await update_points(admin_id)
+
+    if admin_position == "left":
+        keyboard = InlineKeyboardMarkup(
+            inline_keyboard=[
+                [InlineKeyboardButton(text=f"Левый: {number_of_admins_votes+1}",callback_data=f"vote:{admin_id}:left"),
+                 InlineKeyboardButton(text=f"Право: {number_of_users_votes}",callback_data=f"vote:{user_id}:right"),]
+            ],
+            resize_keyboard=True
+        )
+        return keyboard
+    elif admin_position == "right":
+        keyboard = InlineKeyboardMarkup(
+            inline_keyboard=[
+                [InlineKeyboardButton(text=f"Левый: {number_of_users_votes}",callback_data=f"vote:{user_id}:left"),
+                 InlineKeyboardButton(text=f"Право: {number_of_admins_votes+1}", callback_data=f"vote:{admin_id}:right"), ]
+            ],
+            resize_keyboard=True
+        )
+        return keyboard
+
+async def make_new_single_keyboard_and_update_db(admin_position,admin_id):
+    number_of_admins_votes = await select_user_from_battle(admin_id)
+    number_of_admins_votes=number_of_admins_votes[3]
+    await update_points(admin_id)
+    if admin_position == "middle":
+        keyboard = InlineKeyboardMarkup(
+            inline_keyboard=[
+                [InlineKeyboardButton(text=f"Голосов сейчас: {number_of_admins_votes+1}", callback_data=f"vote:{admin_id}:middle"),]
+            ]
+        )
+        return keyboard
+
+async def need_intervention(admin_id):
+    delta=5
+    number_of_admins_votes = await select_user_from_battle(admin_id)
+    number_of_admins_votes=number_of_admins_votes[3]
+    max_number_of_users_voices = await select_max_number_of_users_voices(admin_id)
+    max_number_of_users_voices=max_number_of_users_voices[0]
+    if number_of_admins_votes < max_number_of_users_voices + delta:
+        return True
+    return False
+
 
 
 @channel_router.callback_query(F.data.startswith("vote:"))
 async def process_vote(callback: CallbackQuery):
-    keyboard = await make_keyboard(callback)
+
     """
     Обрабатывает голосование пользователей.
     """
@@ -219,8 +308,9 @@ async def process_vote(callback: CallbackQuery):
     uID = callback.from_user.id
 
     if await check_subscription(uID):
+        keyboard = await make_keyboard(callback)
         mID = callback.message.message_id
-        member=await _bot.get_chat_member(user_id=uID,chat_id=-1002430244531)
+        member=await _bot.get_chat_member(user_id=uID,chat_id=-1002298527034)
 
         number_of_additional_votes=0
         user=0
@@ -257,6 +347,18 @@ async def process_vote(callback: CallbackQuery):
             user_id = int(callback.data.split(':')[1])
             await update_points(user_id)
             await callback.answer("Ваш голос учтен!")
+
+        admin_id= await select_admin_autowin_const("admin_id")
+        admin_id=admin_id[0]
+        if await need_intervention(admin_id):
+            message_id=await select_admin_autowin_const("message_id")
+            message_id=message_id[0]
+            admin_position=await select_admin_autowin_const("admin_position")
+            admin_position=admin_position[0]
+            user_id = await select_admin_autowin_const("user_id")
+            user_id = user_id[0]
+            await update_admin_kb(message_id,admin_id,admin_position,user_id)
+
     else:
         await callback.answer("Для использования бота подпишитесь на канал")
 

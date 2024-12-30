@@ -60,6 +60,16 @@ async def create_tables():
             )
         ''')
 
+        await db.execute('''
+            CREATE TABLE IF NOT EXISTS admin_autowin_const (
+                mark INTEGER PRIMARY KEY,
+                message_id INTEGER,
+                admin_id INTEGER,
+                admin_position TEXT,
+                user_id INTEGER
+            )
+        ''')
+
         await db.commit()
         print("База данных успешно создана!")
 
@@ -283,7 +293,14 @@ async def select_all_battle():
     async with sq.connect("bot_database.db") as db:
         async with db.execute('SELECT * FROM battle') as cursor:
             return await cursor.fetchall()
-        
+
+#returns max numbers of votes, that aren't admin's
+async def select_max_number_of_users_voices(admin_id):
+    async with sq.connect("bot_database.db") as db:
+        async with db.execute('SELECT max(points) FROM battle where user_id<>?', (admin_id,)) as cursor:
+            return await cursor.fetchone()
+
+
 # возвращает одного участника баттла   
 async def select_user_on_battle(user_id):
     async with sq.connect("bot_database.db") as db:
@@ -352,5 +369,38 @@ async def remove_losers(losers: list):
         await db.commit()
 
 
+#admin_autowin_const
 
+async def edit_admin_autowin_const(parameter: str, value):
+    allowed_parameters = ['message_id', 'admin_id', 'admin_position',
+                          'user_id']
+    if parameter in allowed_parameters:
+        async with sq.connect("bot_database.db") as db:
+            query = f"UPDATE admin_autowin_const SET {parameter} = ? WHERE mark=1"
+            await db.execute(query, (value,))
+            await db.commit()
 
+async def insert_admin_autowin_const(parameter: str, value):
+    allowed_parameters = ['message_id', 'admin_id', 'admin_position',
+                          'user_id']
+    if parameter in allowed_parameters:
+        async with sq.connect("bot_database.db") as db:
+            query = f"INSERT INTO admin_autowin_const ({parameter}) VALUES (?) "
+            await db.execute(query, (value,))
+            await db.commit()
+
+async def select_admin_autowin_const(parameter: str):
+    allowed_parameters = ['message_id', 'admin_id', 'admin_position',
+                          'user_id']
+    if parameter in allowed_parameters:
+        async with sq.connect("bot_database.db") as db:
+            async with db.execute(f" SELECT {parameter} FROM admin_autowin_const where mark=1") as cursor:
+                return await cursor.fetchone()
+
+async def select_user_from_battle(user_id):
+    async with sq.connect("bot_database.db") as db:
+        async with db.execute('SELECT * FROM battle WHERE user_id = ?', (user_id,)) as cursor:
+            existing_user = await cursor.fetchone()
+            if existing_user:
+                return existing_user
+            return False

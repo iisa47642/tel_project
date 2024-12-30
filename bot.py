@@ -76,6 +76,7 @@ async def process_cancel_command_state(message: Message, state: FSMContext):
 
 
 async def main():
+    await create_tables()
     dp.message.middleware(ThrottlingMiddleware())
     task_manager = TaskManager()
     await task_manager.initialize()  # Инициализируем настройки
@@ -89,7 +90,7 @@ async def main():
         level=logging.INFO,
         format='%(asctime)s - %(levelname)s - %(message)s'
     )
-    await create_tables()
+    #await create_tables()
     # Запускаем бота
     scheduler_manager.task_manager = task_manager
     await scheduler_manager.setup(bot)  # Настраиваем планировщик
