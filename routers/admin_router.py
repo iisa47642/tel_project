@@ -43,7 +43,10 @@ async def gen_mode_aplic(application):
 
         
         photo=photo_id,
-        caption=f"ID: {user_id}\n" + f"Ник: @{await get_username_by_id(user_id)}\n" +f"Выйгранных фотобатлов: {buttle_win} \n" + f"Общее число фотобатлов: {plays_buttle} \n" + f"Выйгранных дуэлей: {dual_win}\n\n" + f"Дополнительные голоса: {additional_voices}\n" f"Приглашенных рефералов: {referals}"
+        try:
+            caption=f"ID: {user_id}\n" + f"Ник: @{await get_username_by_id(user_id)}\n" +f"Выйгранных фотобатлов: {buttle_win} \n" + f"Общее число фотобатлов: {plays_buttle} \n" + f"Выйгранных дуэлей: {dual_win}\n\n" + f"Дополнительные голоса: {additional_voices}\n" f"Приглашенных рефералов: {referals}"
+        except Exception as e:
+            print("Не удалось получить ник пользователя " + e)
         reply_markup=photo_moderation_admin_kb
         return (photo[0],caption,reply_markup)
 
@@ -95,6 +98,17 @@ async def apply(call: CallbackQuery):
         application = application[0]
         user_id = application[0]
         photo_id = application[1]
+        ref_owner_id = (await get_user(user_id))[8]
+        print(await get_user(ref_owner_id))
+        additional_voices_owner = (await get_user(ref_owner_id))[5]
+        await edit_user(ref_owner_id, 'additional_voices', additional_voices_owner+3)
+        try:
+            await _bot.send_message(ref_owner_id, text=(
+                f"Пользователь {user_id}, зарегестрированный по вашей ссылке получил одобрение на "+
+                f'баттл, вы получаете 3 дополнительных голоса, сейчас количество ваших голосов {additional_voices_owner+3}'
+                ))
+        except Exception as e:
+            print(f"Ошибка при отправке личного сообщения: {e}")
         if delMessage:
             await _bot.send_message(call.from_user.id, "Заявки закончились")
             await call.message.delete()
@@ -102,11 +116,12 @@ async def apply(call: CallbackQuery):
         
         await delete_application(user_id)
         # /////
-        values = await gen_mode_aplic(all_application[1:])
-        photo = values[0]
-        caption = values[1]
-        reply_markup = values[2]
-        await call.message.edit_caption(photo = photo,caption=caption, reply_markup=reply_markup)
+        if len(all_application)>1:
+            values = await gen_mode_aplic(all_application[1:])
+            photo = values[0]
+            caption = values[1]
+            reply_markup = values[2]
+            await call.message.edit_caption(photo = photo,caption=caption, reply_markup=reply_markup)
     else:
         await _bot.send_message(call.from_user.id, "Заявки закончились")
     
@@ -125,11 +140,12 @@ async def decline(call: CallbackQuery):
             await _bot.send_message(call.from_user.id, "Заявки закончились")
             await call.message.delete()
         await delete_application(user_id)
-        values = await gen_mode_aplic(all_application[1:])
-        photo = values[0]
-        caption = values[1]
-        reply_markup = values[2]
-        await call.message.edit_caption(photo = photo,caption=caption, reply_markup=reply_markup)
+        if len(all_application)>1:
+            values = await gen_mode_aplic(all_application[1:])
+            photo = values[0]
+            caption = values[1]
+            reply_markup = values[2]
+            await call.message.edit_caption(photo = photo,caption=caption, reply_markup=reply_markup)
     else:
         await _bot.send_message(call.from_user.id, "Заявки закончились")
 
@@ -148,11 +164,12 @@ async def ban(call: CallbackQuery):
             await call.message.delete()
         await edit_user(user_id,'is_ban',1)
         await delete_application(user_id)
-        values = await gen_mode_aplic(all_application[1:])
-        photo = values[0]
-        caption = values[1]
-        reply_markup = values[2]
-        await call.message.edit_caption(photo = photo,caption=caption, reply_markup=reply_markup)
+        if len(all_application)>1:
+            values = await gen_mode_aplic(all_application[1:])
+            photo = values[0]
+            caption = values[1]
+            reply_markup = values[2]
+            await call.message.edit_caption(photo = photo,caption=caption, reply_markup=reply_markup)
     else:
         await _bot.send_message(call.from_user.id, "Заявки закончились")
 

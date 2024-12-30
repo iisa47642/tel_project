@@ -1,3 +1,4 @@
+import logging
 from aiogram import Bot, Router, F
 from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, InputMediaPhoto
 from database.db import get_participants, update_points, get_round_results, get_message_ids, clear_message_ids
@@ -11,11 +12,10 @@ def setup_router(dp, bot: Bot):
 channel_router = Router()
 user_clicks = {}
 
-async def send_battle_pairs(bot: Bot, channel_id: int):
+async def send_battle_pairs(bot: Bot, channel_id: int, participants):
     """
     Отправляет пары участников в канал для голосования.
     """
-    participants = await get_participants()
     message_ids = []
     
     for i in range(0, len(participants), 2):
@@ -32,8 +32,9 @@ async def send_pair(bot: Bot, channel_id: int, participant1, participant2):
     Отправляет пару участников в канал.
     """
     # эта параша работает нормально, но выглядит неправильно, надо править
+    # Участник №{participant1['user_id']} и " + f"Участник №{participant2['user_id']}
     media = [
-        InputMediaPhoto(media=participant1['photo_id'], caption=f"Участник №{participant1['user_id']} и " + f"Участник №{participant2['user_id']}"),
+        InputMediaPhoto(media=participant1['photo_id'], caption=f""),
         InputMediaPhoto(media=participant2['photo_id'], caption=f"")
     ]
     media_message = await bot.send_media_group(channel_id, media)
@@ -52,7 +53,8 @@ async def send_single(bot: Bot, channel_id: int, participant):
     """
     Отправляет одиночного участника в канал.
     """
-    photo_message = await bot.send_photo(channel_id, participant['photo_id'], caption=f"Участник №{participant['user_id']}")
+    # f"Участник №{participant['user_id']}"
+    photo_message = await bot.send_photo(channel_id, participant['photo_id'], caption="")
 
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text=
@@ -77,16 +79,41 @@ async def end_round(bot: Bot, channel_id: int, min_votes_for_single: int):
             loser = min(pair, key=lambda x: x['votes'])
             loser_ids.append(loser['user_id'])
             message += f"Участник №{winner['user_id']} побеждает участника №{loser['user_id']} со счетом {winner['votes']}:{loser['votes']}\n"
+            try:
+                await bot.send_message(
+                    winner['user_id'],
+                    f"Поздравляем! Вы победили участника №{loser['user_id']} со счетом {winner['votes']}:{loser['votes']}. Вы проходите в следующий раунд!"
+                )
+                await bot.send_message(
+                    loser['user_id'],
+                    f"К сожалению, вы проиграли участнику №{winner['user_id']} со счетом {loser['votes']}:{winner['votes']}. Спасибо за участие!"
+                )
+            except Exception as e:
+                print(f"Ошибка при отправке личного сообщения: {e}")
         else:
             participant = pair[0]
             if participant['votes'] >= min_votes_for_single:
                 message += f"Участник №{participant['user_id']} проходит дальше с {participant['votes']} голосами\n"
+                try:
+                    await bot.send_message(
+                        participant['user_id'],
+                        f"Поздравляем! Вы набрали {participant['votes']} голосов и проходите в следующий раунд!"
+                    )
+                except Exception as e:
+                    print(f"Ошибка при отправке личного сообщения: {e}")
             else:
                 loser_ids.append(participant['user_id'])
                 message += f"Участник №{participant['user_id']} выбывает с {participant['votes']} голосами\n"
-    
+                try:
+                    await bot.send_message(
+                        participant['user_id'],
+                        f"К сожалению, вы выбываете из конкурса, набрав {participant['votes']} голосов. Спасибо за участие!"
+                    )
+                except Exception as e:
+                    print(f"Ошибка при отправке личного сообщения: {e}")
     result_message = await bot.send_message(channel_id, message)
     return [[result_message.message_id],loser_ids]
+    # return [loser_ids]
 
 async def announce_winner(bot: Bot, channel_id: int, winner):
     """
@@ -154,12 +181,30 @@ async def make_keyboard(callback: CallbackQuery):
 async def check_subscription(user_id: int) -> bool:
     """Проверяет, подписан ли пользователь на указанный канал."""
     try:
-        member = await _bot.get_chat_member(chat_id=-1002298527034, user_id=user_id)
+        member = await _bot.get_chat_member(chat_id=-1002430244531, user_id=user_id)
         # Возможные статусы: 'creator', 'administrator', 'member', 'restricted', 'left', 'kicked'
         return member.status in ("creator", "administrator", "member")
     except Exception as e:
         print(f"Ошибка при проверке подписки: {e}")
         return False
+
+
+async def get_new_participants(current_participants):
+        """
+        Проверяет базу данных на наличие новых участников, которых ещё нет в текущем списке.
+        """
+        all_participants = await get_participants()  # Получаем всех участников из базы
+        current_ids = {p['user_id'] for p in current_participants}  # ID текущих участников
+
+        # Фильтруем новых участников
+        new_participants = [p for p in all_participants if p['user_id'] not in current_ids]
+
+        if new_participants:
+            logging.info(f"Найдены новые участники: {[p['user_id'] for p in new_participants]}")
+
+        return new_participants
+
+
 
 
 @channel_router.callback_query(F.data.startswith("vote:"))
@@ -171,7 +216,7 @@ async def process_vote(callback: CallbackQuery):
 
     #TODO check if subscribed before getting by uID
     uID = callback.from_user.id
-    member=await _bot.get_chat_member(user_id=uID,chat_id=-1002298527034)
+    member=await _bot.get_chat_member(user_id=uID,chat_id=-1002430244531)
 
     if uID not in user_clicks:
         user_clicks[uID] = 0
