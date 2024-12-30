@@ -59,7 +59,7 @@ tune_battle_admin_kb = ReplyKeyboardMarkup(
         [KeyboardButton(text="Продолжительность раунда"),KeyboardButton(text="Сумма приза")],
         [KeyboardButton(text="Минимальное количество голосов"), KeyboardButton(text="Интервал между раундами")],
         [KeyboardButton(text="Текущие настройки"),KeyboardButton(text="Время начала баттла")],
-        [KeyboardButton(text="Назад")]
+        [KeyboardButton(text="Автоматическая победа"),KeyboardButton(text="Назад")]
     ],
     resize_keyboard=True
 )

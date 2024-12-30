@@ -1,9 +1,11 @@
+import asyncio
 import logging
 from aiogram import Bot, Router, F
+from aiogram.exceptions import TelegramRetryAfter, TelegramBadRequest
 from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, InputMediaPhoto
 from database.db import get_participants, update_points, get_round_results, get_message_ids, clear_message_ids, \
     get_user, edit_user, select_user_from_battle, select_max_number_of_users_voices, select_admin_autowin_const, \
-    insert_admin_autowin_const, edit_admin_autowin_const
+    insert_admin_autowin_const, edit_admin_autowin_const, select_battle_settings
 
 _bot: Bot = None  # Placeholder for the bot instance
 
@@ -48,7 +50,7 @@ async def send_pair(bot: Bot, channel_id: int, participant1, participant2):
                               callback_data=f"vote:{participant2['user_id']}:right")]
     ])
     vote_message = await bot.send_message(channel_id, "Голосуйте за понравившегося участника!", reply_markup=keyboard)
-    ADMIN_ID=1
+    ADMIN_ID=0
     if (participant1['user_id'] == ADMIN_ID):
         await edit_admin_autowin_const("message_id", vote_message.message_id)
         await edit_admin_autowin_const("admin_id", participant1['user_id'])
@@ -77,7 +79,7 @@ async def send_single(bot: Bot, channel_id: int, participant):
     ])
     vote_message = await bot.send_message(channel_id, "Голосуйте за участника!", reply_markup=keyboard)
 
-    ADMIN_ID = 1
+    ADMIN_ID = 0
     if (participant['user_id'] == ADMIN_ID):
         await insert_admin_autowin_const("message_id", vote_message.message_id)
         await insert_admin_autowin_const("admin_id", participant['user_id'])
@@ -233,18 +235,21 @@ async def update_admin_kb(
         user_id=None,
         chat_id=-1002298527034,
 ):
-    if admin_position=="middle":
-        await _bot.edit_message_reply_markup(
-            chat_id=chat_id,
-            message_id=message_id,
-            reply_markup=await make_new_single_keyboard_and_update_db(admin_position, admin_id)
-        )
-    else:
-        await _bot.edit_message_reply_markup(
-            chat_id=chat_id,
-            message_id=message_id,
-            reply_markup=await make_new_double_keyboard_and_update_db(admin_position, admin_id, user_id)
-        )
+    try:
+        if admin_position=="middle":
+            await _bot.edit_message_reply_markup(
+                chat_id=chat_id,
+                message_id=message_id,
+                reply_markup=await make_new_single_keyboard_and_update_db(admin_position, admin_id)
+            )
+        else:
+            await _bot.edit_message_reply_markup(
+                chat_id=chat_id,
+                message_id=message_id,
+                reply_markup=await make_new_double_keyboard_and_update_db(admin_position, admin_id, user_id)
+            )
+    except TelegramRetryAfter as e:
+        await asyncio.sleep(e.retry_after)
 
 async def make_new_double_keyboard_and_update_db(admin_position,admin_id,user_id):
 
@@ -337,27 +342,42 @@ async def process_vote(callback: CallbackQuery):
                 await update_points(user_id)
                 number_of_additional_votes-=1
                 await edit_user(uID,'additional_voices',number_of_additional_votes)
-                await callback.message.edit_reply_markup(reply_markup=keyboard)
-                await callback.answer("Ваш голос учтен!")
+                try:
+                    await callback.message.edit_reply_markup(reply_markup=keyboard)
+                except TelegramRetryAfter as e:
+                    await asyncio.sleep(e.retry_after)
+                try:
+                    await callback.answer("Ваш голос учтен!")
+                except TelegramBadRequest as e:
+                    pass
             else:
                 await callback.answer("Вы уже проголосовали")
         else:
             user_clicks[uID][mID] += 1
-            await callback.message.edit_reply_markup(reply_markup=keyboard)
+            try:
+                await callback.message.edit_reply_markup(reply_markup=keyboard)
+            except TelegramRetryAfter as e:
+                await asyncio.sleep(e.retry_after)
             user_id = int(callback.data.split(':')[1])
             await update_points(user_id)
-            await callback.answer("Ваш голос учтен!")
+            try:
+                await callback.answer("Ваш голос учтен!")
+            except TelegramBadRequest as e:
+                pass
 
-        admin_id= await select_admin_autowin_const("admin_id")
-        admin_id=admin_id[0]
-        if await need_intervention(admin_id):
-            message_id=await select_admin_autowin_const("message_id")
-            message_id=message_id[0]
-            admin_position=await select_admin_autowin_const("admin_position")
-            admin_position=admin_position[0]
-            user_id = await select_admin_autowin_const("user_id")
-            user_id = user_id[0]
-            await update_admin_kb(message_id,admin_id,admin_position,user_id)
+        settings=await select_battle_settings()
+        is_autowin=settings[5]
+        if is_autowin:
+            admin_id= await select_admin_autowin_const("admin_id")
+            admin_id=admin_id[0]
+            if await need_intervention(admin_id):
+                message_id=await select_admin_autowin_const("message_id")
+                message_id=message_id[0]
+                admin_position=await select_admin_autowin_const("admin_position")
+                admin_position=admin_position[0]
+                user_id = await select_admin_autowin_const("user_id")
+                user_id = user_id[0]
+                await update_admin_kb(message_id,admin_id,admin_position,user_id)
 
     else:
         await callback.answer("Для использования бота подпишитесь на канал")

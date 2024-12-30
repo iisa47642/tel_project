@@ -18,7 +18,7 @@ def setup_router(dp, bot: Bot, tm: TaskManager):
 
 
 class ThrottlingMiddleware(BaseMiddleware):
-    def __init__(self, limit=0.75):
+    def __init__(self, limit=1):
         self.rate_limit = limit
         self.user_timeouts = {}
 

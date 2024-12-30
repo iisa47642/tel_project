@@ -11,3 +11,4 @@ class FSMFillForm(StatesGroup):
     fill_message_for_all = State()
     fill_message_for_moder = State()
     fill_message_for_user_on_battle = State()
+    fill_autowin_state = State()

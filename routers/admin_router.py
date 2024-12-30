@@ -423,6 +423,26 @@ async def get_start_time_of_battle(message: Message, state: FSMContext):
 async def get_start_time_of_battle_invalid(message: Message):
     await message.answer(text="Вы ввели неверные данные. Пожалуйста, попробуйте снова.",reply_markup=back_admin_kb)
 
+@admin_router.message(lambda message: message.text == "Автоматическая победа",StateFilter(default_state))
+async def enter_autowin(message: Message, state: FSMContext):
+    await message.answer(text="Включить автовыигрыш, y/n?",reply_markup=back_admin_kb)
+    await state.set_state(FSMFillForm.fill_autowin_state)
+
+@admin_router.message(StateFilter(FSMFillForm.fill_autowin_state),F.text.regexp(r'^[yYnN]$'))
+async def get_autowin(message: Message, state: FSMContext):
+    req=message.text.lower()
+    if req == 'y':
+        await edit_battle_settings("is_autowin", 1)
+    else:
+        await edit_battle_settings("is_autowin", 0)
+    await message.answer(text="Данные получены",reply_markup=tune_battle_admin_kb)
+    await state.clear()
+
+@admin_router.message(StateFilter(FSMFillForm.fill_autowin_state))
+async def get_autowin_invalid(message: Message):
+    await message.answer(text="Вы ввели неверные данные. Пожалуйста, попробуйте снова.",reply_markup=back_admin_kb)
+
+
 
 #@admin_router.message()
 

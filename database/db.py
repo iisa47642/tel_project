@@ -41,7 +41,7 @@ async def create_tables():
         
         await db.execute('''
         CREATE TABLE IF NOT EXISTS admin_photo (
-            photo_id INTEGER PRIMARY KEY
+            photo_id TEXT PRIMARY KEY
         )
         ''')
         
@@ -51,7 +51,8 @@ async def create_tables():
             prize_amount INTEGER,
             min_vote_total INTEGER,
             round_interval INTEGER,
-            time_of_run INTEGER
+            time_of_run INTEGER,
+            is_autowin INTEGER 
         )
         ''')
         await db.execute('''
@@ -216,7 +217,7 @@ async def delete_applications():
 # изменение настроек
 async def edit_battle_settings(parameter: str, value):
     allowed_parameters = ['round_duration','prize_amount',
-            'min_vote_total','round_interval', 'time_of_run']
+            'min_vote_total','round_interval', 'time_of_run','is_autowin']
     
     if parameter in allowed_parameters:
         async with sq.connect("bot_database.db") as db:
@@ -224,7 +225,7 @@ async def edit_battle_settings(parameter: str, value):
                 async with db.execute("SELECT * FROM battle_settings") as cursor:
                     existing = await cursor.fetchall()
                     if not existing:
-                        await db.execute("INSERT INTO battle_settings VALUES(?, ?, ?, ?, ?)", (7200,1000,5,1800,50400))
+                        await db.execute("INSERT INTO battle_settings VALUES(?, ?, ?, ?, ?, ?)", (7200,1000,5,1800,50400, 1))
                         await db.commit()
                             
                     query = f"UPDATE battle_settings SET {parameter} = ?"
@@ -316,7 +317,7 @@ async def select_battle_settings():
         async with db.execute('SELECT * FROM battle_settings') as cursor:
             flag = await cursor.fetchall()
             if not flag:
-                await db.execute("INSERT INTO battle_settings VALUES(?, ?, ?, ?, ?)", (7200,1000,5,1800,50400))
+                await db.execute("INSERT INTO battle_settings VALUES(?, ?, ?, ?, ?, ?)", (7200,1000,5,1800,50400,1))
                 await db.commit()
                 # Делаем новый SELECT после вставки
                 async with db.execute('SELECT * FROM battle_settings') as new_cursor:
@@ -376,9 +377,15 @@ async def edit_admin_autowin_const(parameter: str, value):
                           'user_id']
     if parameter in allowed_parameters:
         async with sq.connect("bot_database.db") as db:
-            query = f"UPDATE admin_autowin_const SET {parameter} = ? WHERE mark=1"
-            await db.execute(query, (value,))
-            await db.commit()
+            async with db.execute("SELECT * FROM admin_autowin_const") as cursor:
+                existing = await cursor.fetchall()
+                if not existing:
+                    await db.execute("INSERT INTO admin_autowin_const VALUES(?, ?, ?, ?, ?)",
+                                     (1, 0, 0, '0', 0))
+                    await db.commit()
+                query = f"UPDATE admin_autowin_const SET {parameter} = ? WHERE mark=1"
+                await db.execute(query, (value,))
+                await db.commit()
 
 async def insert_admin_autowin_const(parameter: str, value):
     allowed_parameters = ['message_id', 'admin_id', 'admin_position',
@@ -404,3 +411,16 @@ async def select_user_from_battle(user_id):
             if existing_user:
                 return existing_user
             return False
+
+async def select_admin_photo():
+    async with sq.connect("bot_database.db") as db:
+        async with db.execute('SELECT max(photo_id) FROM admin_photo') as cursor:
+            photo_id = await cursor.fetchone()
+            await delete_admin_photo(photo_id[0])
+            return photo_id
+
+async def delete_admin_photo(photo_id):
+    async with sq.connect("bot_database.db") as db:
+        query = f"DELETE FROM admin_photo WHERE photo_id = ?"
+        await db.execute(query, (photo_id,))
+        await db.commit()
