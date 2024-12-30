@@ -12,10 +12,12 @@ from routers import user_router
 from states.user_states import FSMFillForm
 from database.db import *
 from tasks import scheduler_manager
-
+from middlewares.middlewares import setup_router as setup_middleware
 import asyncio
 import logging
 import os
+
+from tasks.task_handlers import TaskManager
 
 
 dirname = os.path.dirname(__file__)
@@ -75,6 +77,11 @@ async def process_cancel_command_state(message: Message, state: FSMContext):
 
 async def main():
     dp.message.middleware(ThrottlingMiddleware())
+    task_manager = TaskManager()
+    await task_manager.initialize()  # Инициализируем настройки
+    
+    # Настраиваем middleware с task_manager
+    setup_middleware(dp, bot, task_manager)
     dp.update.outer_middleware(ModeMiddleware())
     user_router.user_router.message.middleware(UserCheckMiddleware())
 
@@ -84,8 +91,8 @@ async def main():
     )
     await create_tables()
     # Запускаем бота
-    scheduler_manager.setup(bot)  # Настраиваем планировщик
-    scheduler_manager.start()
+    scheduler_manager.task_manager = task_manager
+    await scheduler_manager.setup(bot)  # Настраиваем планировщик
     
     try:
         await dp.start_polling(bot)  # 1
