@@ -11,7 +11,7 @@ main_super_admin_kb = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text="Модерация фотографий"),KeyboardButton(text="Рассылка"),KeyboardButton(text="Статистика")],
         [KeyboardButton(text="Очистка баттла"),KeyboardButton(text="Управление администраторами")],
-        [KeyboardButton(text="Настройка баттла",)]
+        [KeyboardButton(text="Настройка баттла",),KeyboardButton(text="Список участников")]
     ],
     resize_keyboard=True
 )
@@ -82,7 +82,12 @@ photo_moderation_admin_kb = InlineKeyboardMarkup(
     ],
     resize_keyboard=True
 )
-
+kick_user_kb = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [InlineKeyboardButton(text="Кикнуть",callback_data="Кикнуть")],
+    ],
+    resize_keyboard=True
+)
 
 def get_main_admin_kb(user_id):
     return main_super_admin_kb if is_super_admin(user_id) else main_admin_kb

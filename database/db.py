@@ -35,7 +35,8 @@ async def create_tables():
             photo_id TEXT,
             is_participant,
             points INTEGER,
-            role TEXT
+            role TEXT,
+            is_kick INTEGER
         )
         ''')
         
@@ -133,7 +134,7 @@ async def create_user_in_batl(user_id, photo_id, role):
         async with db.execute(f"SELECT 1 FROM battle WHERE user_id == '{user_id}'") as cursor:
             user = await cursor.fetchone()
             if not user:
-                await cursor.execute("INSERT INTO battle VALUES(?, ?, ?, ?, ?)", (user_id,photo_id,1,0,role,))
+                await cursor.execute("INSERT INTO battle VALUES(?, ?, ?, ?, ?, ?)", (user_id,photo_id,1,0,role,0))
                 await db.commit()
     
     
@@ -305,7 +306,7 @@ async def select_max_number_of_users_voices(admin_id):
 # возвращает одного участника баттла   
 async def select_user_on_battle(user_id):
     async with sq.connect("bot_database.db") as db:
-        async with db.execute('SELECT * FROM application WHERE user_id = ?', (user_id,)) as cursor:
+        async with db.execute('SELECT * FROM battle WHERE user_id = ?', (user_id,)) as cursor:
             existing_user = await cursor.fetchone()
             if existing_user:
                 return existing_user
@@ -343,19 +344,19 @@ async def update_points(user_id: int):
 # 
 async def get_round_results(min_votes_for_single: int):
     async with sq.connect("bot_database.db") as db:
-        cursor = await db.execute("SELECT user_id, points FROM battle WHERE is_participant = 1")
+        cursor = await db.execute("SELECT * FROM battle WHERE is_participant = 1")
         participants = await cursor.fetchall()
         
         results = []
         for i in range(0, len(participants), 2):
             if i + 1 < len(participants):
                 results.append([
-                    {'user_id': participants[i][0], 'votes': participants[i][1]},
-                    {'user_id': participants[i+1][0], 'votes': participants[i+1][1]}
+                    {'user_id': participants[i][0], 'votes': participants[i][3], 'is_kick': participants[i][5]},
+                    {'user_id': participants[i+1][0], 'votes': participants[i+1][3], 'is_kick': participants[i+1][5]}
                 ])
             else:
                 results.append([
-                    {'user_id': participants[i][0], 'votes': participants[i][1]}
+                    {'user_id': participants[i][0], 'votes': participants[i][3], 'is_kick': participants[i][5]}
                 ])
         
         return results

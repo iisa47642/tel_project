@@ -95,27 +95,77 @@ async def end_round(bot: Bot, channel_id: int, min_votes_for_single: int):
     results = await get_round_results(min_votes_for_single)
     message = "Результаты раунда:\n\n"
     loser_ids = []
+    # print(results)
     for pair in results:
+        # Если пара состоит из двух участников
         if len(pair) == 2:
-            winner = max(pair, key=lambda x: x['votes'])
-            loser = min(pair, key=lambda x: x['votes'])
+            participant1, participant2 = pair
+
+            # Если оба исключены, оба проигрывают
+            if participant1['is_kick'] == 1 and participant2['is_kick'] == 1:
+                loser_ids.extend([participant1['user_id'], participant2['user_id']])
+                message += (
+                    f"Участник №{participant1['user_id']} и участник №{participant2['user_id']} "
+                    f"исключены за нарушение правил\n"
+                )
+                continue
+
+            # Если первый участник исключён, второй выигрывает
+            if participant1['is_kick'] == 1:
+                loser_ids.append(participant1['user_id'])
+                message += (
+                    f"Участник №{participant1['user_id']} исключен за нарушение правил. "
+                    f"Победителем становится участник №{participant2['user_id']}\n"
+                )
+                continue
+
+            # Если второй участник исключён, первый выигрывает
+            if participant2['is_kick'] == 1:
+                loser_ids.append(participant2['user_id'])
+                message += (
+                    f"Участник №{participant2['user_id']} исключен за нарушение правил. "
+                    f"Победителем становится участник №{participant1['user_id']}\n"
+                )
+                continue
+
+            # Если оба не исключены, побеждает тот, кто набрал больше голосов
+            winner, loser = sorted(pair, key=lambda x: x['votes'], reverse=True)
+            message += (
+                f"Участник №{winner['user_id']} побеждает участника №{loser['user_id']} "
+                f"со счетом {winner['votes']}:{loser['votes']}\n"
+            )
             loser_ids.append(loser['user_id'])
-            message += f"Участник №{winner['user_id']} побеждает участника №{loser['user_id']} со счетом {winner['votes']}:{loser['votes']}\n"
+
+            # Отправляем личные сообщения победителю и проигравшему
             try:
                 await bot.send_message(
                     winner['user_id'],
-                    f"Поздравляем! Вы победили участника №{loser['user_id']} со счетом {winner['votes']}:{loser['votes']}. Вы проходите в следующий раунд!"
+                    f"Поздравляем! Вы победили участника №{loser['user_id']} "
+                    f"со счетом {winner['votes']}:{loser['votes']}. Вы проходите в следующий раунд!"
                 )
                 await bot.send_message(
                     loser['user_id'],
-                    f"К сожалению, вы проиграли участнику №{winner['user_id']} со счетом {loser['votes']}:{winner['votes']}. Спасибо за участие!"
+                    f"К сожалению, вы проиграли участнику №{winner['user_id']} "
+                    f"со счетом {loser['votes']}:{winner['votes']}. Спасибо за участие!"
                 )
             except Exception as e:
                 print(f"Ошибка при отправке личного сообщения: {e}")
-        else:
+
+        # Если один участник без пары
+        elif len(pair) == 1:
             participant = pair[0]
+
+            # Если участник исключён, он проигрывает
+            if participant['is_kick'] == 1:
+                loser_ids.append(participant['user_id'])
+                message += f"Участник №{participant['user_id']} исключен за нарушение правил\n"
+                continue
+
+            # Если участник набрал достаточно голосов, он проходит дальше
             if participant['votes'] >= min_votes_for_single:
-                message += f"Участник №{participant['user_id']} проходит дальше с {participant['votes']} голосами\n"
+                message += (
+                    f"Участник №{participant['user_id']} проходит дальше с {participant['votes']} голосами\n"
+                )
                 try:
                     await bot.send_message(
                         participant['user_id'],
@@ -124,8 +174,11 @@ async def end_round(bot: Bot, channel_id: int, min_votes_for_single: int):
                 except Exception as e:
                     print(f"Ошибка при отправке личного сообщения: {e}")
             else:
+                # Если участник не набрал достаточно голосов, он проигрывает
                 loser_ids.append(participant['user_id'])
-                message += f"Участник №{participant['user_id']} выбывает с {participant['votes']} голосами\n"
+                message += (
+                    f"Участник №{participant['user_id']} выбывает с {participant['votes']} голосами\n"
+                )
                 try:
                     await bot.send_message(
                         participant['user_id'],
@@ -133,9 +186,13 @@ async def end_round(bot: Bot, channel_id: int, min_votes_for_single: int):
                     )
                 except Exception as e:
                     print(f"Ошибка при отправке личного сообщения: {e}")
+
+    # Отправляем общий результат в канал
     result_message = await bot.send_message(channel_id, message)
-    return [[result_message.message_id],loser_ids]
-    # return [loser_ids]
+    return [[result_message.message_id], loser_ids]
+
+
+
 
 async def announce_winner(bot: Bot, channel_id: int, winner):
     """

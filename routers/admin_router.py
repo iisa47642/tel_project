@@ -2,7 +2,7 @@ import os
 import re
 
 from aiogram import Router, Bot, F
-from aiogram.filters import Command, StateFilter
+from aiogram.filters import Command, StateFilter, CommandObject
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
 from aiogram.types import Message, CallbackQuery
@@ -448,5 +448,67 @@ async def get_autowin_invalid(message: Message):
 
 # --------------
 
+@admin_router.message(F.text == "Участники текущего баттла")
+async def participiants_of_current_battle(message: Message):
+    users_on_battle = await select_all_battle()
+    if users_on_battle:
+        text = ''
+        for i in users_on_battle:
+            user_id = i[0]
+            try:
+                username = await get_username_by_id(user_id)
+            except Exception as e:
+                print("Не удалось получить ник пользователя. Ошибка:", e)
+            command = f'/prof{user_id}'
+            text += f'id: {user_id}, ник: {username}, анкета: {command}\n'
+        await message.answer(text=text)
+    else:
+        await message.answer(text='Список участников пуст')
 
-# --------------
+# Команда /prof с параметром telegram_id
+@admin_router.message(F.text.regexp(r'^/prof(\d+)$'))
+async def handle_prof_command(message: Message):
+    # Получаем ID из текста сообщения с помощью регулярного выражения
+    match = re.match(r'^/prof(\d+)$', message.text)
+    telegram_id = match.group(1)  # Получаем ID из регулярного выражения
+    
+    try:
+        user_id = int(telegram_id)
+        user_on_battle = await select_user_on_battle(user_id)
+        if user_on_battle:
+            user = await get_user(user_id)
+            buttle_win = user[1]
+            dual_win = user[2]
+            plays_buttle = user[3]
+            referals = user[4]
+            additional_voices = user[5]
+
+            photo_id = user_on_battle[1]
+            photo = photo_id
+
+            try:
+                caption = (
+                    f"ID: {user_id}\n"
+                    f"Ник: @{await get_username_by_id(user_id)}\n"
+                    f"Выйгранных фотобатлов: {buttle_win}\n"
+                    f"Общее число фотобатлов: {plays_buttle}\n"
+                    f"Выйгранных дуэлей: {dual_win}\n\n"
+                    f"Дополнительные голоса: {additional_voices}\n"
+                    f"Приглашенных рефералов: {referals}"
+                )
+            except Exception as e:
+                print("Не удалось получить ник пользователя. Ошибка:", e)
+                caption = (
+                    f"ID: {user_id}\n"
+                    f"Выйгранных фотобатлов: {buttle_win}\n"
+                    f"Общее число фотобатлов: {plays_buttle}\n"
+                    f"Выйгранных дуэлей: {dual_win}\n\n"
+                    f"Дополнительные голоса: {additional_voices}\n"
+                    f"Приглашенных рефералов: {referals}"
+                )
+
+            await message.answer_photo(photo=photo, caption=caption, reply_markup=kick_user_kb)
+        else:
+            await message.answer(text="Игрок с этим ID не зарегистрирован на баттле")
+    except ValueError:
+        await message.reply("Ошибка: Неверный формат ID")
