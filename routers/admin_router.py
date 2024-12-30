@@ -100,6 +100,7 @@ async def apply(call: CallbackQuery):
         photo_id = application[1]
         ref_owner_id = (await get_user(user_id))
         if ref_owner_id:
+            ref_owner_id=ref_owner_id[8]
             # print(await get_user(ref_owner_id))
             additional_voices_owner = (await get_user(ref_owner_id))[5]
             await edit_user(ref_owner_id, 'additional_voices', additional_voices_owner+3)
