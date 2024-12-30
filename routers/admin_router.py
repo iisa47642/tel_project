@@ -98,17 +98,18 @@ async def apply(call: CallbackQuery):
         application = application[0]
         user_id = application[0]
         photo_id = application[1]
-        ref_owner_id = (await get_user(user_id))[8]
-        print(await get_user(ref_owner_id))
-        additional_voices_owner = (await get_user(ref_owner_id))[5]
-        await edit_user(ref_owner_id, 'additional_voices', additional_voices_owner+3)
-        try:
-            await _bot.send_message(ref_owner_id, text=(
-                f"Пользователь {user_id}, зарегестрированный по вашей ссылке получил одобрение на "+
-                f'баттл, вы получаете 3 дополнительных голоса, сейчас количество ваших голосов {additional_voices_owner+3}'
-                ))
-        except Exception as e:
-            print(f"Ошибка при отправке личного сообщения: {e}")
+        ref_owner_id = (await get_user(user_id))
+        if ref_owner_id:
+            # print(await get_user(ref_owner_id))
+            additional_voices_owner = (await get_user(ref_owner_id))[5]
+            await edit_user(ref_owner_id, 'additional_voices', additional_voices_owner+3)
+            try:
+                await _bot.send_message(ref_owner_id, text=(
+                    f"Пользователь {user_id}, зарегестрированный по вашей ссылке получил одобрение на "+
+                    f'баттл, вы получаете 3 дополнительных голоса, сейчас количество ваших голосов {additional_voices_owner+3}'
+                    ))
+            except Exception as e:
+                print(f"Ошибка при отправке личного сообщения: {e}")
         if delMessage:
             await _bot.send_message(call.from_user.id, "Заявки закончились")
             await call.message.delete()
