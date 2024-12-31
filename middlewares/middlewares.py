@@ -1,12 +1,17 @@
 import asyncio
+import os
+
 from aiogram import BaseMiddleware, Bot
 from typing import Callable, Dict, Any, Awaitable, Union
 from aiogram.types import Message, CallbackQuery, TelegramObject
+
+from config.config import load_config
 from database.db import get_user, select_battle_settings
 from datetime import datetime, time, timedelta
 import pytz
 import logging
 from tasks.task_handlers import TaskManager
+from database.db import select_all_admins
 
 class MiddlewareData:
     _bot: Bot = None
@@ -111,11 +116,22 @@ class ModeMiddleware(BaseMiddleware):
                 f"Новый режим: {new_mode} ({mode_descriptions[new_mode]})"
             )
 
+            dirname = os.path.dirname(__file__)
+            filename = os.path.abspath(os.path.join(dirname, '..', 'config/config.env'))
+            config = load_config(filename)
+            SUPER_ADMIN_IDS = config.tg_bot.super_admin_ids
+
             #TODO
-            admin_id = 842589261
-            # await select
-            try:
-                await MiddlewareData._bot.send_message(admin_id, message)
-                logging.info(f"Mode changed from {self.previous_mode} to {new_mode}")
-            except Exception as e:
-                logging.error(f"Failed to send mode change notification: {e}")
+            ADMIN_IDS = await select_all_admins()
+            admins_list = []
+            if ADMIN_IDS:
+                admins_list = [i[0] for i in ADMIN_IDS]
+            admins_list += SUPER_ADMIN_IDS
+            for admin_id in admins_list:
+                try:
+                    await MiddlewareData._bot.send_message(admin_id, message)
+                    logging.info(f"Mode changed from {self.previous_mode} to {new_mode}")
+                except Exception as e:
+                    logging.error(f"Failed to send mode change notification: {e}")
+
+

@@ -165,7 +165,10 @@ class TaskManager:
 
             await delete_previous_messages(self.bot, self.channel_id)
             await delete_users_points()
-            await update_points(0)
+            settings = await select_battle_settings()
+            is_autowin = settings[5]
+            if is_autowin:
+                await update_points(0)
             start_message = await self.bot.send_message(
                 self.channel_id,
                 f"Начинается раунд {round_number}!"
