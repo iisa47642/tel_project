@@ -223,9 +223,13 @@ async def enter_mailing_everybody(message: Message, state: FSMContext):
     txt = message.text
     # возможно, исключить админов из списка
     users = await get_all_users()
+    
     users_id = [user[0] for user in users]
     for user_id in users_id:
-        await _bot.send_message(user_id,text=txt)
+            try:
+                await _bot.send_message(user_id,text=txt)
+            except Exception as e:
+                print(e)
     await message.answer(text="Отправили всем пользователям",reply_markup=mailing_admin_kb)
     await state.clear()
     
@@ -241,7 +245,10 @@ async def enter_mailing_on_moderation(message: Message, state: FSMContext):
     users = await select_all_applications()
     users_id = [user[0] for user in users]
     for user_id in users_id:
-        await _bot.send_message(user_id,text=txt)
+            try:
+                await _bot.send_message(user_id,text=txt)
+            except Exception as e:
+                print(e)
     await message.answer(text="Отправили всем участникам, чьи фото находятся на модерации",reply_markup=mailing_admin_kb)
     await state.clear()
 
@@ -255,9 +262,13 @@ async def enter_mailing_on_moderation(message: Message, state: FSMContext):
     txt = message.text
     # возможно, исключить админов из списка
     users = await select_all_battle()
+   
     users_id = [user[0] for user in users]
     for user_id in users_id:
-        await _bot.send_message(user_id,text=txt)
+            try:
+                await _bot.send_message(user_id,text=txt)
+            except Exception as e:
+                print(e)
     await message.answer(text="Отправили всем активным участникам текущего баттла", reply_markup=mailing_admin_kb)
     await state.clear()
     
