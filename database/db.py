@@ -108,6 +108,20 @@ async def edit_user(user_id: int, parameter: str, value):
                     await db.commit()
 
 
+async def edit_user_role(user_id: int, value):
+    async with sq.connect("bot_database.db") as db:
+        # Проверяем, существует ли пользователь
+        async with db.execute("SELECT user_id FROM users WHERE user_id = ?", (user_id,)) as cursor:
+            existing_user = await cursor.fetchone()
+
+            if existing_user:
+                # Формируем SQL-запрос динамически
+                query = f"UPDATE users SET role = ? WHERE user_id = ?"
+                await db.execute(query, (value, user_id))
+                await db.commit()
+                return True
+            else:
+                return False
 
 async def delete_user(user_id: int):
     """

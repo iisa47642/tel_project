@@ -273,32 +273,47 @@ async def enter_correct_data(message: Message):
 
 
 @admin_router.message(lambda message: message.text == "Управление администраторами",StateFilter(default_state))
-async def photo_moderation(message: Message):
+async def amdin_moderation(message: Message):
     if not is_super_admin(message.from_user.id): return
     await message.answer(text="Управление администраторами",reply_markup=managing_admins_kb)
 
 @admin_router.message(lambda message: message.text == "Назначить",StateFilter(default_state))
-async def enter_duration_of_round(message: Message, state: FSMContext):
+async def enter_new_admin(message: Message, state: FSMContext):
     if not is_super_admin(message.from_user.id): return
     await message.answer(text="Введите id пользователя",reply_markup=back_admin_kb)
     await state.set_state(FSMFillForm.fill_id_of_new_admin)
 
+@admin_router.message(StateFilter(FSMFillForm.fill_id_of_new_admin), F.text.regexp(r"^\d+$"))
+async def get_new_admin(message: Message, state: FSMContext):
+    if await edit_user_role(int(message.text), "admin"):
+        await message.answer(text="Данные получены",reply_markup=managing_admins_kb)
+        await state.clear()
+    else:
+        await message.answer(text="Упс, похоже этот пользователь не подписан на бота.", reply_markup=back_admin_kb)
+
 @admin_router.message(StateFilter(FSMFillForm.fill_id_of_new_admin))
-async def get_duration_of_round(message: Message, state: FSMContext):
-    await message.answer(text="Данные получены",reply_markup=managing_admins_kb)
-    await state.clear()
+async def get_id_of_new_admin_invalid(message: Message):
+    await message.answer(text="Вы ввели неверные данные. Пожалуйста, попробуйте снова.",reply_markup=back_admin_kb)
+
 
 @admin_router.message(lambda message: message.text == "Cнять права",StateFilter(default_state))
-async def enter_duration_of_round(message: Message, state: FSMContext):
+async def enter_id_of_old_admin(message: Message, state: FSMContext):
     if not is_super_admin(message.from_user.id): return
     await message.answer(text="Введите id администратора",reply_markup=back_admin_kb)
     await state.set_state(FSMFillForm.fill_id_of_old_admin)
 
-#TODO add validation
+
+@admin_router.message(StateFilter(FSMFillForm.fill_id_of_old_admin), F.text.regexp(r"^\d+$"))
+async def get_id_of_old_admin(message: Message, state: FSMContext):
+    if await edit_user_role(int(message.text), "user"):
+        await message.answer(text="Данные получены",reply_markup=managing_admins_kb)
+        await state.clear()
+    else:
+        await message.answer(text="Упс, похоже этот пользователь не подписан на бота.", reply_markup=back_admin_kb)
+
 @admin_router.message(StateFilter(FSMFillForm.fill_id_of_old_admin))
-async def get_duration_of_round(message: Message, state: FSMContext):
-    await message.answer(text="Данные получены",reply_markup=managing_admins_kb)
-    await state.clear()
+async def get_id_of_old_admin_invalid(message: Message):
+    await message.answer(text="Вы ввели неверные данные. Пожалуйста, попробуйте снова.",reply_markup=back_admin_kb)
 
 
 ##############################          Настройка баттла                ####################################

@@ -91,7 +91,7 @@ async def make_some_magic():
 
 async def main():
     await create_tables()
-    await make_some_magic()
+    #await make_some_magic()
     dp.message.middleware(ThrottlingMiddleware())
     global task_manager
     task_manager = TaskManager()
