@@ -260,7 +260,7 @@ async def make_keyboard(callback: CallbackQuery):
 async def check_subscription(user_id: int) -> bool:
     """Проверяет, подписан ли пользователь на указанный канал."""
     try:
-        member = await _bot.get_chat_member(chat_id=-1002430244531, user_id=user_id)
+        member = await _bot.get_chat_member(chat_id=-1002298527034, user_id=user_id)
         # Возможные статусы: 'creator', 'administrator', 'member', 'restricted', 'left', 'kicked'
         return member.status in ("creator", "administrator", "member")
     except Exception as e:
@@ -289,7 +289,7 @@ async def update_admin_kb(
         admin_id,
         admin_position="middle",
         user_id=None,
-        chat_id=-1002430244531,
+        chat_id=-1002298527034,
 ):
     try:
         if admin_position=="middle":
@@ -371,7 +371,7 @@ async def process_vote(callback: CallbackQuery):
     if await check_subscription(uID):
         keyboard = await make_keyboard(callback)
         mID = callback.message.message_id
-        member=await _bot.get_chat_member(user_id=uID,chat_id=-1002430244531)
+        member=await _bot.get_chat_member(user_id=uID,chat_id=-1002298527034)
 
         number_of_additional_votes=0
         user=0

@@ -42,7 +42,8 @@ async def create_tables():
         
         await db.execute('''
         CREATE TABLE IF NOT EXISTS admin_photo (
-            photo_id TEXT PRIMARY KEY
+            id INTEGER PRIMARY KEY,
+            photo_id TEXT
         )
         ''')
         
@@ -431,13 +432,13 @@ async def select_user_from_battle(user_id):
 
 async def select_admin_photo():
     async with sq.connect("bot_database.db") as db:
-        async with db.execute('SELECT max(photo_id) FROM admin_photo') as cursor:
+        async with db.execute('SELECT id,max(photo_id) FROM admin_photo') as cursor:
             photo_id = await cursor.fetchone()
-            await delete_admin_photo(photo_id[0])
+            await delete_admin_photo(photo_id[0],photo_id[1])
             return photo_id
 
-async def delete_admin_photo(photo_id):
+async def delete_admin_photo(id, photo_id):
     async with sq.connect("bot_database.db") as db:
-        query = f"DELETE FROM admin_photo WHERE photo_id = ?"
-        await db.execute(query, (photo_id,))
+        query = f"DELETE FROM admin_photo WHERE photo_id = ? AND id=?"
+        await db.execute(query, (photo_id,id,))
         await db.commit()

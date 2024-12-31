@@ -19,7 +19,7 @@ class TaskManager:
     def __init__(self):
         self.admin_id: int = 842589261
         self._bot: Optional[Bot] = None
-        self.channel_id: int = -1002430244531
+        self.channel_id: int = -1002298527034
         self.round_duration: int = 1 #15
         self.break_duration: int = 1 #30
         self.min_votes_for_single: int = 0  # Минимум голосов для одиночного участника

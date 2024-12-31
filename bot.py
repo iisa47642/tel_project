@@ -81,7 +81,7 @@ async def make_some_magic():
     is_autowin = settings[5]
     if is_autowin:
         photo_id=await select_admin_photo()
-        photo_id=photo_id[0]
+        photo_id=photo_id[1]
         try:
             await create_user(0,'user')
         except Exception:
