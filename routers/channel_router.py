@@ -7,7 +7,6 @@ from aiogram.exceptions import TelegramRetryAfter, TelegramBadRequest
 from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, InputMediaPhoto
 
 from config.config import load_config
-from database.db import get_participants, update_points, get_round_results, get_message_ids, clear_message_ids, \
 from database.db import create_user, create_user_in_batl, get_participants, select_admin_photo, update_points, get_round_results, get_message_ids, clear_message_ids, \
     get_user, edit_user, select_user_from_battle, select_max_number_of_users_voices, select_admin_autowin_const, \
     insert_admin_autowin_const, edit_admin_autowin_const, select_battle_settings

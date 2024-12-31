@@ -143,7 +143,7 @@ class TaskManager:
     async def start_battle(self):
         self.battle_active = True
         self.first_round_active = True
-        # await make_some_magic()
+        await make_some_magic()
         round_number = 1
         TIMEZONE = pytz.timezone('Europe/Moscow')
         # время начала баттла
