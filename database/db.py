@@ -123,6 +123,11 @@ async def edit_user_role(user_id: int, value):
             else:
                 return False
 
+async def select_all_admins():
+    async with sq.connect("bot_database.db") as db:
+        async with db.execute('SELECT * FROM users WHERE role=?',('admin',)) as cursor:
+            return await cursor.fetchall()
+
 async def delete_user(user_id: int):
     """
     Удаляет пользователя из базы данных.
