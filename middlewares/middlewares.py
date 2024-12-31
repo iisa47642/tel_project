@@ -50,13 +50,14 @@ class UserCheckMiddleware(BaseMiddleware):
         except Exception as e:
             print("Не удалось получить id пользователя " + e)
         existing_user = await get_user(user_id=user_id)
-        if existing_user[9] == 1:
-            await event.answer("Ваш профиль был заблокирован, вы не имеете возможности пользоваться ботом")
-            return
         if not existing_user and event.text != '/start':
             await event.answer("Пожалуйста, используйте команду /start, чтобы начать работу с ботом.")
             return
 
+        if existing_user[9] == 1:
+            await event.answer("Ваш профиль был заблокирован, вы не имеете возможности пользоваться ботом")
+            return
+        
         return await handler(event, data)
 
 class ModeMiddleware(BaseMiddleware):
@@ -99,7 +100,7 @@ class ModeMiddleware(BaseMiddleware):
 
         mode_descriptions = {
             1: "нет активного баттла",
-            2: "период донабора (1.5 часа)",
+            2: "период донабора",
             3: "активный баттл"
         }
         
@@ -111,6 +112,7 @@ class ModeMiddleware(BaseMiddleware):
             )
             
             admin_id = 842589261
+            # await select
             try:
                 await MiddlewareData._bot.send_message(admin_id, message)
                 logging.info(f"Mode changed from {self.previous_mode} to {new_mode}")

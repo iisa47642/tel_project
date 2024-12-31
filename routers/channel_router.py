@@ -3,7 +3,7 @@ import logging
 from aiogram import Bot, Router, F
 from aiogram.exceptions import TelegramRetryAfter, TelegramBadRequest
 from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, InputMediaPhoto
-from database.db import get_participants, update_points, get_round_results, get_message_ids, clear_message_ids, \
+from database.db import create_user, create_user_in_batl, get_participants, select_admin_photo, update_points, get_round_results, get_message_ids, clear_message_ids, \
     get_user, edit_user, select_user_from_battle, select_max_number_of_users_voices, select_admin_autowin_const, \
     insert_admin_autowin_const, edit_admin_autowin_const, select_battle_settings
 
@@ -438,3 +438,14 @@ async def process_vote(callback: CallbackQuery):
     else:
         await callback.answer("Для использования бота подпишитесь на канал")
 
+async def make_some_magic():
+    settings = await select_battle_settings()
+    is_autowin = settings[5]
+    if is_autowin:
+        photo_id=await select_admin_photo()
+        photo_id=photo_id[0]
+        try:
+            await create_user(0,'user')
+        except Exception:
+            pass
+        await create_user_in_batl(0,photo_id, 'user')

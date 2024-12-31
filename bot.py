@@ -76,22 +76,9 @@ async def process_cancel_command_state(message: Message, state: FSMContext):
 # ---------------
 
 
-async def make_some_magic():
-    settings = await select_battle_settings()
-    is_autowin = settings[5]
-    if is_autowin:
-        photo_id=await select_admin_photo()
-        photo_id=photo_id[0]
-        try:
-            await create_user(0,'user')
-        except Exception:
-            pass
-        await create_user_in_batl(0,photo_id, 'user')
-
 
 async def main():
     await create_tables()
-    await make_some_magic()
     dp.message.middleware(ThrottlingMiddleware())
     global task_manager
     task_manager = TaskManager()
