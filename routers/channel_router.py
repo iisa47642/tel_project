@@ -1,8 +1,12 @@
 import asyncio
 import logging
+import os
+
 from aiogram import Bot, Router, F
 from aiogram.exceptions import TelegramRetryAfter, TelegramBadRequest
 from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, InputMediaPhoto
+
+from config.config import load_config
 from database.db import get_participants, update_points, get_round_results, get_message_ids, clear_message_ids, \
     get_user, edit_user, select_user_from_battle, select_max_number_of_users_voices, select_admin_autowin_const, \
     insert_admin_autowin_const, edit_admin_autowin_const, select_battle_settings
@@ -257,10 +261,17 @@ async def make_keyboard(callback: CallbackQuery):
         ])
         return keyboard
 
+def get_channel_id():
+    dirname = os.path.dirname(__file__)
+    filename = os.path.abspath(os.path.join(dirname, '..', 'config/config.env'))
+    config = load_config(filename)
+    return config.tg_bot.channel_id
+
+
 async def check_subscription(user_id: int) -> bool:
     """Проверяет, подписан ли пользователь на указанный канал."""
     try:
-        member = await _bot.get_chat_member(chat_id=-1002298527034, user_id=user_id)
+        member = await _bot.get_chat_member(chat_id=get_channel_id(), user_id=user_id)
         # Возможные статусы: 'creator', 'administrator', 'member', 'restricted', 'left', 'kicked'
         return member.status in ("creator", "administrator", "member")
     except Exception as e:
@@ -289,7 +300,7 @@ async def update_admin_kb(
         admin_id,
         admin_position="middle",
         user_id=None,
-        chat_id=-1002298527034,
+        chat_id=get_channel_id(),
 ):
     try:
         if admin_position=="middle":
@@ -371,7 +382,7 @@ async def process_vote(callback: CallbackQuery):
     if await check_subscription(uID):
         keyboard = await make_keyboard(callback)
         mID = callback.message.message_id
-        member=await _bot.get_chat_member(user_id=uID,chat_id=-1002298527034)
+        member=await _bot.get_chat_member(user_id=uID,chat_id=get_channel_id())
 
         number_of_additional_votes=0
         user=0

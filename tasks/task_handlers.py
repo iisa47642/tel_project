@@ -19,7 +19,7 @@ class TaskManager:
     def __init__(self):
         self.admin_id: int = 842589261
         self._bot: Optional[Bot] = None
-        self.channel_id: int = -1002298527034
+        self.channel_id: int = self.get_channel_id()
         self.round_duration: int = 1 #15
         self.break_duration: int = 1 #30
         self.min_votes_for_single: int = 0  # Минимум голосов для одиночного участника
@@ -133,7 +133,7 @@ class TaskManager:
         else:
             logging.info("Notification task is not running")
 
-    def load_channel_id(self):
+    def get_channel_id(self):
         dirname = os.path.dirname(__file__)
         filename = os.path.abspath(os.path.join(dirname, '..', 'config/config.env'))
         config = load_config(filename)
