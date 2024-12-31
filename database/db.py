@@ -461,3 +461,6 @@ async def delete_admin_photo(id, photo_id):
         query = f"DELETE FROM admin_photo WHERE photo_id = ? AND id=?"
         await db.execute(query, (photo_id,id,))
         await db.commit()
+
+
+# async def select_admins()

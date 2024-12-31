@@ -8,7 +8,8 @@ from typing import Optional
 import asyncio
 
 import pytz
-from routers.channel_router import send_battle_pairs, end_round, announce_winner, delete_previous_messages, get_new_participants
+
+from routers.channel_router import make_some_magic, send_battle_pairs, end_round, announce_winner, delete_previous_messages, get_new_participants
 from database.db import get_participants, remove_losers, save_message_ids, delete_users_in_batl, select_battle_settings, delete_users_points
 
 from config.config import load_config
@@ -20,9 +21,9 @@ class TaskManager:
         self.admin_id: int = 842589261
         self._bot: Optional[Bot] = None
         self.channel_id: int = self.get_channel_id()
-        self.round_duration: int = 1 #15
-        self.break_duration: int = 1 #30
-        self.min_votes_for_single: int = 0  # Минимум голосов для одиночного участника
+        self.round_duration: int = None #15
+        self.break_duration: int = None #30
+        self.min_votes_for_single: int = None  # Минимум голосов для одиночного участника
         self.notification_task = None
         self.battle_task = None
         self.mode_2_duration = timedelta(hours=1, minutes=30)  # Длительность режима 2
@@ -31,11 +32,8 @@ class TaskManager:
         self.current_round_start = None
         self.next_battle_start = None
         self.timezone = pytz.timezone('Europe/Moscow')
-        # self.DEFAULT_BATTLE_TIME = time(hour=15, minute=0)
-        # BATTLE_SETTINGS = select_battle_settings()
-        # hours = BATTLE_SETTINGS[4] // 3600
-        # minutes = (BATTLE_SETTINGS[4] % 3600) // 60
         self.DEFAULT_BATTLE_TIME = None
+        self.prize = None
 
     async def initialize(self):
     # """Асинхронная инициализация настроек"""
@@ -43,7 +41,10 @@ class TaskManager:
         hours = BATTLE_SETTINGS[4] // 3600
         minutes = (BATTLE_SETTINGS[4] % 3600) // 60
         self.DEFAULT_BATTLE_TIME = time(hour=int(hours), minute=int(minutes))
-
+        self.round_duration = BATTLE_SETTINGS[0]//60
+        self.break_duration = BATTLE_SETTINGS[3]//60
+        self.min_votes_for_single = BATTLE_SETTINGS[2]
+        self.prize = BATTLE_SETTINGS[1]
     @property
     def bot(self) -> Bot:
         return self._bot
@@ -142,6 +143,7 @@ class TaskManager:
     async def start_battle(self):
         self.battle_active = True
         self.first_round_active = True
+        # await make_some_magic()
         round_number = 1
         TIMEZONE = pytz.timezone('Europe/Moscow')
         # время начала баттла
@@ -149,18 +151,6 @@ class TaskManager:
 
         while self.battle_active:
             now = datetime.now(TIMEZONE)
-
-            # Проверяем время суток
-            # if 0 <= now.hour < 10:
-            #     # Если баттл начался после полуночи, ждем до 10 утра
-            #     next_morning = datetime.combine(now.date(), time(hour=10))
-            #     wait_time = (next_morning - now).total_seconds()
-            #     await self.bot.send_message(
-            #         self.channel_id,
-            #         "Баттл приостановлен до 10:00 утра."
-            #     )
-            #     await asyncio.sleep(wait_time)
-            #     continue
 
             participants = await get_participants()
             if len(participants) == 1:
