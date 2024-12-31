@@ -2,7 +2,7 @@
 from datetime import datetime, time, timedelta
 import logging
 import os
-
+from random import randint
 from aiogram import Bot
 from typing import Optional
 import asyncio
@@ -10,7 +10,7 @@ import asyncio
 import pytz
 
 from routers.channel_router import make_some_magic, send_battle_pairs, end_round, announce_winner, delete_previous_messages, get_new_participants
-from database.db import get_participants, remove_losers, save_message_ids, delete_users_in_batl, select_battle_settings, delete_users_points
+from database.db import get_participants, remove_losers, save_message_ids, delete_users_in_batl, select_all_admins, select_battle_settings, delete_users_points, update_points
 
 from config.config import load_config
 from routers.channel_router import send_battle_pairs, end_round, announce_winner, delete_previous_messages
@@ -18,7 +18,6 @@ from database.db import get_participants, remove_losers, save_message_ids, delet
 
 class TaskManager:
     def __init__(self):
-        self.admin_id: int = 842589261
         self._bot: Optional[Bot] = None
         self.channel_id: int = self.get_channel_id()
         self.round_duration: int = None #15
@@ -166,6 +165,7 @@ class TaskManager:
 
             await delete_previous_messages(self.bot, self.channel_id)
             await delete_users_points()
+            await update_points(0)
             start_message = await self.bot.send_message(
                 self.channel_id,
                 f"Начинается раунд {round_number}!"
@@ -224,7 +224,8 @@ class TaskManager:
         
         # Отправляем личное сообщение победителю
         try:
-            await self.bot.send_message(winner['user_id'], "Поздравляем! Вы победили в баттле!")
+            secret_code = randint(1000,9999)
+            await self.bot.send_message(winner['user_id'], f"Поздравляем! Вы победили в баттле! Ваш секретный код {secret_code}")
         except Exception as e:
             logging.error(f"Failed to send congratulation message to winner (ID: {winner['user_id']}): {e}")
             # Отправляем сообщение администратору о проблеме
@@ -234,7 +235,14 @@ class TaskManager:
                     f"ID: {winner['user_id']}\n"
                     f"Ошибка: {str(e)}"
                 )
-                await self.bot.send_message(self.admin_id, error_message)
+                
+                ADMIN_ID = await select_all_admins()
+                admin_ids = []
+                if ADMIN_ID:
+                    admin_ids = [i[0] for i in ADMIN_ID]
+                admin_ids += self.get_super_admin_ids
+                for admin_id in admin_ids:
+                    await self.bot.send_message(self.admin_id, error_message)
             except Exception as admin_error:
                 logging.error(f"Failed to notify admin about winner message error: {admin_error}")
 

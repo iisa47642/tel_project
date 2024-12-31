@@ -53,8 +53,8 @@ class UserCheckMiddleware(BaseMiddleware):
         if not existing_user and event.text != '/start':
             await event.answer("Пожалуйста, используйте команду /start, чтобы начать работу с ботом.")
             return
-
-        if existing_user[9] == 1:
+        
+        if existing_user and existing_user[9] == 1:
             await event.answer("Ваш профиль был заблокирован, вы не имеете возможности пользоваться ботом")
             return
         
