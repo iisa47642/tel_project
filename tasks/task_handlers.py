@@ -9,7 +9,7 @@ import asyncio
 
 import pytz
 from routers.channel_router import send_battle_pairs, end_round, announce_winner, delete_previous_messages, get_new_participants
-from database.db import get_participants, remove_losers, save_message_ids, delete_users_in_batl, select_battle_settings
+from database.db import get_participants, remove_losers, save_message_ids, delete_users_in_batl, select_battle_settings, delete_users_points
 
 from config.config import load_config
 from routers.channel_router import send_battle_pairs, end_round, announce_winner, delete_previous_messages
@@ -19,7 +19,7 @@ class TaskManager:
     def __init__(self):
         self.admin_id: int = 842589261
         self._bot: Optional[Bot] = None
-        self.channel_id: int = -1002298527034
+        self.channel_id: int = -1002430244531
         self.round_duration: int = 1 #15
         self.break_duration: int = 1 #30
         self.min_votes_for_single: int = 0  # Минимум голосов для одиночного участника
@@ -168,7 +168,7 @@ class TaskManager:
                 break
 
             await delete_previous_messages(self.bot, self.channel_id)
-            
+            await delete_users_points()
             start_message = await self.bot.send_message(
                 self.channel_id,
                 f"Начинается раунд {round_number}!"

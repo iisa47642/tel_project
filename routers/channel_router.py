@@ -35,8 +35,6 @@ async def send_pair(bot: Bot, channel_id: int, participant1, participant2):
     """
     Отправляет пару участников в канал.
     """
-    # эта параша работает нормально, но выглядит неправильно, надо править
-    # Участник №{participant1['user_id']} и " + f"Участник №{participant2['user_id']}
     media = [
         InputMediaPhoto(media=participant1['photo_id'], caption=f""),
         InputMediaPhoto(media=participant2['photo_id'], caption=f"")
@@ -189,6 +187,7 @@ async def end_round(bot: Bot, channel_id: int, min_votes_for_single: int):
 
     # Отправляем общий результат в канал
     result_message = await bot.send_message(channel_id, message)
+    
     return [[result_message.message_id], loser_ids]
 
 
@@ -261,7 +260,7 @@ async def make_keyboard(callback: CallbackQuery):
 async def check_subscription(user_id: int) -> bool:
     """Проверяет, подписан ли пользователь на указанный канал."""
     try:
-        member = await _bot.get_chat_member(chat_id=-1002298527034, user_id=user_id)
+        member = await _bot.get_chat_member(chat_id=-1002430244531, user_id=user_id)
         # Возможные статусы: 'creator', 'administrator', 'member', 'restricted', 'left', 'kicked'
         return member.status in ("creator", "administrator", "member")
     except Exception as e:
@@ -290,7 +289,7 @@ async def update_admin_kb(
         admin_id,
         admin_position="middle",
         user_id=None,
-        chat_id=-1002298527034,
+        chat_id=-1002430244531,
 ):
     try:
         if admin_position=="middle":
@@ -372,7 +371,7 @@ async def process_vote(callback: CallbackQuery):
     if await check_subscription(uID):
         keyboard = await make_keyboard(callback)
         mID = callback.message.message_id
-        member=await _bot.get_chat_member(user_id=uID,chat_id=-1002298527034)
+        member=await _bot.get_chat_member(user_id=uID,chat_id=-1002430244531)
 
         number_of_additional_votes=0
         user=0

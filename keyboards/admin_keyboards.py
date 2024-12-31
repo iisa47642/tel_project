@@ -82,12 +82,17 @@ photo_moderation_admin_kb = InlineKeyboardMarkup(
     ],
     resize_keyboard=True
 )
-kick_user_kb = InlineKeyboardMarkup(
-    inline_keyboard=[
-        [InlineKeyboardButton(text="Кикнуть",callback_data="Кикнуть")],
-    ],
-    resize_keyboard=True
-)
+kick_user_kb = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text="Кикнуть", callback_data="kick")]
+])
+
+
+confirm_kick_kb = InlineKeyboardMarkup(inline_keyboard=[
+    [
+        InlineKeyboardButton(text="✅ Да", callback_data="confirm_kick"),
+        InlineKeyboardButton(text="❌ Нет", callback_data="cancel_kick")
+    ]
+])
 
 def get_main_admin_kb(user_id):
     return main_super_admin_kb if is_super_admin(user_id) else main_admin_kb

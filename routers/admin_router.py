@@ -13,9 +13,7 @@ from filters.isAdmin import is_admin
 from keyboards.admin_keyboards import *
 from database.db import *
 from states.admin_states import FSMFillForm
-
-
-
+from utils.task_manager import TaskManagerInstance
 admin_router = Router()
 admin_router.message.filter(is_admin)
 
@@ -102,11 +100,14 @@ async def apply(call: CallbackQuery):
         if ref_owner_id:
             ref_owner_id=ref_owner_id[8]
             # print(await get_user(ref_owner_id))
-            additional_voices_owner = (await get_user(ref_owner_id))[5]
+            owner = await get_user(ref_owner_id)
+            additional_voices_owner = owner[5]
+            referals = owner[4]
             await edit_user(ref_owner_id, 'additional_voices', additional_voices_owner+3)
+            await edit_user(ref_owner_id, 'referals',  referals+1)
             try:
                 await _bot.send_message(ref_owner_id, text=(
-                    f"Пользователь {user_id}, зарегестрированный по вашей ссылке получил одобрение на "+
+                    f"Пользователь {user_id}, зарегистрированный по вашей ссылке получил одобрение на "+
                     f'баттл, вы получаете 3 дополнительных голоса, сейчас количество ваших голосов {additional_voices_owner+3}'
                     ))
             except Exception as e:
@@ -448,7 +449,7 @@ async def get_autowin_invalid(message: Message):
 
 # --------------
 
-@admin_router.message(F.text == "Участники текущего баттла")
+@admin_router.message(F.text == "Список участников")
 async def participiants_of_current_battle(message: Message):
     users_on_battle = await select_all_battle()
     if users_on_battle:
@@ -460,7 +461,7 @@ async def participiants_of_current_battle(message: Message):
             except Exception as e:
                 print("Не удалось получить ник пользователя. Ошибка:", e)
             command = f'/prof{user_id}'
-            text += f'id: {user_id}, ник: {username}, анкета: {command}\n'
+            text += f'ID: {user_id}, ник: @{username}, анкета: {command}\n'
         await message.answer(text=text)
     else:
         await message.answer(text='Список участников пуст')
@@ -512,3 +513,47 @@ async def handle_prof_command(message: Message):
             await message.answer(text="Игрок с этим ID не зарегистрирован на баттле")
     except ValueError:
         await message.reply("Ошибка: Неверный формат ID")
+
+@admin_router.callback_query(lambda c: c.data == "kick")
+async def process_kick_button(callback: CallbackQuery):
+    # Получаем ID пользователя из текста сообщения
+    text = callback.message.caption
+    user_id = int(text.split('\n')[0].split(': ')[1])
+    
+    await callback.message.edit_caption(
+        caption=f"{callback.message.caption}\n\nВы уверены, что хотите кикнуть этого пользователя?",
+        reply_markup=confirm_kick_kb
+    )
+    await callback.answer()
+
+@admin_router.callback_query(lambda c: c.data == "confirm_kick")
+async def process_confirm_kick(callback: CallbackQuery):
+    # Получаем ID пользователя из текста сообщения
+    text = callback.message.caption
+    user_id = int(text.split('\n')[0].split(': ')[1])
+    
+    try:
+        task_manager = TaskManagerInstance.get_instance()
+        current_mode = await task_manager.get_current_mode()
+        if current_mode != 1:
+            await kick_user_battle(user_id)
+            
+            await callback.message.edit_caption(
+                caption=f"{callback.message.caption}\n\nПользователь будет кикнут и удален из баттла в конце 1 раунда!",
+                reply_markup=None
+            )
+        else:
+            await delete_user_in_batl(user_id)
+
+            await callback.message.edit_caption(
+                caption=f"{callback.message.caption}\n\nПользователь был удален из баттла!",
+                reply_markup=None
+            )
+            
+    except Exception as e:
+        await callback.answer(f"Ошибка при удалении пользователя: {str(e)}", show_alert=True)
+
+@admin_router.callback_query(lambda c: c.data == "cancel_kick")
+async def process_cancel_kick(callback: CallbackQuery):
+    await callback.message.edit_reply_markup(reply_markup=kick_user_kb)
+    await callback.answer("Действие отменено")

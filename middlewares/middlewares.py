@@ -50,7 +50,9 @@ class UserCheckMiddleware(BaseMiddleware):
         except Exception as e:
             print("Не удалось получить id пользователя " + e)
         existing_user = await get_user(user_id=user_id)
-
+        if existing_user[9] == 1:
+            await event.answer("Ваш профиль был заблокирован, вы не имеете возможности пользоваться ботом")
+            return
         if not existing_user and event.text != '/start':
             await event.answer("Пожалуйста, используйте команду /start, чтобы начать работу с ботом.")
             return

@@ -18,6 +18,7 @@ import logging
 import os
 
 from tasks.task_handlers import TaskManager
+from utils.task_manager import TaskManagerInstance
 
 
 dirname = os.path.dirname(__file__)
@@ -92,9 +93,10 @@ async def main():
     await create_tables()
     await make_some_magic()
     dp.message.middleware(ThrottlingMiddleware())
+    global task_manager
     task_manager = TaskManager()
     await task_manager.initialize()  # Инициализируем настройки
-    
+    TaskManagerInstance.set_instance(task_manager)
     # Настраиваем middleware с task_manager
     setup_middleware(dp, bot, task_manager)
     dp.update.outer_middleware(ModeMiddleware())

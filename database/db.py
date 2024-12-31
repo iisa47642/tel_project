@@ -91,7 +91,7 @@ async def create_user(user_id, role):
 async def edit_user(user_id: int, parameter: str, value):
     allowed_parameters = ['user_id','buttle_win','dual_win',
                           'plays_buttle' ,'referals','additional_voices',
-                          'registration_date','role','ref_owner']
+                          'registration_date','role','ref_owner','is_ban']
     
     if parameter in allowed_parameters:
         async with sq.connect("bot_database.db") as db:
@@ -149,7 +149,18 @@ async def edite_photo_in_batl(user_id):
                     await db.execute(query, (user_id,))
                     await db.commit()
                 
-                
+async def kick_user_battle(user_id):
+    async with sq.connect("bot_database.db") as db:
+        # Проверяем, существует ли пользователь
+            async with db.execute("SELECT user_id FROM battle WHERE user_id = ?", (user_id,)) as cursor:
+                existing_user = await cursor.fetchone()
+                if existing_user:
+                    # Формируем SQL-запрос динамически
+                    query = f"UPDATE battle SET is_kick = 1 WHERE user_id = ?"
+                    await db.execute(query, (user_id,))
+                    await db.commit()
+    
+
 async def delete_user_in_batl(user_id):
     async with sq.connect("bot_database.db") as db:
         # Проверяем, существует ли пользователь
@@ -370,6 +381,11 @@ async def remove_losers(losers: list):
             await cursor.execute("DELETE FROM battle WHERE user_id = ?", (user_id,))
         await db.commit()
 
+
+async def delete_users_points():
+    async with sq.connect("bot_database.db") as db:
+        await db.execute("UPDATE battle SET points = 0")
+        await db.commit()
 
 #admin_autowin_const
 
