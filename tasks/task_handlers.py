@@ -140,6 +140,13 @@ class TaskManager:
         config = load_config(filename)
         return config.tg_bot.channel_id
 
+    def get_super_admin_ids(self):
+        dirname = os.path.dirname(__file__)
+        filename = os.path.abspath(os.path.join(dirname, '..', 'config/config.env'))
+        config = load_config(filename)
+        return config.tg_bot.super_admin_ids
+
+
     async def start_battle(self):
         self.battle_active = True
         self.first_round_active = True
