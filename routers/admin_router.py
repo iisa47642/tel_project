@@ -5,7 +5,7 @@ from aiogram import Router, Bot, F
 from aiogram.filters import Command, StateFilter, CommandObject
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import Message, CallbackQuery, InputMediaPhoto
 
 from config.config import load_config
 import keyboards
@@ -41,6 +41,7 @@ async def gen_mode_aplic(application):
 
         
         photo=photo_id,
+        print(photo)
         try:
             caption=f"ID: {user_id}\n" + f"Ник: @{await get_username_by_id(user_id)}\n" +f"Выйгранных фотобатлов: {buttle_win} \n" + f"Общее число фотобатлов: {plays_buttle} \n" + f"Выйгранных дуэлей: {dual_win}\n\n" + f"Дополнительные голоса: {additional_voices}\n" f"Приглашенных рефералов: {referals}"
         except Exception as e:
@@ -124,7 +125,7 @@ async def apply(call: CallbackQuery):
             photo = values[0]
             caption = values[1]
             reply_markup = values[2]
-            await call.message.edit_caption(photo = photo,caption=caption, reply_markup=reply_markup)
+            await call.message.edit_media(media=InputMediaPhoto(media=photo, caption=caption), reply_markup=reply_markup)
     else:
         await _bot.send_message(call.from_user.id, "Заявки закончились")
     

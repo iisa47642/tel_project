@@ -180,7 +180,7 @@ class TaskManager:
 
             # Определяем продолжительность раунда
             # if now.hour < 10 and now.hour >= 0:
-            if now.hour < 10 and now.hour >= 6:  # Если раунд начался после полуночи
+            if now.hour < 10 and now.hour >= 9:  # Если раунд начался после полуночи
                 tomorrow = now.date() + timedelta(days=1)
                 round_end_time = self.timezone.localize(datetime.combine(tomorrow, time(hour=10)))
                 wait_time = (round_end_time - now).total_seconds()
@@ -263,7 +263,7 @@ class TaskManager:
                 datetime.combine(next_day, self.DEFAULT_BATTLE_TIME)
             )
 
-            if now.hour >= 5 and now.hour < 10:
+            if now.hour >= 9 and now.hour < 10:
                 self.next_battle_start = TIMEZONE.localize(
                     datetime.combine(next_day, time(hour=10, minute=0))
                 )
@@ -321,7 +321,7 @@ class TaskManager:
                 if now >= battle_time:
                     battle_time += timedelta(days=1)
                 # Проверяем ночное время
-                if battle_time.hour >= 5 and battle_time.hour < 10:
+                if battle_time.hour >= 9 and battle_time.hour < 10:
                     next_day = battle_time.date()
                     # if battle_time.hour >= 3:
                         # 22 быть должно
