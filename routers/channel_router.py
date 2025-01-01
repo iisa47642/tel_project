@@ -7,9 +7,12 @@ from aiogram.exceptions import TelegramRetryAfter, TelegramBadRequest
 from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, InputMediaPhoto
 
 from config.config import load_config
-from database.db import create_user, create_user_in_batl, get_participants, select_admin_photo, update_points, get_round_results, get_message_ids, clear_message_ids, \
+from database.db import create_user, create_user_in_batl, get_participants, select_admin_photo, update_points, \
+    get_round_results, get_message_ids, clear_message_ids, \
     get_user, edit_user, select_user_from_battle, select_max_number_of_users_voices, select_admin_autowin_const, \
-    insert_admin_autowin_const, edit_admin_autowin_const, select_battle_settings
+    insert_admin_autowin_const, edit_admin_autowin_const, select_battle_settings, select_all_admins
+
+from filters.isAdmin import is_admin
 
 _bot: Bot = None  # Placeholder for the bot instance
 
@@ -302,6 +305,19 @@ async def update_admin_kb(
         user_id=None,
         chat_id=get_channel_id(),
 ):
+    """
+        Обновляет клавиатуру администратора.
+
+        Эта функция редактирует клавиатуру сообщения в зависимости от позиции администратора.
+        Если позиция администратора "middle", создается новая клавиатура для одиночного голосования.
+        В противном случае создается новая клавиатура для двойного голосования.
+
+        :param message_id: ID сообщения, которое нужно отредактировать
+        :param admin_id: ID администратора
+        :param admin_position: Позиция администратора в голосовании ("middle" по умолчанию)
+        :param user_id: ID пользователя (необязательный параметр, используется для двойного голосования)
+        :param chat_id: ID чата (по умолчанию используется ID канала)
+    """
     try:
         if admin_position=="middle":
             await _bot.edit_message_reply_markup(
@@ -319,7 +335,17 @@ async def update_admin_kb(
         await asyncio.sleep(e.retry_after)
 
 async def make_new_double_keyboard_and_update_db(admin_position,admin_id,user_id):
+    """
+        Создает новую клавиатуру для двойного голосования и обновляет базу данных.
 
+        Эта функция получает количество голосов администратора и пользователя, обновляет очки администратора
+        и создает новую клавиатуру для двойного голосования с обновленным количеством голосов.
+
+        :param admin_position: Позиция администратора в голосовании ("left" или "right")
+        :param admin_id: ID администратора
+        :param user_id: ID пользователя
+        :return: Объект InlineKeyboardMarkup с обновленной клавиатурой
+    """
     number_of_admins_votes = await select_user_from_battle(admin_id)
     number_of_admins_votes = number_of_admins_votes[3]
     number_of_users_votes = await select_user_from_battle(user_id)
@@ -346,6 +372,17 @@ async def make_new_double_keyboard_and_update_db(admin_position,admin_id,user_id
         return keyboard
 
 async def make_new_single_keyboard_and_update_db(admin_position,admin_id):
+    """
+        Создает новую клавиатуру для одиночного голосования и обновляет базу данных.
+
+        Эта функция получает количество голосов администратора, обновляет его очки и создает новую клавиатуру
+        для одиночного голосования с обновленным количеством голосов.
+
+        :param admin_position: Позиция администратора в голосовании (должна быть "middle")
+        :param admin_id: ID администратора
+        :return: Объект InlineKeyboardMarkup с обновленной клавиатурой
+    """
+
     number_of_admins_votes = await select_user_from_battle(admin_id)
     number_of_admins_votes=number_of_admins_votes[3]
     await update_points(admin_id)
@@ -358,6 +395,16 @@ async def make_new_single_keyboard_and_update_db(admin_position,admin_id):
         return keyboard
 
 async def need_intervention(admin_id):
+    """
+        Проверяет, требуется ли вмешательство администратора.
+
+        Эта функция сравнивает количество голосов администратора с максимальным количеством голосов пользователей,
+        добавляя дельту. Если количество голосов администратора меньше, чем максимальное количество голосов пользователей плюс дельта,
+        функция возвращает True, иначе False.
+
+        :param admin_id: ID администратора
+        :return: True, если требуется вмешательство, иначе False
+    """
     delta=5
     number_of_admins_votes = await select_user_from_battle(admin_id)
     number_of_admins_votes=number_of_admins_votes[3]
@@ -367,6 +414,23 @@ async def need_intervention(admin_id):
         return True
     return False
 
+
+
+# 842589261,1270990667
+
+async def is_admin(callback: CallbackQuery) -> bool:
+    dirname = os.path.dirname(__file__)
+    filename = os.path.abspath(os.path.join(dirname, '..', 'config/config.env'))
+    config = load_config(filename)
+    SUPER_ADMIN_IDS = config.tg_bot.super_admin_ids
+    if callback.from_user.id in SUPER_ADMIN_IDS:
+        return True
+    ADMIN_ID = await select_all_admins()
+    if ADMIN_ID:
+        ADMIN_ID = [i[0] for i in ADMIN_ID]
+        return callback.from_user.id in ADMIN_ID
+    else:
+        return False
 
 
 @channel_router.callback_query(F.data.startswith("vote:"))
@@ -403,7 +467,9 @@ async def process_vote(callback: CallbackQuery):
         elif mID not in user_clicks[uID]:
             user_clicks[uID][mID] = 0
 
-        if user_clicks.get(uID) is not None and user_clicks.get(uID).get(mID) is not None and user_clicks[uID][mID] == 1 and member.status not in ["creator", "administrator"]:
+        is_admin_of_bot=await is_admin(callback)
+
+        if user_clicks.get(uID) is not None and user_clicks.get(uID).get(mID) is not None and user_clicks[uID][mID] >= 1 and member.status not in ["creator", "administrator"] and not is_admin_of_bot:
             if number_of_additional_votes > 0:
                 user_id = int(callback.data.split(':')[1]) # the one who is voted
                 await update_points(user_id)
@@ -432,31 +498,57 @@ async def process_vote(callback: CallbackQuery):
             except TelegramBadRequest as e:
                 pass
 
+        # Получает настройки баттла
         settings=await select_battle_settings()
+        # Проверяет, включен ли автоматический выигрыш
         is_autowin=settings[5]
+
         if is_autowin:
+            # Получает ID администратора для автоматического выигрыша
             admin_id= await select_admin_autowin_const("admin_id")
             admin_id=admin_id[0]
+
+            # Проверяет, требуется ли вмешательство администратора
             if await need_intervention(admin_id):
+                # Получает ID сообщения для автоматического выигрыша
                 message_id=await select_admin_autowin_const("message_id")
                 message_id=message_id[0]
+
+                # Получает позицию администратора в голосовании
                 admin_position=await select_admin_autowin_const("admin_position")
                 admin_position=admin_position[0]
+
+                # Получает ID пользователя для автоматического выигрыша
                 user_id = await select_admin_autowin_const("user_id")
                 user_id = user_id[0]
-                await update_admin_kb(message_id,admin_id,admin_position,user_id)
 
+                # Обновляет клавиатуру администратора
+                await update_admin_kb(message_id,admin_id,admin_position,user_id)
     else:
         await callback.answer("Для использования бота подпишитесь на канал")
 
 async def make_some_magic():
+    """
+        Проверяет, включен ли автоматический выигрыш, и выполняет необходимые действия.
+
+        Эта функция проверяет настройки баттла, чтобы узнать, включена ли функция автоматического выигрыша.
+        Если она включена, функция получает ID фото администратора, создает пользователя с ID 0 (если он еще не создан),
+        и добавляет этого пользователя в баттл с полученным ID фото.
+    """
+    # Проверяет, включен ли автоматический выигрыш
     settings = await select_battle_settings()
     is_autowin = settings[5]
+
     if is_autowin:
+        # Получает ID фото администратора
         photo_id=await select_admin_photo()
         photo_id=photo_id[1]
+
+        # Создает пользователя с ID 0, если он еще не создан
         try:
             await create_user(0,'user')
         except Exception:
             pass
+
+        # Добавляет пользователя с ID 0 в баттл с полученным ID фото
         await create_user_in_batl(0,photo_id, 'user')
