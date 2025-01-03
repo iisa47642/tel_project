@@ -364,9 +364,9 @@ async def set_user_as_participant(user_id: int):
 # 
 async def get_participants():
     async with sq.connect("bot_database.db") as db:
-        cursor = await db.execute("SELECT user_id, photo_id FROM battle WHERE is_participant = 1")
+        cursor = await db.execute("SELECT user_id, photo_id, points FROM battle WHERE is_participant = 1")
         participants = await cursor.fetchall()
-        return [{'user_id': p[0], 'photo_id': p[1]} for p in participants]
+        return [{'user_id': p[0], 'photo_id': p[1], 'points': p[2]} for p in participants]
 # 
 async def update_points(user_id: int):
     async with sq.connect("bot_database.db") as db:
@@ -464,3 +464,29 @@ async def delete_admin_photo(id, photo_id):
 
 
 # async def select_admins()
+# ------ обновление статистики
+
+async def users_plays_buttle_update():
+    async with sq.connect("bot_database.db") as db:
+        async with db.execute("SELECT user_id FROM battle") as cursor:
+            existing_users = await cursor.fetchall()
+            if existing_users:
+                await db.execute("UPDATE users SET plays_buttle = plays_buttle + 1")
+                await db.commit()
+
+async def users_buttle_win_update(user_id):
+    async with sq.connect("bot_database.db") as db:
+        async with db.execute("SELECT user_id FROM battle WHERE user_id = ?", (user_id,)) as cursor:
+            existing_user = await cursor.fetchone()
+            if existing_user:
+                await db.execute("UPDATE users SET buttle_win = buttle_win + 1 WHERE user_id = ?", (user_id,))
+                await db.commit()
+
+
+async def users_dual_win_update(user_id):
+    async with sq.connect("bot_database.db") as db:
+        async with db.execute("SELECT user_id FROM battle WHERE user_id = ?", (user_id,)) as cursor:
+            existing_user = await cursor.fetchone()
+            if existing_user:
+                await db.execute("UPDATE users SET dual_win = dual_win + 1 WHERE user_id = ?", (user_id,))
+                await db.commit()

@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import os
+from random import randint
 
 from aiogram import Bot, Router, F
 from aiogram.exceptions import TelegramRetryAfter, TelegramBadRequest
@@ -10,7 +11,7 @@ from config.config import load_config
 from database.db import create_user, create_user_in_batl, get_participants, select_admin_photo, update_points, \
     get_round_results, get_message_ids, clear_message_ids, \
     get_user, edit_user, select_user_from_battle, select_max_number_of_users_voices, select_admin_autowin_const, \
-    insert_admin_autowin_const, edit_admin_autowin_const, select_battle_settings, select_all_admins
+    insert_admin_autowin_const, edit_admin_autowin_const, select_battle_settings, select_all_admins,users_dual_win_update
 
 from filters.isAdmin import is_admin
 
@@ -122,6 +123,7 @@ async def end_round(bot: Bot, channel_id: int, min_votes_for_single: int):
                     f"Участник №{participant1['user_id']} исключен за нарушение правил. "
                     f"Победителем становится участник №{participant2['user_id']}\n"
                 )
+                await users_dual_win_update(participant2['user_id'])
                 continue
 
             # Если второй участник исключён, первый выигрывает
@@ -131,16 +133,34 @@ async def end_round(bot: Bot, channel_id: int, min_votes_for_single: int):
                     f"Участник №{participant2['user_id']} исключен за нарушение правил. "
                     f"Победителем становится участник №{participant1['user_id']}\n"
                 )
+                await users_dual_win_update(participant1['user_id'])
                 continue
-
+            
+            if participant1['votes'] == participant2['votes']:
+                message += (
+                    f"Участник №{participant1['user_id']} сыграл в ничью с участником №{participant2['user_id']} "
+                    f"со счетом {participant1['votes']}:{participant2['votes']}\n"
+                )
+                for partic in pair:
+                    try:
+                        await bot.send_message(
+                        partic['user_id'],
+                        f"Поздравляем! Вы сыграли в ничью "
+                        f"со счетом {participant1['votes']}:{participant2['votes']}. Вы проходите в следующий раунд!"
+                    )
+                    except Exception as e:
+                        print(f"Ошибка при отправке личного сообщения: {e}")
+                continue
+            
+            
             # Если оба не исключены, побеждает тот, кто набрал больше голосов
             winner, loser = sorted(pair, key=lambda x: x['votes'], reverse=True)
             message += (
                 f"Участник №{winner['user_id']} побеждает участника №{loser['user_id']} "
                 f"со счетом {winner['votes']}:{loser['votes']}\n"
             )
+            await users_dual_win_update(winner['user_id'])
             loser_ids.append(loser['user_id'])
-
             # Отправляем личные сообщения победителю и проигравшему
             try:
                 await bot.send_message(
@@ -198,14 +218,59 @@ async def end_round(bot: Bot, channel_id: int, min_votes_for_single: int):
     return [[result_message.message_id], loser_ids]
 
 
+async def get_super_admin_ids():
+        dirname = os.path.dirname(__file__)
+        filename = os.path.abspath(os.path.join(dirname, '..', 'config/config.env'))
+        config = load_config(filename)
+        return config.tg_bot.super_admin_ids
 
 
-async def announce_winner(bot: Bot, channel_id: int, winner):
+async def announce_winner(bot: Bot, channel_id: int, winners):
     """
     Объявляет победителя баттла.
     """
-    winner_message = await bot.send_message(channel_id, f"Поздравляем участника №{winner['user_id']}! Победитель баттла!")
-    return [winner_message.message_id]
+    # Отправляем личное сообщение победителю
+    for winner in winners:
+        try:
+            secret_code = randint(1000,9999)
+            if len(winners)==1:
+                await bot.send_message(winner['user_id'], f"Поздравляем! Вы победили в баттле! Ваш секретный код {secret_code}. Обратитесь в поддержку за получением приза")
+            if len(winners)==2:
+                await bot.send_message(winner['user_id'], f"Поздравляем! Вы сыграли в ничью в баттле с другим участником! Ваш секретный код {secret_code}. Обратитесь в поддержку за получением приза")
+        except Exception as e:
+            logging.error(f"Failed to send congratulation message to winner (ID: {winner['user_id']}): {e}")
+            # Отправляем сообщение администратору о проблеме
+            try:
+                error_message = (
+                    f"⚠️ Не удалось отправить поздравление победителю:\n"
+                    f"ID: {winner['user_id']}\n"
+                    f"Ошибка: {str(e)}"
+                )
+                
+                ADMIN_ID = await select_all_admins()
+                admin_ids = []
+                if ADMIN_ID:
+                    admin_ids = [i[0] for i in ADMIN_ID]
+                admin_ids += await get_super_admin_ids()
+                for admin_id in admin_ids:
+                    await bot.send_message(admin_id, error_message)
+            except Exception as admin_error:
+                logging.error(f"Failed to notify admin about winner message error: {admin_error}")
+    if len(winners)==1:
+        winner = winners[0]
+        media = [
+        InputMediaPhoto(media=winner['photo_id'], caption=f"Поздравляем участника №{winner['user_id']}! Победитель баттла!")
+    ]
+        
+    if len(winners)==2:
+        winner1 = winners[0]
+        winner2 = winners[1]
+        media = [
+        InputMediaPhoto(media=winner1['photo_id'], caption=f"Поздравляем участников №{winner1['user_id']} и №{winner2['user_id']}! Сыгравших баттл в ничью!"),
+        InputMediaPhoto(media=winner2['photo_id'], caption=f"")
+    ]
+    winner_message = await bot.send_media_group(channel_id, media)
+    return [msg.message_id for msg in winner_message]
 
 async def delete_previous_messages(bot: Bot, channel_id: int):
     """

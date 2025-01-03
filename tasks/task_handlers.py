@@ -6,11 +6,11 @@ from random import randint
 from aiogram import Bot
 from typing import Optional
 import asyncio
-
+from math import log
 import pytz
 
 from routers.channel_router import make_some_magic, send_battle_pairs, end_round, announce_winner, delete_previous_messages, get_new_participants
-from database.db import get_participants, remove_losers, save_message_ids, delete_users_in_batl, select_all_admins, select_battle_settings, delete_users_points, update_points
+from database.db import get_participants, remove_losers, save_message_ids, delete_users_in_batl, select_all_admins, select_battle_settings, delete_users_points, update_points,users_plays_buttle_update,users_buttle_win_update
 
 from config.config import load_config
 from routers.channel_router import send_battle_pairs, end_round, announce_winner, delete_previous_messages
@@ -159,8 +159,14 @@ class TaskManager:
             now = datetime.now(TIMEZONE)
 
             participants = await get_participants()
+            if round_number == 1:
+                await users_plays_buttle_update()
+            # number_of_rounds = int(log(len(participants),2))
             if len(participants) == 1:
-                await self.end_battle(participants[0])
+                await self.end_battle([participants[0]])
+                break
+            elif len(participants) == 2 and participants[0]['points'] == participants[1]['points']:
+                await self.end_battle([participants[0], participants[1]])
                 break
 
             await delete_previous_messages(self.bot, self.channel_id)
@@ -169,7 +175,18 @@ class TaskManager:
             is_autowin = settings[5]
             if is_autowin:
                 await update_points(0)
-            start_message = await self.bot.send_message(
+            if 2 < len(participants)<=4:
+                start_message = await self.bot.send_message(
+                self.channel_id,
+                f"Начинается полуфинал!"
+            )
+            elif len(participants)==2:
+                start_message = await self.bot.send_message(
+                self.channel_id,
+                f"Начинается финал!"
+            )
+            else:
+                start_message = await self.bot.send_message(
                 self.channel_id,
                 f"Начинается раунд {round_number}!"
             )
@@ -212,43 +229,22 @@ class TaskManager:
 
             await remove_losers(losers)
             round_number += 1
+            self.min_votes_for_single += 5
             self.first_round_active = False
 
             await asyncio.sleep(self.break_duration * 60)
 
-    async def end_battle(self, winner):
+    async def end_battle(self, winners: list):
         # Удаляем все предыдущие сообщения
         await delete_previous_messages(self.bot, self.channel_id)
-        
+        for winner in winners:
+            await users_buttle_win_update(winner['user_id'])
         # Объявляем победителя
-        final_message_ids = await announce_winner(self.bot, self.channel_id, winner)
+        final_message_ids = await announce_winner(self.bot, self.channel_id, winners)
         await save_message_ids(final_message_ids)
         await delete_users_in_batl()
-        
-        # Отправляем личное сообщение победителю
-        try:
-            secret_code = randint(1000,9999)
-            await self.bot.send_message(winner['user_id'], f"Поздравляем! Вы победили в баттле! Ваш секретный код {secret_code}")
-        except Exception as e:
-            logging.error(f"Failed to send congratulation message to winner (ID: {winner['user_id']}): {e}")
-            # Отправляем сообщение администратору о проблеме
-            try:
-                error_message = (
-                    f"⚠️ Не удалось отправить поздравление победителю:\n"
-                    f"ID: {winner['user_id']}\n"
-                    f"Ошибка: {str(e)}"
-                )
-                
-                ADMIN_ID = await select_all_admins()
-                admin_ids = []
-                if ADMIN_ID:
-                    admin_ids = [i[0] for i in ADMIN_ID]
-                admin_ids += self.get_super_admin_ids
-                for admin_id in admin_ids:
-                    await self.bot.send_message(self.admin_id, error_message)
-            except Exception as admin_error:
-                logging.error(f"Failed to notify admin about winner message error: {admin_error}")
-
+        BATTLE_SETTINGS = await select_battle_settings()
+        self.min_votes_for_single = BATTLE_SETTINGS[2]
 
         TIMEZONE = pytz.timezone('Europe/Moscow')
         now = datetime.now(TIMEZONE)
