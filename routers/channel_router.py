@@ -1,17 +1,23 @@
 import asyncio
+from collections import defaultdict
 import logging
 import os
 from random import randint
-
+import asyncio
+import random
+from datetime import datetime, timedelta
+import logging
+from aiogram import F, Bot, Router
+from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, InputMediaPhoto
+from aiogram.exceptions import TelegramBadRequest
 from aiogram import Bot, Router, F
 from aiogram.exceptions import TelegramRetryAfter, TelegramBadRequest
 from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, InputMediaPhoto
 
 from config.config import load_config
-from database.db import create_user, create_user_in_batl, get_participants, select_admin_photo, update_points, \
-    get_round_results, get_message_ids, clear_message_ids, \
-    get_user, edit_user, select_user_from_battle, select_max_number_of_users_voices, select_admin_autowin_const, \
-    insert_admin_autowin_const, edit_admin_autowin_const, select_battle_settings, select_all_admins,users_dual_win_update
+from database.db import create_user, create_user_in_batl, get_current_votes, get_participants, select_admin_photo, update_admin_battle_points, update_points, \
+    get_round_results, get_message_ids, clear_message_ids,\
+    select_battle_settings, select_all_admins,users_dual_win_update
 
 from filters.isAdmin import is_admin
 
@@ -20,9 +26,77 @@ _bot: Bot = None  # Placeholder for the bot instance
 def setup_router(dp, bot: Bot):
     global _bot
     _bot = bot
-    
+
+ROUND_DURATION = 300  # 30 минут
+END_PHASE_THRESHOLD = 0.85  # Последние 15% времени считаются концом раунда
+MIN_REQUIRED_VOTES = 5  # Минимальное количество голосов для прохождения
+MIN_VOTE_INCREMENT = 1   # Минимальный прирост голосов
+MAX_VOTE_INCREMENT = 2   # Максимальный прирост голосов
+VOTE_SPEED_SLOW = (15, 25)    # Медленная скорость (интервал в секундах)
+VOTE_SPEED_NORMAL = (8, 15)   # Нормальная скорость
+VOTE_SPEED_FAST = (3, 8)      # Быстрая скорость
+# Константы для задержек в разных фазах (в секундах)
+INITIAL_PHASE_DELAYS = (2.0, 3.0)  # Большие задержки в начальной фазе
+MIDDLE_PHASE_DELAYS = (1.0, 2.0)   # Средние задержки в средней фазе
+FINAL_PHASE_DELAYS = (0.3, 0.8)    # Минимальные задержки в финальной фазе
+
+# Константы для задержек при пошаговом обновлении счета
+INITIAL_PHASE_STEP_DELAYS = (9, 13)
+MIDDLE_PHASE_STEP_DELAYS = (4, 9)
+FINAL_PHASE_STEP_DELAYS = (1, 2)
+
+
+ALLOW_LAG_CHANCE = 0.4  # Вероятность разрешить отставание
+MIN_LAG_DURATION = 10  # Минимальная продолжительность отставания в секундах
+MAX_LAG_DURATION = 30  # Максимальная продолжительность отставания в секундах
+MAX_LAG_DIFFERENCE = 5  # Максимальная разница в голосах при отставании
+GUARANTEED_WIN_PHASE = 0.8  # Начало фазы гарантированной победы (85% времени раунда)
+MIN_WINNING_MARGIN = 3  # Минимальный отрыв для победы
+FINAL_SPRINT_SPEED = (0.8, 0.1)  # Очень быстрые обновления в финальной фазе
+
+MIN_UPDATE_INTERVAL = 2.0  # Минимальный интервал между обновлениями в секундах
+FLOOD_CONTROL_RESET = 10# Время сброса флуд-контроля в секундах
+
+MAX_VOTE_DIFFERENCE = 4  # Максимальная разница в голосах
+FINAL_PHASE_MAX_DIFFERENCE = 7  # Максимальная разница в финальной фазе
+
+CLICK_COOLDOWN = 0.3  # Уменьшаем задержку между кликами до 300мс
+MAX_CLICKS_PER_INTERVAL = 5  # Увеличиваем количество разрешенных кликов
+RESET_INTERVAL = 2.0  # Интервал сброса счетчика кликов
+
+INITIAL_PHASE_VOTE_DIFF = 3  # В начальной фазе допускаем разницу в 3 голоса
+MIDDLE_PHASE_VOTE_DIFF = 2   # В средней фазе - в 2 голоса
+FINAL_PHASE_VOTE_DIFF = 1 
+
+# Создаем словари для отслеживания кликов
+user_last_click = defaultdict(lambda: datetime.min)
+click_counters = defaultdict(int)
+click_reset_times = defaultdict(lambda: datetime.min)
+
 channel_router = Router()
-user_clicks = {0:{}}
+vote_states = {}  # Хранение состояний голосования
+user_clicks = {}  # Хранение информации о голосованиях пользователей
+last_updates = defaultdict(lambda: datetime.min)
+message_states = defaultdict(dict)
+update_locks = defaultdict(asyncio.Lock)
+pair_locks = defaultdict(asyncio.Lock)
+vote_states_locks = defaultdict(asyncio.Lock)
+
+async def init_vote_state(message_id: int, admin_id: int, admin_position: str, opponent_id: int):
+    """
+    Инициализирует состояние голосования для сообщения с админом
+    """
+    vote_states[message_id] = {
+        'admin_id': admin_id,
+        'admin_position': admin_position,
+        'opponent_id': opponent_id,
+        'current_votes': 0,
+        'start_time': datetime.now(),
+        'last_update_time': datetime.now(),
+        'round_duration': ROUND_DURATION,
+        'vote_history': [],
+        'is_single': admin_position == "middle"
+    }
 
 async def send_battle_pairs(bot: Bot, channel_id: int, participants):
     """
@@ -52,22 +126,34 @@ async def send_pair(bot: Bot, channel_id: int, participant1, participant2):
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text=f"Левый: 0",
                               callback_data=f"vote:{participant1['user_id']}:left"),
-        InlineKeyboardButton(text=f"Право: 0",
+        InlineKeyboardButton(text=f"Правый: 0",
                               callback_data=f"vote:{participant2['user_id']}:right")]
     ])
     vote_message = await bot.send_message(channel_id, "Голосуйте за понравившегося участника!", reply_markup=keyboard)
     ADMIN_ID=0
-    if (participant1['user_id'] == ADMIN_ID):
-        await edit_admin_autowin_const("message_id", vote_message.message_id)
-        await edit_admin_autowin_const("admin_id", participant1['user_id'])
-        await edit_admin_autowin_const("admin_position", 'left')
-        await edit_admin_autowin_const("user_id", participant2['user_id'])
-    elif (participant2['user_id'] == ADMIN_ID):
-        await edit_admin_autowin_const("message_id", vote_message.message_id)
-        await edit_admin_autowin_const("admin_id", participant2['user_id'])
-        await edit_admin_autowin_const("admin_position", "right")
-        await edit_admin_autowin_const("user_id", participant1['user_id'])
-    
+    if participant1['user_id'] == ADMIN_ID:
+        await init_vote_state(
+            message_id=vote_message.message_id,
+            admin_id=participant1['user_id'],
+            admin_position="left",
+            opponent_id=participant2['user_id']
+        )
+    # Инициализация для админа справа
+    elif participant2['user_id'] == ADMIN_ID:
+        await init_vote_state(
+            message_id=vote_message.message_id,
+            admin_id=participant2['user_id'],
+            admin_position="right",
+            opponent_id=participant1['user_id']
+        )
+    else:
+        await init_vote_state(
+            message_id=vote_message.message_id,
+            admin_id=participant1['user_id'],
+            admin_position="left",
+            opponent_id=participant2['user_id']
+        )
+        
     return [msg.message_id for msg in media_message] + [vote_message.message_id]
 
 async def send_single(bot: Bot, channel_id: int, participant):
@@ -85,12 +171,12 @@ async def send_single(bot: Bot, channel_id: int, participant):
     ])
     vote_message = await bot.send_message(channel_id, "Голосуйте за участника!", reply_markup=keyboard)
 
-    ADMIN_ID = 0
-    if (participant['user_id'] == ADMIN_ID):
-        await insert_admin_autowin_const("message_id", vote_message.message_id)
-        await insert_admin_autowin_const("admin_id", participant['user_id'])
-        await insert_admin_autowin_const("admin_position", "middle")
-        await insert_admin_autowin_const("user_id", participant['user_id'])
+    await init_vote_state(
+        message_id=vote_message.message_id,
+        admin_id=participant['user_id'],
+        admin_position="middle",
+        opponent_id=0  # для одиночного фото opponent_id не важен
+    )
     
     return [photo_message.message_id, vote_message.message_id]
 
@@ -284,50 +370,7 @@ async def delete_previous_messages(bot: Bot, channel_id: int):
             print(f"Не удалось удалить сообщение {msg_id}: {e}")
     await clear_message_ids()
 
-async def make_keyboard(callback: CallbackQuery):
-    #votes:id:pos
-    splitted_callback_data = callback.data.split(":")
-    if splitted_callback_data[2] == "left":
-        right_callback_data=callback.message.reply_markup.inline_keyboard[0][1].callback_data
-        splitted_right_text = callback.message.reply_markup.inline_keyboard[0][0].text.split(":")
-        right_text= callback.message.reply_markup.inline_keyboard[0][1].text
-        old_text = splitted_right_text[0]
-        current_value = int(splitted_right_text[1]) + 1
-        keyboard = InlineKeyboardMarkup(
-            inline_keyboard=[
-                [
-                    InlineKeyboardButton(text=old_text+f": {current_value}", callback_data=callback.data),
-                    InlineKeyboardButton(text=right_text, callback_data=right_callback_data)
-                ]
-            ])
-        return keyboard
-    elif splitted_callback_data[2] == "right":
-        left_callback_data = callback.message.reply_markup.inline_keyboard[0][0].callback_data
-        splitted_right_text = callback.message.reply_markup.inline_keyboard[0][1].text.split(":")
-        left_text = callback.message.reply_markup.inline_keyboard[0][0].text
-        old_text = splitted_right_text[0]
-        current_value = int(splitted_right_text[1]) + 1
-        keyboard = InlineKeyboardMarkup(
-            inline_keyboard=[
-                [
-                    InlineKeyboardButton(text=left_text, callback_data=left_callback_data),
-                    InlineKeyboardButton(text=old_text + f": {current_value}", callback_data=callback.data),
 
-                ]
-            ])
-        return keyboard
-    elif splitted_callback_data[2] == "middle":
-        splitted_text=callback.message.reply_markup.inline_keyboard[0][0].text.split(":")
-        old_text = splitted_text[0]
-        current_value = int(splitted_text[1])+1
-
-
-        keyboard = InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text=
-                                   old_text+f": {current_value}"
-                                  , callback_data=callback.data)]
-        ])
-        return keyboard
 
 def get_channel_id():
     dirname = os.path.dirname(__file__)
@@ -363,127 +406,7 @@ async def get_new_participants(current_participants):
         return new_participants
 
 
-async def update_admin_kb(
-        message_id,
-        admin_id,
-        admin_position="middle",
-        user_id=None,
-        chat_id=get_channel_id(),
-):
-    """
-        Обновляет клавиатуру администратора.
-
-        Эта функция редактирует клавиатуру сообщения в зависимости от позиции администратора.
-        Если позиция администратора "middle", создается новая клавиатура для одиночного голосования.
-        В противном случае создается новая клавиатура для двойного голосования.
-
-        :param message_id: ID сообщения, которое нужно отредактировать
-        :param admin_id: ID администратора
-        :param admin_position: Позиция администратора в голосовании ("middle" по умолчанию)
-        :param user_id: ID пользователя (необязательный параметр, используется для двойного голосования)
-        :param chat_id: ID чата (по умолчанию используется ID канала)
-    """
-    try:
-        if admin_position=="middle":
-            await _bot.edit_message_reply_markup(
-                chat_id=chat_id,
-                message_id=message_id,
-                reply_markup=await make_new_single_keyboard_and_update_db(admin_position, admin_id)
-            )
-        else:
-            await _bot.edit_message_reply_markup(
-                chat_id=chat_id,
-                message_id=message_id,
-                reply_markup=await make_new_double_keyboard_and_update_db(admin_position, admin_id, user_id)
-            )
-    except TelegramRetryAfter as e:
-        await asyncio.sleep(e.retry_after)
-
-async def make_new_double_keyboard_and_update_db(admin_position,admin_id,user_id):
-    """
-        Создает новую клавиатуру для двойного голосования и обновляет базу данных.
-
-        Эта функция получает количество голосов администратора и пользователя, обновляет очки администратора
-        и создает новую клавиатуру для двойного голосования с обновленным количеством голосов.
-
-        :param admin_position: Позиция администратора в голосовании ("left" или "right")
-        :param admin_id: ID администратора
-        :param user_id: ID пользователя
-        :return: Объект InlineKeyboardMarkup с обновленной клавиатурой
-    """
-    number_of_admins_votes = await select_user_from_battle(admin_id)
-    number_of_admins_votes = number_of_admins_votes[3]
-    number_of_users_votes = await select_user_from_battle(user_id)
-    number_of_users_votes = number_of_users_votes[3]
-    await update_points(admin_id)
-
-    if admin_position == "left":
-        keyboard = InlineKeyboardMarkup(
-            inline_keyboard=[
-                [InlineKeyboardButton(text=f"Левый: {number_of_admins_votes+1}",callback_data=f"vote:{admin_id}:left"),
-                 InlineKeyboardButton(text=f"Право: {number_of_users_votes}",callback_data=f"vote:{user_id}:right"),]
-            ],
-            resize_keyboard=True
-        )
-        return keyboard
-    elif admin_position == "right":
-        keyboard = InlineKeyboardMarkup(
-            inline_keyboard=[
-                [InlineKeyboardButton(text=f"Левый: {number_of_users_votes}",callback_data=f"vote:{user_id}:left"),
-                 InlineKeyboardButton(text=f"Право: {number_of_admins_votes+1}", callback_data=f"vote:{admin_id}:right"), ]
-            ],
-            resize_keyboard=True
-        )
-        return keyboard
-
-async def make_new_single_keyboard_and_update_db(admin_position,admin_id):
-    """
-        Создает новую клавиатуру для одиночного голосования и обновляет базу данных.
-
-        Эта функция получает количество голосов администратора, обновляет его очки и создает новую клавиатуру
-        для одиночного голосования с обновленным количеством голосов.
-
-        :param admin_position: Позиция администратора в голосовании (должна быть "middle")
-        :param admin_id: ID администратора
-        :return: Объект InlineKeyboardMarkup с обновленной клавиатурой
-    """
-
-    number_of_admins_votes = await select_user_from_battle(admin_id)
-    number_of_admins_votes=number_of_admins_votes[3]
-    await update_points(admin_id)
-    if admin_position == "middle":
-        keyboard = InlineKeyboardMarkup(
-            inline_keyboard=[
-                [InlineKeyboardButton(text=f"Голосов сейчас: {number_of_admins_votes+1}", callback_data=f"vote:{admin_id}:middle"),]
-            ]
-        )
-        return keyboard
-
-async def need_intervention(admin_id):
-    """
-        Проверяет, требуется ли вмешательство администратора.
-
-        Эта функция сравнивает количество голосов администратора с максимальным количеством голосов пользователей,
-        добавляя дельту. Если количество голосов администратора меньше, чем максимальное количество голосов пользователей плюс дельта,
-        функция возвращает True, иначе False.
-
-        :param admin_id: ID администратора
-        :return: True, если требуется вмешательство, иначе False
-    """
-    delta=5
-    number_of_admins_votes = await select_user_from_battle(admin_id)
-    number_of_admins_votes=number_of_admins_votes[3]
-    max_number_of_users_voices = await select_max_number_of_users_voices(admin_id)
-    max_number_of_users_voices=max_number_of_users_voices[0]
-    if number_of_admins_votes < max_number_of_users_voices + delta:
-        return True
-    return False
-
-
-
-# 842589261,1270990667
-
-async def is_admin(callback: CallbackQuery) -> bool:
+async def check_is_admin(callback: CallbackQuery, bot, channel_id, user_id) -> bool:
     dirname = os.path.dirname(__file__)
     filename = os.path.abspath(os.path.join(dirname, '..', 'config/config.env'))
     config = load_config(filename)
@@ -494,103 +417,15 @@ async def is_admin(callback: CallbackQuery) -> bool:
     if ADMIN_ID:
         ADMIN_ID = [i[0] for i in ADMIN_ID]
         return callback.from_user.id in ADMIN_ID
+    try:
+        member = await bot.get_chat_member(channel_id, user_id)
+        if member.status in ['creator', 'administrator']:
+            return True
+    except Exception as e:
+        logging.error(f"Error checking admin status: {e}")
     else:
         return False
 
-
-@channel_router.callback_query(F.data.startswith("vote:"))
-async def process_vote(callback: CallbackQuery):
-
-    """
-    Обрабатывает голосование пользователей.
-    """
-
-    #TODO check if subscribed before getting by uID
-    uID = callback.from_user.id
-
-    if await check_subscription(uID):
-        keyboard = await make_keyboard(callback)
-        mID = callback.message.message_id
-        member=await _bot.get_chat_member(user_id=uID,chat_id=get_channel_id())
-
-        number_of_additional_votes=0
-        user=0
-        user = await get_user(uID)
-        if user == False :
-            number_of_additional_votes=0
-        else:
-            number_of_additional_votes=user[5]
-
-        # allowed_number_of_votes=number_of_additional_votes+1
-
-        # {uID:{mID:clicks}}
-
-        if uID not in user_clicks:
-            user_clicks[uID]={}
-            if mID not in user_clicks[uID]:
-                user_clicks[uID][mID]=0
-        elif mID not in user_clicks[uID]:
-            user_clicks[uID][mID] = 0
-
-        is_admin_of_bot=await is_admin(callback)
-
-        if user_clicks.get(uID) is not None and user_clicks.get(uID).get(mID) is not None and user_clicks[uID][mID] >= 1 and member.status not in ["creator", "administrator"] and not is_admin_of_bot:
-            if number_of_additional_votes > 0:
-                user_id = int(callback.data.split(':')[1]) # the one who is voted
-                await update_points(user_id)
-                number_of_additional_votes-=1
-                await edit_user(uID,'additional_voices',number_of_additional_votes)
-                try:
-                    await callback.message.edit_reply_markup(reply_markup=keyboard)
-                except TelegramRetryAfter as e:
-                    await asyncio.sleep(e.retry_after)
-                try:
-                    await callback.answer("Ваш голос учтен!")
-                except TelegramBadRequest as e:
-                    pass
-            else:
-                await callback.answer("Вы уже проголосовали")
-        else:
-            user_clicks[uID][mID] += 1
-            try:
-                await callback.message.edit_reply_markup(reply_markup=keyboard)
-            except TelegramRetryAfter as e:
-                await asyncio.sleep(e.retry_after)
-            user_id = int(callback.data.split(':')[1])
-            await update_points(user_id)
-            try:
-                await callback.answer("Ваш голос учтен!")
-            except TelegramBadRequest as e:
-                pass
-
-        # Получает настройки баттла
-        settings=await select_battle_settings()
-        # Проверяет, включен ли автоматический выигрыш
-        is_autowin=settings[5]
-
-        if is_autowin:
-            # Получает ID администратора для автоматического выигрыша
-            admin_id= await select_admin_autowin_const("admin_id")
-            admin_id=admin_id[0]
-
-            # Проверяет, требуется ли вмешательство администратора
-            if await need_intervention(admin_id):
-                # Получает ID сообщения для автоматического выигрыша
-                message_id=await select_admin_autowin_const("message_id")
-                message_id=message_id[0]
-
-                # Получает позицию администратора в голосовании
-                admin_position=await select_admin_autowin_const("admin_position")
-                admin_position=admin_position[0]
-
-                # Получает ID пользователя для автоматического выигрыша
-                user_id = await select_admin_autowin_const("user_id")
-                user_id = user_id[0]
-
-                # Обновляет клавиатуру администратора
-                await update_admin_kb(message_id,admin_id,admin_position,user_id)
-    else:
-        await callback.answer("Для использования бота подпишитесь на канал")
 
 async def make_some_magic():
     """
@@ -612,8 +447,454 @@ async def make_some_magic():
         # Создает пользователя с ID 0, если он еще не создан
         try:
             await create_user(0,'user')
-        except Exception:
-            pass
+        except Exception as e:
+            print('Не удалось создать подставного игрока: ' + e)
 
         # Добавляет пользователя с ID 0 в баттл с полученным ID фото
-        await create_user_in_batl(0,photo_id, 'user')
+        try:
+            await create_user_in_batl(0,photo_id, 'user')
+        except Exception as e:
+            print('Не удалось добавить подставного игрока в баттл: ' + e)
+        await update_admin_battle_points()
+
+
+
+
+
+# -------------------------------------------------------
+
+
+
+async def calculate_vote_increment(state: dict, opponent_votes: int = 0) -> int:
+    """
+    Рассчитывает следующее увеличение голосов с учетом прогресса и типа голосования
+    """
+    elapsed_time = (datetime.now() - state['start_time']).total_seconds()
+    progress = elapsed_time / state['round_duration']
+    is_end_phase = progress > END_PHASE_THRESHOLD
+    current_votes = state['current_votes']
+
+    if state['is_single']:
+        if current_votes < MIN_REQUIRED_VOTES:
+            remaining_time = state['round_duration'] - elapsed_time
+            needed_votes = MIN_REQUIRED_VOTES - current_votes
+            
+            if remaining_time <= 0:
+                return MAX_VOTE_INCREMENT
+            
+            votes_per_second_needed = needed_votes / remaining_time
+            if votes_per_second_needed > 0.1:
+                return random.randint(2, MAX_VOTE_INCREMENT)
+            return random.randint(MIN_VOTE_INCREMENT, 2)
+    else:
+        if is_end_phase:
+            return random.randint(MIN_VOTE_INCREMENT, 2)
+        elif opponent_votes > current_votes:
+            return random.randint(2, MAX_VOTE_INCREMENT)
+        return random.randint(MIN_VOTE_INCREMENT, 2)
+    
+async def safe_get_vote_state(message_id: int):
+    """
+    Безопасное получение состояния голосования
+    """
+    async with vote_states_locks[message_id]:
+        return vote_states.get(message_id)
+    
+async def safe_update_vote_state(message_id: int, state: dict):
+    """
+    Безопасное обновление состояния голосования
+    """
+    async with vote_states_locks[message_id]:
+        vote_states[message_id] = state
+
+
+async def update_vote_display(bot: Bot, channel_id: int, message_id: int, state: dict, opponent_votes: int):
+    """
+    Обновляет отображение голосов на кнопках
+    """
+    try:
+        if state['is_single']:
+            keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(
+                    text=f"Голосов сейчас: {state['current_votes']}",
+                    callback_data=f"vote:{state['admin_id']}:middle"
+                )]
+            ])
+        else:
+            if state['admin_position'] == 'left':
+                keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                    [InlineKeyboardButton(
+                        text=f"Левый: {state['current_votes']}",
+                        callback_data=f"vote:{state['admin_id']}:left"
+                    ),
+                    InlineKeyboardButton(
+                        text=f"Правый: {opponent_votes}",
+                        callback_data=f"vote:{state['opponent_id']}:right"
+                    )]
+                ])
+            else:
+                keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                    [InlineKeyboardButton(
+                        text=f"Левый: {opponent_votes}",
+                        callback_data=f"vote:{state['opponent_id']}:left"
+                    ),
+                    InlineKeyboardButton(
+                        text=f"Правый: {state['current_votes']}",
+                        callback_data=f"vote:{state['admin_id']}:right"
+                    )]
+                ])
+
+        await bot.edit_message_reply_markup(
+            chat_id=channel_id,
+            message_id=message_id,
+            reply_markup=keyboard
+        )
+        
+    except TelegramBadRequest as e:
+        if "message is not modified" not in str(e):
+            logging.error(f"Telegram error: {e}")
+    except Exception as e:
+        logging.error(f"Error updating vote display: {e}")
+
+        
+def get_phase_delays(progress: float) -> tuple:
+    """
+    Возвращает задержки в зависимости от фазы раунда
+    """
+    if progress < 0.3:
+        return INITIAL_PHASE_DELAYS, INITIAL_PHASE_STEP_DELAYS
+    elif progress < 0.7:
+        return MIDDLE_PHASE_DELAYS, MIDDLE_PHASE_STEP_DELAYS
+    else:
+        return FINAL_PHASE_DELAYS, FINAL_PHASE_STEP_DELAYS
+
+
+async def gradual_vote_update(bot: Bot, channel_id: int, message_id: int, 
+                            state: dict, opponent_votes: int, 
+                            target_votes: int, step_delay_range: tuple):
+    """
+    Постепенно обновляет количество голосов
+    """
+    current = state['current_votes']
+    target = target_votes
+    
+    while current < target:
+        delay = random.uniform(*step_delay_range)
+        delay = max(delay, MIN_UPDATE_INTERVAL)
+        await asyncio.sleep(delay)
+        
+        current += 1
+        if current > target:
+            break
+            
+        state['current_votes'] = current
+        
+        try:
+            await update_vote_display(bot, channel_id, message_id, state, opponent_votes)
+        except Exception as e:
+            if "Flood control exceeded" in str(e):
+                await asyncio.sleep(FLOOD_CONTROL_RESET)
+            elif "message is not modified" not in str(e):
+                logging.error(f"Error in gradual update: {e}")
+
+
+async def admin_vote_monitor(bot: Bot, channel_id: int, message_id: int):
+    pair_key = f"{channel_id}:{message_id}"
+    allow_lag_until = None
+    update_interval = VOTE_SPEED_NORMAL[0]
+    last_update_time = datetime.now()
+    
+    while True:
+        try:
+            current_time = datetime.now()
+            if (current_time - last_update_time).total_seconds() < MIN_UPDATE_INTERVAL:
+                await asyncio.sleep(MIN_UPDATE_INTERVAL)
+                continue
+
+            async with pair_locks[pair_key]:
+                current_state = await safe_get_vote_state(message_id)
+                if not current_state or current_state['admin_id'] != 0:
+                    return
+
+                elapsed_time = (current_time - current_state['start_time']).total_seconds()
+                progress = elapsed_time / current_state['round_duration']
+                
+                if elapsed_time >= current_state['round_duration']:
+                    break
+
+                update_delays, step_delays = get_phase_delays(progress)
+                opponent_votes = await get_current_votes(current_state['opponent_id'])
+                admin_votes = current_state['current_votes']
+                vote_difference = abs(admin_votes - opponent_votes)
+
+                # Определяем допустимую разницу в голосах в зависимости от фазы
+                if progress < 0.3:  # Начальная фаза
+                    allowed_difference = INITIAL_PHASE_VOTE_DIFF
+                    current_step_delays = INITIAL_PHASE_STEP_DELAYS
+                elif progress < 0.7:  # Средняя фаза
+                    allowed_difference = MIDDLE_PHASE_VOTE_DIFF
+                    current_step_delays = MIDDLE_PHASE_STEP_DELAYS
+                else:  # Финальная фаза
+                    allowed_difference = FINAL_PHASE_VOTE_DIFF
+                    current_step_delays = FINAL_PHASE_STEP_DELAYS
+
+                # Проверяем необходимость обновления
+                needs_update = False
+                if progress >= GUARANTEED_WIN_PHASE:
+                    # В финальной фазе гарантируем победу
+                    if opponent_votes >= admin_votes or (admin_votes - opponent_votes) < MIN_WINNING_MARGIN:
+                        needs_update = True
+                else:
+                    # В других фазах обновляем, если разница больше допустимой
+                    # или если соперник впереди и нет активного отставания
+                    if (vote_difference > allowed_difference or 
+                        (opponent_votes > admin_votes and not (allow_lag_until and current_time < allow_lag_until))):
+                        needs_update = True
+
+                if needs_update:
+                    # Увеличиваем на 1 голос
+                    new_admin_votes = admin_votes + 1
+                    current_state['current_votes'] = new_admin_votes
+                    await safe_update_vote_state(message_id, current_state)
+
+                    try:
+                        # Создаем новую клавиатуру
+                        if current_state['admin_position'] == 'left':
+                            new_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                                [InlineKeyboardButton(
+                                    text=f"Левый: {new_admin_votes}",
+                                    callback_data=f"vote:{current_state['admin_id']}:left"
+                                ),
+                                InlineKeyboardButton(
+                                    text=f"Правый: {opponent_votes}",
+                                    callback_data=f"vote:{current_state['opponent_id']}:right"
+                                )]
+                            ])
+                        else:
+                            new_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                                [InlineKeyboardButton(
+                                    text=f"Левый: {opponent_votes}",
+                                    callback_data=f"vote:{current_state['opponent_id']}:left"
+                                ),
+                                InlineKeyboardButton(
+                                    text=f"Правый: {new_admin_votes}",
+                                    callback_data=f"vote:{current_state['admin_id']}:right"
+                                )]
+                            ])
+
+                        await bot.edit_message_reply_markup(
+                            chat_id=channel_id,
+                            message_id=message_id,
+                            reply_markup=new_keyboard
+                        )
+                        last_update_time = datetime.now()
+
+                        # Используем задержки из констант
+                        await asyncio.sleep(random.uniform(*current_step_delays))
+
+                    except TelegramBadRequest as e:
+                        if "Flood control exceeded" in str(e):
+                            logging.warning("Flood control hit, waiting...")
+                            await asyncio.sleep(FLOOD_CONTROL_RESET)
+                            continue
+                        elif "message is not modified" not in str(e):
+                            logging.error(f"Error updating keyboard: {e}")
+                    except Exception as e:
+                        logging.error(f"Error updating votes: {e}")
+                        await asyncio.sleep(2)
+                        continue
+
+                # Обработка отставания
+                if not progress >= GUARANTEED_WIN_PHASE:
+                    if allow_lag_until is None and random.random() < ALLOW_LAG_CHANCE:
+                        lag_duration = random.uniform(MIN_LAG_DURATION, MAX_LAG_DURATION)
+                        max_allowed_lag_time = current_state['round_duration'] * GUARANTEED_WIN_PHASE - elapsed_time
+                        lag_duration = min(lag_duration, max_allowed_lag_time)
+                        if lag_duration > 0:
+                            allow_lag_until = current_time + timedelta(seconds=lag_duration)
+
+                # Используем правильные задержки между итерациями
+                await asyncio.sleep(random.uniform(*update_delays))
+
+        except Exception as e:
+            logging.error(f"Error in admin monitor: {e}")
+            await asyncio.sleep(2)
+
+
+
+
+
+
+async def can_process_click(user_id: int, message_id: int) -> bool:
+    """
+    Проверяет, можно ли обработать клик пользователя
+    """
+    current_time = datetime.now()
+    key = f"{user_id}:{message_id}"
+    
+    if (current_time - click_reset_times[key]).total_seconds() >= RESET_INTERVAL:
+        click_counters[key] = 0
+        click_reset_times[key] = current_time
+    
+    if click_counters[key] >= MAX_CLICKS_PER_INTERVAL:
+        return False
+        
+    time_since_last_click = (current_time - user_last_click[key]).total_seconds()
+    if time_since_last_click < CLICK_COOLDOWN:
+        return False
+        
+    click_counters[key] += 1
+    user_last_click[key] = current_time
+    return True
+
+
+
+@channel_router.callback_query(F.data.startswith("vote:"))
+async def process_vote(callback: CallbackQuery):
+    """
+    Обработчик голосования с мгновенной обработкой клика
+    """
+    try:
+        await callback.answer()
+        
+        channel_id = callback.message.chat.id
+        message_id = callback.message.message_id
+        user_id = callback.from_user.id
+        pair_key = f"{channel_id}:{message_id}"
+
+        is_admin = await check_is_admin(callback, _bot, channel_id, user_id)
+        
+        if not is_admin:
+            if not await can_process_click(user_id, message_id):
+                return
+            if not await check_subscription(callback.bot, user_id, channel_id):
+                return
+            if message_id in user_clicks and user_id in user_clicks[message_id]:
+                return
+
+        _, vote_user_id, position = callback.data.split(":")
+        vote_user_id = int(vote_user_id)
+
+        current_state = await safe_get_vote_state(message_id)
+        if not current_state:
+            return
+
+        # Получаем текущие значения голосов
+        current_markup = callback.message.reply_markup
+        current_buttons = current_markup.inline_keyboard[0]
+        
+        # Быстрое обновление для клика пользователя
+        if position == "middle":
+            current_votes = int(current_buttons[0].text.split(": ")[1])
+            new_votes = current_votes + 1
+            
+            new_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(
+                    text=f"Голосов сейчас: {new_votes}",
+                    callback_data=f"vote:{vote_user_id}:middle"
+                )]
+            ])
+            
+            current_state['current_votes'] = new_votes
+            await safe_update_vote_state(message_id, current_state)
+            await callback.message.edit_reply_markup(reply_markup=new_keyboard)
+            
+        else:
+            left_votes = int(current_buttons[0].text.split(": ")[1])
+            right_votes = int(current_buttons[1].text.split(": ")[1])
+            
+            if position == "left":
+                left_votes += 1
+                if vote_user_id == current_state['admin_id']:
+                    current_state['current_votes'] = left_votes
+                new_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                    [InlineKeyboardButton(
+                        text=f"Левый: {left_votes}",
+                        callback_data=f"vote:{vote_user_id}:left"
+                    ),
+                    InlineKeyboardButton(
+                        text=f"Правый: {right_votes}",
+                        callback_data=f"vote:{current_state['opponent_id']}:right"
+                    )]
+                ])
+            else:
+                right_votes += 1
+                if vote_user_id == current_state['admin_id']:
+                    current_state['current_votes'] = right_votes
+                new_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                    [InlineKeyboardButton(
+                        text=f"Левый: {left_votes}",
+                        callback_data=f"vote:{current_state['admin_id']}:left"
+                    ),
+                    InlineKeyboardButton(
+                        text=f"Правый: {right_votes}",
+                        callback_data=f"vote:{vote_user_id}:right"
+                    )]
+                ])
+
+            await safe_update_vote_state(message_id, current_state)
+            await callback.message.edit_reply_markup(reply_markup=new_keyboard)
+
+        # Отмечаем голос пользователя и обновляем базу данных
+        if not is_admin:
+            if message_id not in user_clicks:
+                user_clicks[message_id] = set()
+            user_clicks[message_id].add(user_id)
+        
+        asyncio.create_task(update_points(vote_user_id))
+
+        # Запускаем монитор админа в отдельном таске, если нужно
+        if (not current_state['is_single'] and 
+            current_state['admin_id'] == 0 and 
+            vote_user_id != current_state['admin_id']):
+            
+            admin_votes = current_state['current_votes']
+            opponent_votes = (right_votes if current_state['admin_position'] == 'left' 
+                            else left_votes)
+
+            if opponent_votes > admin_votes:
+                monitor_task = asyncio.create_task(
+                    admin_vote_monitor(callback.bot, channel_id, message_id)
+                )
+                
+                if not hasattr(callback.bot, 'monitor_tasks'):
+                    callback.bot.monitor_tasks = set()
+                callback.bot.monitor_tasks.add(monitor_task)
+                monitor_task.add_done_callback(
+                    lambda t: callback.bot.monitor_tasks.remove(t) 
+                    if t in callback.bot.monitor_tasks else None
+                )
+
+    except Exception as e:
+        logging.error(f"Error processing vote: {e}")
+
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+# async def create_new_vote(bot: Bot, channel_id: int, admin_id: int, admin_position: str, opponent_id: int):
+#     """
+#     Создает новое голосование
+#     """
+#     # Создаем сообщение с голосованием
+#     keyboard = InlineKeyboardMarkup(...)  # создание клавиатуры
+#     message = await bot.send_photo(
+#         chat_id=channel_id,
+#         photo=photo,
+#         reply_markup=keyboard
+#     )
+    
+#     # Инициализируем состояние голосования
+#     await init_vote_state(
+#         message_id=message.message_id,
+#         admin_id=admin_id,
+#         admin_position=admin_position,
+#         opponent_id=opponent_id
+#     )

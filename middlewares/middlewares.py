@@ -23,25 +23,53 @@ def setup_router(dp, bot: Bot, tm: TaskManager):
 
 
 class ThrottlingMiddleware(BaseMiddleware):
-    def __init__(self, limit=1):
+    def __init__(self, limit: float = 1.0) -> None:
         self.rate_limit = limit
-        self.user_timeouts = {}
+        self.user_timeouts: Dict[int, datetime] = {}
+        self.cleanup_threshold = 1000
+        super().__init__()
 
     async def __call__(
         self,
-        handler: Callable[[Message, Dict[str, Any]], Awaitable[Any]],
-        event: Message,
+        handler: Callable[[Union[Message, CallbackQuery], Dict[str, Any]], Awaitable[Any]],
+        event: Union[Message, CallbackQuery],
         data: Dict[str, Any]
     ) -> Any:
-        user_id = event.from_user.id
+        # Очистка старых записей
+        if len(self.user_timeouts) > self.cleanup_threshold:
+            current_time = datetime.now()
+            self.user_timeouts = {
+                user_id: timestamp 
+                for user_id, timestamp in self.user_timeouts.items()
+                if (current_time - timestamp).total_seconds() < self.rate_limit
+            }
 
+        user_id = event.from_user.id
+        current_time = datetime.now()
+
+        # Проверяем ограничение
         if user_id in self.user_timeouts:
             last_time = self.user_timeouts[user_id]
-            if datetime.now() - last_time < timedelta(seconds=self.rate_limit):
+            time_passed = (current_time - last_time).total_seconds()
+            
+            if time_passed < self.rate_limit:
+                if isinstance(event, Message):
+                    await event.answer(
+                        f"Пожалуйста, подождите {self.rate_limit - time_passed:.1f} секунд"
+                    )
+                elif isinstance(event, CallbackQuery):
+                    await event.answer(
+                        f"Пожалуйста, подождите {self.rate_limit - time_passed:.1f} секунд",
+                        show_alert=True
+                    )
                 return
 
-        self.user_timeouts[user_id] = datetime.now()
+        # Обновляем время последнего запроса
+        self.user_timeouts[user_id] = current_time
+        
+        # Продолжаем обработку
         return await handler(event, data)
+
 
 class UserCheckMiddleware(BaseMiddleware):
     async def __call__(

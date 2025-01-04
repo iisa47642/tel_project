@@ -12,6 +12,7 @@ import keyboards
 from filters.isAdmin import is_admin
 from keyboards.admin_keyboards import *
 from database.db import *
+from routers.channel_router import make_some_magic
 from states.admin_states import FSMFillForm
 from utils.task_manager import TaskManagerInstance
 admin_router = Router()
@@ -345,13 +346,19 @@ async def current_battle_settings(message: Message):
     start_time = settings[4]
     hours = start_time // 3600
     minutes = (start_time % 3600) // 60
+    autowin = settings[5]
+    if autowin == 0:
+        autowin = 'Off'
+    else:
+        autowin = 'On'
     await message.answer(text=
                         f"Текущие настройки баттла: \n\n" 
                         f"Продолжительность раунда: {round_duration} мин\n"+
                         f"Сумма приза: {prize_amount}\n"+
                         f"Минимальное количество голосов: {min_vote_total}\n"+
                         f"Интервал между раундами: {round_interval} мин\n"+
-                        f"Время начала баттла: {hours:02d}:{minutes:02d} ",
+                        f"Время начала баттла: {hours:02d}:{minutes:02d}\n"+
+                        f"Автопобеда: {autowin} ",
                          reply_markup=tune_battle_admin_kb)
 
 
@@ -461,8 +468,10 @@ async def get_autowin(message: Message, state: FSMContext):
     req=message.text.lower()
     if req == 'y':
         await edit_battle_settings("is_autowin", 1)
+        await make_some_magic()
     else:
         await edit_battle_settings("is_autowin", 0)
+        await delete_user_in_batl(0)
     await message.answer(text="Данные получены",reply_markup=tune_battle_admin_kb)
     await state.clear()
 

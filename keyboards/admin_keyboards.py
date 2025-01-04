@@ -19,7 +19,7 @@ main_super_admin_kb = ReplyKeyboardMarkup(
 main_admin_kb = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text="Модерация фотографий"),KeyboardButton(text="Рассылка"),KeyboardButton(text="Статистика")],
-        [KeyboardButton(text="Очистка баттла")],
+        [KeyboardButton(text="Очистка баттла"),KeyboardButton(text="Список участников")],
         [KeyboardButton(text="Настройка баттла",)]
     ],
     resize_keyboard=True

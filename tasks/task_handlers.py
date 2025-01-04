@@ -10,7 +10,7 @@ from math import log
 import pytz
 
 from routers.channel_router import make_some_magic, send_battle_pairs, end_round, announce_winner, delete_previous_messages, get_new_participants
-from database.db import get_participants, remove_losers, save_message_ids, delete_users_in_batl, select_all_admins, select_battle_settings, delete_users_points, update_points,users_plays_buttle_update,users_buttle_win_update
+from database.db import get_participants, remove_losers, save_message_ids, delete_users_in_batl, select_all_admins, select_battle_settings, delete_users_points, update_admin_battle_points, update_points,users_plays_buttle_update,users_buttle_win_update
 
 from config.config import load_config
 from routers.channel_router import send_battle_pairs, end_round, announce_winner, delete_previous_messages
@@ -108,7 +108,7 @@ class TaskManager:
                         f"Внимание! Баттл начнется через 1 час (в {battle_time.strftime('%H:%M')})!"
                     )
 
-                await asyncio.sleep(60)
+                await asyncio.sleep(10)
 
             except Exception as e:
                 logging.error(f"Error in notification task: {e}")
@@ -149,7 +149,6 @@ class TaskManager:
     async def start_battle(self):
         self.battle_active = True
         self.first_round_active = True
-        await make_some_magic()
         round_number = 1
         TIMEZONE = pytz.timezone('Europe/Moscow')
         # время начала баттла
@@ -162,6 +161,12 @@ class TaskManager:
             if round_number == 1:
                 await users_plays_buttle_update()
             # number_of_rounds = int(log(len(participants),2))
+            # if len(participants) == 0:
+            #     self._bot.send_message(
+            #         self.channel_id,
+            #     f"Баттл был принудительно завершен администратором")
+            #     break
+            
             if len(participants) == 1:
                 await self.end_battle([participants[0]])
                 break
@@ -171,10 +176,8 @@ class TaskManager:
 
             await delete_previous_messages(self.bot, self.channel_id)
             await delete_users_points()
+            await update_admin_battle_points()
             settings = await select_battle_settings()
-            is_autowin = settings[5]
-            if is_autowin:
-                await update_points(0)
             if 2 < len(participants)<=4:
                 start_message = await self.bot.send_message(
                 self.channel_id,
@@ -409,3 +412,11 @@ class TaskManager:
     #         self.channel_id,
     #         f"Следующий баттл начнется в {self.next_battle_start.strftime('%H:%M')}"
     #     )
+    
+    
+    
+    
+    
+    
+    
+    

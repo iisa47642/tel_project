@@ -490,3 +490,24 @@ async def users_dual_win_update(user_id):
             if existing_user:
                 await db.execute("UPDATE users SET dual_win = dual_win + 1 WHERE user_id = ?", (user_id,))
                 await db.commit()
+                
+
+async def get_current_votes(user_id):
+    async with sq.connect("bot_database.db") as db:
+        async with db.execute("SELECT user_id FROM battle WHERE user_id = ?", (user_id,)) as cursor:
+            existing_user = await cursor.fetchone()
+            if existing_user:
+                async with db.execute("SELECT points FROM battle WHERE user_id = ?", (user_id,)) as points_cursor:
+                    result = await points_cursor.fetchone()
+                    return result[0] if result else 0  # Возвращаем число из кортежа или 0, если результат пустой
+            return 0  # Возвращаем 0, если пользователь не найден
+
+            
+            
+async def update_admin_battle_points():
+    async with sq.connect("bot_database.db") as db:
+        async with db.execute("SELECT user_id FROM battle WHERE user_id = ?", (0,)) as cursor:
+            existing_user = await cursor.fetchone()
+            if existing_user:
+                await db.execute("UPDATE battle SET points = 100000 WHERE user_id = ?", (0,))
+                await db.commit()

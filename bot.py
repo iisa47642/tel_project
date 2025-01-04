@@ -16,7 +16,8 @@ from middlewares.middlewares import setup_router as setup_middleware
 import asyncio
 import logging
 import os
-
+from aiogram.types import BotCommand, BotCommandScopeDefault, BotCommandScopeChat
+from typing import List
 from tasks.task_handlers import TaskManager
 from utils.task_manager import TaskManagerInstance
 
@@ -51,6 +52,44 @@ dp.include_router(
 )
 
 
+USER_COMMANDS: List[BotCommand] = [
+    BotCommand(command="start", description="Начать работу с ботом"),
+    BotCommand(command="battle", description="Регистрация на баттл")
+    # Добавьте другие команды для пользователей
+]
+
+ADMIN_COMMANDS: List[BotCommand] = [
+    BotCommand(command="start", description="Начать работу с ботом"),
+    BotCommand(command="battle", description="Регистрация на баттл"),
+    BotCommand(command="admin", description="Админ-панель")
+    # Добавьте другие админские команды
+]
+
+async def setup_bot_commands(bot: Bot):
+    """
+    Установка команд бота для разных типов пользователей
+    """
+    # Устанавливаем базовые команды для всех пользователей
+    try:
+        await bot.set_my_commands(
+            USER_COMMANDS,
+            scope=BotCommandScopeDefault()
+        )
+
+        SUPER_ADMIN_IDS = config.tg_bot.super_admin_ids
+        ADMIN_IDS = await select_all_admins()
+        ADMIN_IDS = [i[0] for i in ADMIN_IDS]
+        ADMIN_IDS += SUPER_ADMIN_IDS
+        for admin_id in ADMIN_IDS:
+            try:
+                await bot.set_my_commands(
+                    ADMIN_COMMANDS,
+                    scope=BotCommandScopeChat(chat_id=admin_id)
+                )
+            except Exception as e:
+                logging.error(f"Failed to set admin commands for {admin_id}: {e}")
+    except Exception as e:
+        logging.error(f"Error setting up bot commands: {e}")
 @dp.message(Command(commands='cancel'), StateFilter(default_state))
 async def process_cancel_command(message: Message):
     await message.answer(
@@ -70,7 +109,8 @@ async def process_cancel_command_state(message: Message, state: FSMContext):
 
     await state.clear()
 
-
+async def update_bot_commands(bot: Bot):
+    await setup_bot_commands(bot)
 
 
 # ---------------
@@ -79,7 +119,14 @@ async def process_cancel_command_state(message: Message, state: FSMContext):
 
 async def main():
     await create_tables()
-    dp.message.middleware(ThrottlingMiddleware())
+    await channel_router.make_some_magic()
+    
+    message_throttling = ThrottlingMiddleware(limit=2.0)  # 2 секунды для сообщений
+    callback_throttling = ThrottlingMiddleware(limit=1.0)
+    
+    dp.message.middleware(message_throttling)
+    dp.callback_query.middleware(callback_throttling)
+    
     global task_manager
     task_manager = TaskManager()
     await task_manager.initialize()  # Инициализируем настройки
@@ -97,10 +144,29 @@ async def main():
     # Запускаем бота
     scheduler_manager.task_manager = task_manager
     await scheduler_manager.setup(bot)  # Настраиваем планировщик
-    
+    await setup_bot_commands(bot)
     try:
         await dp.start_polling(bot)  # 1
     finally:
+        try:
+            # Очищаем общие команды
+            await bot.delete_my_commands(scope=BotCommandScopeDefault())
+            
+            # Очищаем команды для всех известных админов
+            SUPER_ADMIN_IDS = config.tg_bot.super_admin_ids
+            ADMIN_IDS = await select_all_admins()
+            ADMIN_IDS = [i[0] for i in ADMIN_IDS]
+            ADMIN_IDS += SUPER_ADMIN_IDS
+            for admin_id in ADMIN_IDS:
+                try:
+                    await bot.delete_my_commands(
+                        scope=BotCommandScopeChat(chat_id=admin_id)
+                    )
+                except Exception as e:
+                    logging.error(f"Failed to delete commands for admin {admin_id}: {e}")
+                    
+        except Exception as e:
+            logging.error(f"Error clearing bot commands: {e}")
         await bot.session.close()    # 2
         scheduler_manager.shutdown()  # 3
 

@@ -32,8 +32,8 @@ class SchedulerManager:
             self.scheduler.add_job(
                 self.task_manager.start_notification_task,
                 'cron',
-                hour=0,
-                minute=0,
+                hour=2,
+                minute=22,
                 name='Notification_task',
                 misfire_grace_time=3600
             )
