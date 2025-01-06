@@ -93,18 +93,14 @@ async def setup_bot_commands(bot: Bot):
 @dp.message(Command(commands='cancel'), StateFilter(default_state))
 async def process_cancel_command(message: Message):
     await message.answer(
-        text='Отменять нечего. Вы регистрации на баттл\n\n'
-             'Чтобы перейти к заполнению анкеты - '
-             'отправьте команду /battle'
+        text='Отменять нечего. Вы ничего не заполняете\n\n'
     )
 
 
 @dp.message(Command(commands='cancel'), ~StateFilter(default_state))
 async def process_cancel_command_state(message: Message, state: FSMContext):
     await message.answer(
-        text='Вы вышли из регистрации на баттл\n\n'
-             'Чтобы снова перейти к заполнению анкеты - '
-             'отправьте команду /battle'
+        text='Вы больше не заполняете форму\n\n'
     )
 
     await state.clear()
@@ -121,7 +117,7 @@ async def main():
     await create_tables()
     await channel_router.make_some_magic()
     
-    message_throttling = ThrottlingMiddleware(limit=2.0)  # 2 секунды для сообщений
+    message_throttling = ThrottlingMiddleware(limit=1.0)  # 2 секунды для сообщений
     callback_throttling = ThrottlingMiddleware(limit=1.0)
     
     dp.message.middleware(message_throttling)

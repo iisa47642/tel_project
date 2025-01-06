@@ -25,6 +25,15 @@ main_admin_kb = ReplyKeyboardMarkup(
     resize_keyboard=True
 )
 
+admin_channel_keyboard = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton(text="Добавить канал")],
+        [KeyboardButton(text="Удалить канал")],
+        [KeyboardButton(text="Назад в меню")]
+    ],
+    resize_keyboard=True
+)
+
 
 # photo_moderation_admin_kb = ReplyKeyboardMarkup(
 #     keyboard=[

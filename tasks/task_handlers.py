@@ -14,8 +14,8 @@ from database.db import get_participants, remove_losers, save_message_ids, delet
 
 from config.config import load_config
 from routers.channel_router import send_battle_pairs, end_round, announce_winner, delete_previous_messages
-from database.db import get_participants, remove_losers, save_message_ids, delete_users_in_batl
-
+from database.db import get_participants, remove_losers, save_message_ids, delete_users_in_batl,get_all_users
+from routers.globals_var import reset_vote_states
 class TaskManager:
     def __init__(self):
         self._bot: Optional[Bot] = None
@@ -87,51 +87,79 @@ class TaskManager:
                 if self.next_battle_start:
                     battle_time = self.next_battle_start
                 else:
-                    BATTLE_SETTINGS = await select_battle_settings()
-                    BATTLE_START_SECONDS = BATTLE_SETTINGS[4]
-                    hours = BATTLE_START_SECONDS // 3600
-                    minutes = (BATTLE_START_SECONDS % 3600) // 60
-                    battle_time = datetime.combine(
-                        now.date(),
-                        time(hour=int(hours), minute=int(minutes))
-                    )
-                    if now.time() >= time(hour=int(hours), minute=int(minutes)):
-                        battle_time += timedelta(days=1)
+                    # Используем существующий метод вместо повторного получения настроек
+                    battle_time = await self.get_next_battle_time()
+
+                # Убедимся, что battle_time имеет информацию о временной зоне
+                if battle_time.tzinfo is None:
+                    battle_time = TIMEZONE.localize(battle_time)
 
                 notification_time = battle_time - timedelta(hours=1)
+                
+                # Добавим логирование для отладки
+                logging.info(f"Current time: {now}")
+                logging.info(f"Battle time: {battle_time}")
+                logging.info(f"Notification time: {notification_time}")
+                
                 wait_seconds = (notification_time - now).total_seconds()
+                logging.info(f"Wait seconds: {wait_seconds}")
 
                 if wait_seconds > 0:
+                    logging.info(f"Waiting {wait_seconds} seconds until notification")
                     await asyncio.sleep(wait_seconds)
+                    # Проверяем, не было ли задача отменена во время ожидания
+                    if self.notification_task and self.notification_task.cancelled():
+                        break
+                    
                     await self.bot.send_message(
                         self.channel_id,
-                        f"Внимание! Баттл начнется через 1 час (в {battle_time.strftime('%H:%M')})!"
+                        f"⚠️ Внимание! Баттл начнется через 1 час (в {battle_time.strftime('%H:%M')})!"
                     )
+                    
+                    users = await get_all_users()
+                    users_id = [i[0] for i in users]
+                    for id_u in users_id:
+                        await self.bot.send_message(
+                        id_u,
+                        f"⚠️ Внимание! Баттл начнется через 1 час (в {battle_time.strftime('%H:%M')})!"
+                    )
+                    logging.info("Notification sent successfully")
 
-                await asyncio.sleep(10)
+                # Ждем немного перед следующей итерацией
+                await asyncio.sleep(10)  # Увеличил интервал до минуты
 
+            except asyncio.CancelledError:
+                logging.info("Notification task was cancelled")
+                break
             except Exception as e:
-                logging.error(f"Error in notification task: {e}")
+                logging.error(f"Error in notification task: {e}", exc_info=True)
                 await asyncio.sleep(60)
 
     async def start_notification_task(self):
-        if self.notification_task is None or self.notification_task.done():
-            self.notification_task = asyncio.create_task(self.notification_before_battle())
-            logging.info("Notification task started")
-        else:
-            logging.info("Notification task is already running")
+        try:
+            if self.notification_task is None or self.notification_task.done():
+                self.notification_task = asyncio.create_task(self.notification_before_battle())
+                logging.info("Notification task started")
+            else:
+                logging.info("Notification task is already running")
+                
+        except Exception as e:
+            logging.error(f"Error starting notification task: {e}", exc_info=True)
 
     async def stop_notification_task(self):
-        if self.notification_task and not self.notification_task.done():
-            self.notification_task.cancel()
-            try:
-                await self.notification_task
-            except asyncio.CancelledError:
-                pass
-            self.notification_task = None
-            logging.info("Notification task stopped")
-        else:
-            logging.info("Notification task is not running")
+        try:
+            if self.notification_task and not self.notification_task.done():
+                self.notification_task.cancel()
+                try:
+                    await self.notification_task
+                except asyncio.CancelledError:
+                    pass
+                self.notification_task = None
+                logging.info("Notification task stopped")
+            else:
+                logging.info("Notification task is not running")
+        except Exception as e:
+            logging.error(f"Error stopping notification task: {e}", exc_info=True)
 
     def get_channel_id(self):
         dirname = os.path.dirname(__file__)
@@ -147,6 +175,18 @@ class TaskManager:
 
 
     async def start_battle(self):
+        await reset_vote_states()
+        users = await get_all_users()
+        users_id = [i[0] for i in users]
+        for id_u in users_id:
+            try:
+                await self.bot.send_message(
+                    id_u,
+                    f"⚠️ Внимание! Баттл начался!"
+                )
+            except Exception as e:
+                logging.error(f'Не удалось отправить сообщение пользователю {id_u}: {str(e)}')
+                continue
         self.battle_active = True
         self.first_round_active = True
         round_number = 1
@@ -155,17 +195,17 @@ class TaskManager:
         self.current_round_start = datetime.now(TIMEZONE)
 
         while self.battle_active:
+            # Проверяем отмену в начале каждой итерации
+            if not self.battle_active:
+                break
             now = datetime.now(TIMEZONE)
-
             participants = await get_participants()
+            # Если баттл был принудительно завершен администратором
+            # if not self.battle_active:
+            #     break
+            
             if round_number == 1:
                 await users_plays_buttle_update()
-            # number_of_rounds = int(log(len(participants),2))
-            # if len(participants) == 0:
-            #     self._bot.send_message(
-            #         self.channel_id,
-            #     f"Баттл был принудительно завершен администратором")
-            #     break
             
             if len(participants) == 1:
                 await self.end_battle([participants[0]])
@@ -173,11 +213,17 @@ class TaskManager:
             elif len(participants) == 2 and participants[0]['points'] == participants[1]['points']:
                 await self.end_battle([participants[0], participants[1]])
                 break
-
+            if not self.battle_active:
+                break
+            if not self.battle_active:
+                break
             await delete_previous_messages(self.bot, self.channel_id)
             await delete_users_points()
             await update_admin_battle_points()
-            settings = await select_battle_settings()
+            # settings = await select_battle_settings()
+            
+            # if not self.battle_active:
+            #     break
             if 2 < len(participants)<=4:
                 start_message = await self.bot.send_message(
                 self.channel_id,
@@ -193,11 +239,17 @@ class TaskManager:
                 self.channel_id,
                 f"Начинается раунд {round_number}!"
             )
+            # if not self.battle_active:  # Проверка после отправки сообщения о раунде
+            #     await delete_previous_messages(self.bot, self.channel_id)
+            #     break
+            if not self.battle_active:
+                break
             await save_message_ids([start_message.message_id])
             
             message_ids = await send_battle_pairs(self.bot, self.channel_id, participants)
             await save_message_ids(message_ids)
-
+            if not self.battle_active:
+                break
             # Определяем продолжительность раунда
             # if now.hour < 10 and now.hour >= 0:
             if now.hour < 10 and now.hour >= 9:  # Если раунд начался после полуночи
@@ -209,12 +261,16 @@ class TaskManager:
 
             # Основное ожидание заверешния раунда с динамическим добавлением участников
             start_time = datetime.now(TIMEZONE)
+            if not self.battle_active:
+                break
             end_time = start_time + timedelta(seconds=wait_time)
 
             while datetime.now(TIMEZONE) < end_time:
                 try:
+                    if not self.battle_active:
+                        return
                     # Проверяем участников каждые 10 секунд
-                    await asyncio.sleep(10)
+                    await asyncio.sleep(1)
 
                     new_participants = await get_new_participants(participants)
                     if new_participants:
@@ -305,10 +361,19 @@ class TaskManager:
             if not self.DEFAULT_BATTLE_TIME:
                 logging.warning("DEFAULT_BATTLE_TIME not set, initializing...")
                 await self.initialize()
-
-            if not self.next_battle_start:
+            # Получаем текущие настройки из БД
+            
+            current_settings = await select_battle_settings()
+            current_hours = current_settings[4] // 3600
+            current_minutes = (current_settings[4] % 3600) // 60
+            current_battle_time = time(hour=int(current_hours), minute=int(current_minutes))
+            
+            if not self.next_battle_start or current_battle_time != self.DEFAULT_BATTLE_TIME:
                 now = datetime.now(self.timezone)
                 print(f"now in get {now}")
+                
+                # Обновляем DEFAULT_BATTLE_TIME на новое значение
+                self.DEFAULT_BATTLE_TIME = current_battle_time
                 # Создаем время следующего баттла
                 battle_time = datetime.combine(
                     now.date(),

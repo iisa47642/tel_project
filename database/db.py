@@ -72,6 +72,14 @@ async def create_tables():
                 user_id INTEGER
             )
         ''')
+       
+        await db.execute('''
+            CREATE TABLE IF NOT EXISTS channels (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                link TEXT NOT NULL
+            )
+        ''')
 
         await db.commit()
         print("База данных успешно создана!")
@@ -511,3 +519,44 @@ async def update_admin_battle_points():
             if existing_user:
                 await db.execute("UPDATE battle SET points = 100000 WHERE user_id = ?", (0,))
                 await db.commit()
+
+
+
+
+async def get_channels_from_db():
+    async with sq.connect("bot_database.db") as db:
+        query = "SELECT name, link FROM channels"
+        cursor = await db.execute(query)
+        rows = await cursor.fetchall()
+        await cursor.close()
+        
+        # Преобразуем результат в список словарей
+        channels = [{"name": row[0], "link": row[1]} for row in rows]
+        return channels
+
+
+async def add_channel_to_db(name: str, link: str):
+    async with sq.connect("bot_database.db") as db:
+        query = "INSERT INTO channels (name, link) VALUES (?, ?)"
+        await db.execute(query, (name, link))
+        await db.commit()
+
+
+
+async def delete_channel_from_db(name: str):
+    async with sq.connect("bot_database.db") as db:
+        query = "DELETE FROM channels WHERE name = ?"
+        cursor = await db.execute(query, (name,))
+        await db.commit()
+        return cursor.rowcount > 0  # True, если канал был удален
+
+async def clear_users_in_batl():
+    async with sq.connect("bot_database.db") as db:
+        await db.execute("DELETE FROM battle WHERE user_id != 0")
+        await db.commit()
+
+async def select_participants_no_id_null():
+    async with sq.connect("bot_database.db") as db:
+        cursor = await db.execute("SELECT user_id, photo_id, points FROM battle WHERE is_participant = 1 AND user_id != 0")
+        participants = await cursor.fetchall()
+        return [{'user_id': p[0], 'photo_id': p[1]} for p in participants]

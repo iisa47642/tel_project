@@ -1,3 +1,4 @@
+import logging
 from aiogram import F, Router, Bot
 from aiogram.filters import Command, CommandStart, StateFilter
 from aiogram.fsm.context import FSMContext
@@ -7,7 +8,6 @@ from aiogram.utils.deep_linking import create_start_link, decode_payload
 from database.db import *
 from keyboards.user_keyboards import main_user_kb, vote_user_kb, support_user_kb
 from keyboards.admin_keyboards import *
-
 
 from filters.mode_filter import mode_filter
 from states.user_states import FSMFillForm
@@ -58,22 +58,31 @@ async def cmd_battle(message: Message, state: FSMContext):
 
 
 
-@user_router.message(StateFilter(FSMFillForm.fill_photo),
-            F.photo[-1].as_('largest_photo'))
-async def process_photo_sent(message: Message,
-                             state: FSMContext,
-                             largest_photo: PhotoSize):
-    await state.update_data(
-        photo_unique_id=largest_photo.file_unique_id,
-        photo_id=largest_photo.file_id
-    )
-    data = await state.get_data()
-    await message.answer(
-        text='Спасибо!\n\nОжидайте сообщения о начале раунда'
-    )
-    await create_application(message.from_user.id, data["photo_id"])
+@user_router.message(StateFilter(FSMFillForm.fill_photo), F.photo[-1].as_('largest_photo'))
+async def process_photo_sent(message: Message, state: FSMContext, largest_photo: PhotoSize):
+    # Получаем размеры фотографии
+    width = largest_photo.width
+    height = largest_photo.height
 
-    await state.clear()
+    # Проверяем, является ли фотография вертикальной
+    if height > width:
+        await state.update_data(
+            photo_unique_id=largest_photo.file_unique_id,
+            photo_id=largest_photo.file_id
+        )
+        data = await state.get_data()
+
+        await message.answer(
+            text='Спасибо!\n\nОжидайте сообщения о начале раунда'
+        )
+        await create_application(message.from_user.id, data["photo_id"])
+        await state.clear()
+    else:
+        await message.answer(
+            text='Фотография должна быть вертикальной. Пожалуйста, отправьте другую фотографию.\n\n Если вы хотите прервать '
+             'заполнение анкеты - отправьте команду /cancel'
+        )
+
 
 
 @user_router.message(StateFilter(FSMFillForm.fill_photo))
@@ -123,6 +132,32 @@ async def mt_referal_menu (message: Message, state: FSMContext, bot: Bot):
     await message.answer(
         text=f"Ваша реферальная ссылка {link}"
     )
+    
+
+@user_router.message(lambda message: message.text == "Наши каналы и спонсоры")
+async def show_channels_for_admin(message: Message):
+    try:
+        # Получаем названия и ссылки на каналы из базы данных
+        channels = await get_channels_from_db()  # Функция для получения данных из БД
+        if not channels:
+            if (await is_admin(message)):
+                await message.answer(text="Список каналов пока пуст.",reply_markup=admin_channel_keyboard)
+            else:
+                await message.answer("Список каналов пока пуст.")
+            return
+        
+        # Генерируем сообщение
+        response = "Наши каналы и спонсоры:\n\n"
+        for channel in channels:
+            response += f"🔗 <b>{channel['name']}</b>: <a href='{channel['link']}'>ссылка</a>\n"
+        if (await is_admin(message)):
+            await message.answer(response, parse_mode="HTML",reply_markup=admin_channel_keyboard)
+        else:
+            await message.answer(response, parse_mode="HTML")
+    except Exception as e:
+        await message.answer("Произошла ошибка при получении списка каналов.")
+        logging.error(f"Error in show_channels: {e}")
+
 
 
 

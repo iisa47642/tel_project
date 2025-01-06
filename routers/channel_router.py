@@ -5,7 +5,7 @@ import os
 from random import randint
 import asyncio
 import random
-from datetime import datetime, timedelta
+from datetime import datetime, time, timedelta
 import logging
 from aiogram import F, Bot, Router
 from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, InputMediaPhoto
@@ -15,9 +15,13 @@ from aiogram.exceptions import TelegramRetryAfter, TelegramBadRequest
 from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, InputMediaPhoto
 
 from config.config import load_config
-from database.db import create_user, create_user_in_batl, get_current_votes, get_participants, select_admin_photo, update_admin_battle_points, update_points, \
+from database.db import create_user, create_user_in_batl, edit_user, get_current_votes, get_participants, get_user, select_admin_photo, update_admin_battle_points, update_points, \
     get_round_results, get_message_ids, clear_message_ids,\
     select_battle_settings, select_all_admins,users_dual_win_update
+from routers.globals_var import (
+    vote_states, user_clicks, pair_locks, vote_states_locks,
+    user_last_click, click_counters, click_reset_times
+)
 
 from filters.isAdmin import is_admin
 
@@ -27,7 +31,7 @@ def setup_router(dp, bot: Bot):
     global _bot
     _bot = bot
 
-ROUND_DURATION = 300  # 30 минут
+ROUND_DURATION = 300
 END_PHASE_THRESHOLD = 0.85  # Последние 15% времени считаются концом раунда
 MIN_REQUIRED_VOTES = 5  # Минимальное количество голосов для прохождения
 MIN_VOTE_INCREMENT = 1   # Минимальный прирост голосов
@@ -43,7 +47,7 @@ FINAL_PHASE_DELAYS = (0.3, 0.8)    # Минимальные задержки в 
 # Константы для задержек при пошаговом обновлении счета
 INITIAL_PHASE_STEP_DELAYS = (9, 13)
 MIDDLE_PHASE_STEP_DELAYS = (4, 9)
-FINAL_PHASE_STEP_DELAYS = (1, 2)
+FINAL_PHASE_STEP_DELAYS = (0.2, 0.8)
 
 
 ALLOW_LAG_CHANCE = 0.4  # Вероятность разрешить отставание
@@ -69,18 +73,34 @@ MIDDLE_PHASE_VOTE_DIFF = 2   # В средней фазе - в 2 голоса
 FINAL_PHASE_VOTE_DIFF = 1 
 
 # Создаем словари для отслеживания кликов
-user_last_click = defaultdict(lambda: datetime.min)
-click_counters = defaultdict(int)
-click_reset_times = defaultdict(lambda: datetime.min)
+# user_last_click = defaultdict(lambda: datetime.min)
+# click_counters = defaultdict(int)
+# click_reset_times = defaultdict(lambda: datetime.min)
 
 channel_router = Router()
-vote_states = {}  # Хранение состояний голосования
-user_clicks = {}  # Хранение информации о голосованиях пользователей
-last_updates = defaultdict(lambda: datetime.min)
-message_states = defaultdict(dict)
-update_locks = defaultdict(asyncio.Lock)
-pair_locks = defaultdict(asyncio.Lock)
-vote_states_locks = defaultdict(asyncio.Lock)
+# vote_states = {}  # Хранение состояний голосования
+# user_clicks = {}  # Хранение информации о голосованиях пользователей
+# # last_updates = defaultdict(lambda: datetime.min)
+# # message_states = defaultdict(dict)
+# # update_locks = defaultdict(asyncio.Lock)
+# pair_locks = defaultdict(asyncio.Lock)
+# vote_states_locks = defaultdict(asyncio.Lock)
+
+async def reset_vote_states():
+    """
+    Сбрасывает глобальные переменные, связанные с голосованием.
+    """
+    global vote_states, user_clicks, last_updates, message_states, update_locks, pair_locks, vote_states_locks
+
+    vote_states = {}  # Хранение состояний голосования
+    user_clicks = {}  # Хранение информации о голосованиях пользователей
+    # last_updates = defaultdict(lambda: datetime.min)  # Последние обновления
+    # message_states = defaultdict(dict)  # Состояния сообщений
+    # update_locks = defaultdict(asyncio.Lock)  # Лок для обновлений
+    pair_locks = defaultdict(asyncio.Lock)  # Лок для пар
+    vote_states_locks = defaultdict(asyncio.Lock)  # Лок для состояний голосования
+
+    print("Vote states and related globals have been reset.")
 
 async def init_vote_state(message_id: int, admin_id: int, admin_position: str, opponent_id: int):
     """
@@ -129,7 +149,10 @@ async def send_pair(bot: Bot, channel_id: int, participant1, participant2):
         InlineKeyboardButton(text=f"Правый: 0",
                               callback_data=f"vote:{participant2['user_id']}:right")]
     ])
-    vote_message = await bot.send_message(channel_id, "Голосуйте за понравившегося участника!", reply_markup=keyboard)
+    vote_message = await bot.send_message(channel_id, 
+                                          f"[Голосуйте за понравившегося участника!](t.me/c/{str(channel_id)[4:]}/{media_message[0].message_id})",
+                                          reply_markup=keyboard,
+                                          parse_mode="Markdown")
     ADMIN_ID=0
     if participant1['user_id'] == ADMIN_ID:
         await init_vote_state(
@@ -169,7 +192,11 @@ async def send_single(bot: Bot, channel_id: int, participant):
                               f"Голосов сейчас: 0"
                               , callback_data=f"vote:{participant['user_id']}:middle")]
     ])
-    vote_message = await bot.send_message(channel_id, "Голосуйте за участника!", reply_markup=keyboard)
+    vote_message = await bot.send_message(channel_id,
+                                          f"[Голосуйте за участника!](t.me/c/{str(channel_id)[4:]}/{photo_message.message_id})",
+                                          reply_markup=keyboard,
+                                          parse_mode="Markdown")
+    
 
     await init_vote_state(
         message_id=vote_message.message_id,
@@ -767,7 +794,7 @@ async def process_vote(callback: CallbackQuery):
         if not is_admin:
             if not await can_process_click(user_id, message_id):
                 return
-            if not await check_subscription(callback.bot, user_id, channel_id):
+            if not await check_subscription(user_id):
                 return
             if message_id in user_clicks and user_id in user_clicks[message_id]:
                 return
@@ -839,7 +866,13 @@ async def process_vote(callback: CallbackQuery):
         if not is_admin:
             if message_id not in user_clicks:
                 user_clicks[message_id] = set()
-            user_clicks[message_id].add(user_id)
+            us = await get_user(user_id)
+            if us and us[5]!=0:
+                add_voic = us[5]
+                new_add_voic=add_voic-1
+                await edit_user(us[0],'additional_voices',new_add_voic)
+            else:
+                user_clicks[message_id].add(user_id)
         
         asyncio.create_task(update_points(vote_user_id))
 
@@ -868,33 +901,3 @@ async def process_vote(callback: CallbackQuery):
     except Exception as e:
         logging.error(f"Error processing vote: {e}")
 
-
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-# async def create_new_vote(bot: Bot, channel_id: int, admin_id: int, admin_position: str, opponent_id: int):
-#     """
-#     Создает новое голосование
-#     """
-#     # Создаем сообщение с голосованием
-#     keyboard = InlineKeyboardMarkup(...)  # создание клавиатуры
-#     message = await bot.send_photo(
-#         chat_id=channel_id,
-#         photo=photo,
-#         reply_markup=keyboard
-#     )
-    
-#     # Инициализируем состояние голосования
-#     await init_vote_state(
-#         message_id=message.message_id,
-#         admin_id=admin_id,
-#         admin_position=admin_position,
-#         opponent_id=opponent_id
-#     )

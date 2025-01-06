@@ -5,7 +5,7 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMar
 main_user_kb = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text="Поддержка")],
-        [KeyboardButton(text="Принять участие")],
+        [KeyboardButton(text="Принять участие"),KeyboardButton(text="Наши каналы и спонсоры")],
         [KeyboardButton(text="Получить голоса"),KeyboardButton(text="Профиль")]
     ],
     resize_keyboard=True

@@ -1,3 +1,4 @@
+import logging
 import os
 import re
 
@@ -6,17 +7,20 @@ from aiogram.filters import Command, StateFilter, CommandObject
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
 from aiogram.types import Message, CallbackQuery, InputMediaPhoto
-
 from config.config import load_config
 import keyboards
 from filters.isAdmin import is_admin
 from keyboards.admin_keyboards import *
 from database.db import *
-from routers.channel_router import make_some_magic
+from routers.channel_router import delete_previous_messages, make_some_magic, get_channel_id
 from states.admin_states import FSMFillForm
+from tasks import scheduler_manager
 from utils.task_manager import TaskManagerInstance
+from keyboards.user_keyboards import main_user_kb
 admin_router = Router()
 admin_router.message.filter(is_admin)
+
+
 
 _bot: Bot = None
 
@@ -67,7 +71,11 @@ async def get_username_by_id(user_id: int):
 async def cmd_admin(message: Message):
     await message.answer("Привет, админ! Ты в админской панели.", reply_markup=get_main_admin_kb(message.from_user.id))
 
-
+@admin_router.message(lambda message: message.text == "Назад в меню")
+async def photo_moderation(message: Message, state: FSMContext):
+    await message.answer(text="Назад в меню",reply_markup=main_user_kb)
+    await state.clear()
+    
 @admin_router.message(lambda message: message.text == "Назад")
 async def photo_moderation(message: Message, state: FSMContext):
     await message.answer(text="Назад",reply_markup=get_main_admin_kb(message.from_user.id))
@@ -201,11 +209,51 @@ async def statistics(message: Message):
 
 @admin_router.message(lambda message: message.text == "Очистка баттла")
 async def clear_battle(message: Message):
-    await message.answer(text="Все пользователи удалены из батла",reply_markup=get_main_admin_kb(message.from_user.id))
-    await delete_applications()
-    await delete_users_in_batl()
-    
-    
+    channel_id = get_channel_id()
+    try:
+        if not scheduler_manager.task_manager.battle_active:
+            users_on_battle = await select_participants_no_id_null()
+            if users_on_battle:
+                for user in users_on_battle:
+                    await create_application(user['user_id'],user['photo_id'])
+                await clear_users_in_batl()        
+                await _bot.send_message(message.from_user.id,"Список участников баттла очищен")
+            else:
+                await _bot.send_message(message.from_user.id,"Список участников баттла уже пуст")
+            await _bot.send_message(message.from_user.id,"В данный момент нет активного баттла.")
+            return
+        
+        
+        # Останавливаем текущий баттл
+        if scheduler_manager.remove_current_battle():
+            # Очистка произойдет автоматически в обработчике CancelledError
+            await delete_previous_messages(message.bot, channel_id)
+            
+            users_on_battle = await select_participants_no_id_null()
+            if users_on_battle:
+                for user in users_on_battle:
+                    await create_application(user['user_id'],user['photo_id'])
+            # Обновляем сообщение с подтверждением
+            await _bot.send_message(message.from_user.id, text="Баттл успешно остановлен.")
+            
+            # Отправляем уведомление в канал
+            war_message = await _bot.send_message(
+                channel_id,
+                "⚠️ Баттл был остановлен администратором."
+            )
+            await save_message_ids([war_message.message_id])
+
+
+        else:
+            await _bot.send_message(message.from_user.id,text="Не удалось остановить баттл.")
+        
+
+    except Exception as e:
+        error_message = f"Ошибка при остановке баттла: {e}"
+        logging.error(error_message)
+        await _bot.send_message(message.from_user.id, error_message)
+
+
 
 
 ####################################                    Рассылка                      #################################
@@ -593,3 +641,70 @@ async def process_confirm_kick(callback: CallbackQuery):
 async def process_cancel_kick(callback: CallbackQuery):
     await callback.message.edit_reply_markup(reply_markup=kick_user_kb)
     await callback.answer("Действие отменено")
+
+
+@admin_router.message(lambda message: message.text == "Добавить канал")
+async def start_adding_channel(message: Message, state: FSMContext):
+    await message.answer("Введите название канала:")
+    await state.set_state(FSMFillForm.add_channel_name)
+    
+@admin_router.message(FSMFillForm.add_channel_name)
+async def process_channel_name(message: Message, state: FSMContext):
+    # Проверяем корректность ввода (название не должно быть пустым)
+    if not message.text or len(message.text) < 3:
+        await message.answer("Название канала должно содержать хотя бы 3 символа. Попробуйте снова.")
+        return
+
+    # Сохраняем название канала во временное состояние
+    await state.update_data(channel_name=message.text)
+    await message.answer("Теперь введите ссылку на канал:")
+    await state.set_state(FSMFillForm.add_channel_link)
+
+
+@admin_router.message(FSMFillForm.add_channel_link)
+async def process_channel_link(message: Message, state: FSMContext):
+    # Проверяем, что ссылка корректна
+    if not re.match(r'^https?://', message.text):
+        await message.answer("Ссылка должна начинаться с http:// или https://. Попробуйте снова.")
+        return
+
+    # Получаем данные из состояния
+    data = await state.get_data()
+    channel_name = data.get("channel_name")
+    channel_link = message.text
+
+    # Сохраняем канал в базу данных
+    try:
+        await add_channel_to_db(channel_name, channel_link)  # Функция для добавления в БД
+        await message.answer(f"Канал <b>{channel_name}</b> успешно добавлен!", parse_mode="HTML")
+    except Exception as e:
+        await message.answer("Произошла ошибка при добавлении канала.")
+        logging.error(f"Error adding channel: {e}")
+
+    # Выходим из состояния
+    await state.clear()
+
+@admin_router.message(lambda message: message.text == "Удалить канал")
+async def start_deleting_channel(message: Message, state: FSMContext):
+    await message.answer("Введите название канала, который хотите удалить:")
+    await state.set_state(FSMFillForm.delete_channel_name)
+
+
+@admin_router.message(FSMFillForm.delete_channel_name)
+async def process_channel_deletion(message: Message, state: FSMContext):
+    channel_name = message.text
+
+    try:
+        # Удаляем канал из базы данных
+        success = await delete_channel_from_db(channel_name)  # Функция для удаления из БД
+
+        if success:
+            await message.answer(f"Канал <b>{channel_name}</b> успешно удален!", parse_mode="HTML")
+        else:
+            await message.answer(f"Канал с названием <b>{channel_name}</b> не найден.", parse_mode="HTML")
+    except Exception as e:
+        await message.answer("Произошла ошибка при удалении канала.")
+        logging.error(f"Error deleting channel: {e}")
+
+    # Выходим из состояния
+    await state.clear()
