@@ -42,21 +42,21 @@ VOTE_SPEED_FAST = (3, 8)      # Быстрая скорость
 # Константы для задержек в разных фазах (в секундах)
 INITIAL_PHASE_DELAYS = (2.0, 3.0)  # Большие задержки в начальной фазе
 MIDDLE_PHASE_DELAYS = (1.0, 2.0)   # Средние задержки в средней фазе
-FINAL_PHASE_DELAYS = (0.3, 0.8)    # Минимальные задержки в финальной фазе
+FINAL_PHASE_DELAYS = (1.0, 2.0)    # Минимальные задержки в финальной фазе
 
 # Константы для задержек при пошаговом обновлении счета
 INITIAL_PHASE_STEP_DELAYS = (9, 13)
 MIDDLE_PHASE_STEP_DELAYS = (4, 9)
-FINAL_PHASE_STEP_DELAYS = (0.2, 0.8)
+FINAL_PHASE_STEP_DELAYS = (1.0, 2.0)
 
 
 ALLOW_LAG_CHANCE = 0.4  # Вероятность разрешить отставание
-MIN_LAG_DURATION = 10  # Минимальная продолжительность отставания в секундах
-MAX_LAG_DURATION = 30  # Максимальная продолжительность отставания в секундах
-MAX_LAG_DIFFERENCE = 5  # Максимальная разница в голосах при отставании
+MIN_LAG_DURATION = 30  # Минимальная продолжительность отставания в секундах
+MAX_LAG_DURATION = 50  # Максимальная продолжительность отставания в секундах
+MAX_LAG_DIFFERENCE = 8  # Максимальная разница в голосах при отставании
 GUARANTEED_WIN_PHASE = 0.8  # Начало фазы гарантированной победы (85% времени раунда)
 MIN_WINNING_MARGIN = 3  # Минимальный отрыв для победы
-FINAL_SPRINT_SPEED = (0.8, 0.1)  # Очень быстрые обновления в финальной фазе
+FINAL_SPRINT_SPEED = (0.2, 0.8)  # Очень быстрые обновления в финальной фазе
 
 MIN_UPDATE_INTERVAL = 2.0  # Минимальный интервал между обновлениями в секундах
 FLOOD_CONTROL_RESET = 10# Время сброса флуд-контроля в секундах
@@ -68,39 +68,13 @@ CLICK_COOLDOWN = 0.3  # Уменьшаем задержку между клик�
 MAX_CLICKS_PER_INTERVAL = 5  # Увеличиваем количество разрешенных кликов
 RESET_INTERVAL = 2.0  # Интервал сброса счетчика кликов
 
-INITIAL_PHASE_VOTE_DIFF = 3  # В начальной фазе допускаем разницу в 3 голоса
-MIDDLE_PHASE_VOTE_DIFF = 2   # В средней фазе - в 2 голоса
+INITIAL_PHASE_VOTE_DIFF = 7  # В начальной фазе допускаем разницу в 3 голоса
+MIDDLE_PHASE_VOTE_DIFF = 5   # В средней фазе - в 2 голоса
 FINAL_PHASE_VOTE_DIFF = 1 
 
-# Создаем словари для отслеживания кликов
-# user_last_click = defaultdict(lambda: datetime.min)
-# click_counters = defaultdict(int)
-# click_reset_times = defaultdict(lambda: datetime.min)
 
 channel_router = Router()
-# vote_states = {}  # Хранение состояний голосования
-# user_clicks = {}  # Хранение информации о голосованиях пользователей
-# # last_updates = defaultdict(lambda: datetime.min)
-# # message_states = defaultdict(dict)
-# # update_locks = defaultdict(asyncio.Lock)
-# pair_locks = defaultdict(asyncio.Lock)
-# vote_states_locks = defaultdict(asyncio.Lock)
 
-# async def reset_vote_states():
-#     """
-#     Сбрасывает глобальные переменные, связанные с голосованием.
-#     """
-#     global vote_states, user_clicks, last_updates, message_states, update_locks, pair_locks, vote_states_locks
-
-#     vote_states = {}  # Хранение состояний голосования
-#     user_clicks = {}  # Хранение информации о голосованиях пользователей
-#     # last_updates = defaultdict(lambda: datetime.min)  # Последние обновления
-#     # message_states = defaultdict(dict)  # Состояния сообщений
-#     # update_locks = defaultdict(asyncio.Lock)  # Лок для обновлений
-#     pair_locks = defaultdict(asyncio.Lock)  # Лок для пар
-#     vote_states_locks = defaultdict(asyncio.Lock)  # Лок для состояний голосования
-
-#     print("Vote states and related globals have been reset.")
 
 async def init_vote_state(message_id: int, admin_id: int, admin_position: str, opponent_id: int):
     """
@@ -336,7 +310,7 @@ async def end_round(bot: Bot, channel_id: int, min_votes_for_single: int):
                     winner['user_id'],
                     f"🎉 Поздравляем, вы успешно прошли в следующий раунд! Продолжайте в том же духе и выиграете!"
                 )
-                asyncio.sleep(0.2)
+                await asyncio.sleep(0.2)
                 await bot.send_message(
                     loser['user_id'],
                     f"😢 К сожалению, вы потерпели поражение в фотобатле, так как ваш соперник набрал больше реакций\n " +
@@ -393,6 +367,12 @@ async def get_super_admin_ids():
         config = load_config(filename)
         return config.tg_bot.super_admin_ids
 
+async def get_config():
+        dirname = os.path.dirname(__file__)
+        filename = os.path.abspath(os.path.join(dirname, '..', 'config/config.env'))
+        config = load_config(filename)
+        return config
+
 
 async def announce_winner(bot: Bot, channel_id: int, winners):
     """
@@ -404,7 +384,8 @@ async def announce_winner(bot: Bot, channel_id: int, winners):
     if ADMIN_ID:
         admin_ids = [i[0] for i in ADMIN_ID]
     admin_ids += await get_super_admin_ids()
-    
+    config = await get_config()
+    user_link = config.tg_bot.user_link
     for winner in winners:
         try:
             secret_code = randint(1000,9999)
@@ -431,14 +412,14 @@ async def announce_winner(bot: Bot, channel_id: int, winners):
     if len(winners)==1:
         winner = winners[0]
         media = [
-        InputMediaPhoto(media=winner['photo_id'], caption="🥇Поздравляем победителя!🥇\n\n🏆 Можешь забрать свой приз, написав нам <a href='https://t.me/isaev_isa712'>сюда</a>\n\n 🏆🧸 Проигравшим не отчаиваться, ведь новый день - новые возможности 🧸\n\n💛 Следующий батл начнется завтра в то же время, отправляй заявку! 💛", parse_mode="HTML")
+        InputMediaPhoto(media=winner['photo_id'], caption=f"🥇Поздравляем победителя!🥇\n\n🏆 Можешь забрать свой приз, написав нам <a href='{user_link}'>сюда</a>\n\n 🏆🧸 Проигравшим не отчаиваться, ведь новый день - новые возможности 🧸\n\n💛 Следующий батл начнется завтра в то же время, отправляй заявку! 💛", parse_mode="HTML")
     ]
         
     if len(winners)==2:
         winner1 = winners[0]
         winner2 = winners[1]
         media = [
-        InputMediaPhoto(media=winner1['photo_id'], caption=f"🥇Поздравляем победителей!🥇\n\n🏆 Можете забрать свой приз, написав нам <a href='https://t.me/isaev_isa712'>сюда</a>\n\n 🏆🧸 Проигравшим не отчаиваться, ведь новый день - новые возможности 🧸\n\n💛 Следующий батл начнется завтра в то же время, отправляй заявку! 💛", parse_mode="HTML"),
+        InputMediaPhoto(media=winner1['photo_id'], caption=f"🥇Поздравляем победителей!🥇\n\n🏆 Можете забрать свой приз, написав нам <a href='{user_link}'>сюда</a>\n\n 🏆🧸 Проигравшим не отчаиваться, ведь новый день - новые возможности 🧸\n\n💛 Следующий батл начнется завтра в то же время, отправляй заявку! 💛", parse_mode="HTML"),
         
         InputMediaPhoto(media=winner2['photo_id'], caption=f"")
     ]
@@ -842,7 +823,6 @@ async def process_vote(callback: CallbackQuery):
     Обработчик голосования с мгновенной обработкой клика
     """
     try:
-        await callback.answer()
         
         channel_id = callback.message.chat.id
         message_id = callback.message.message_id
@@ -855,8 +835,10 @@ async def process_vote(callback: CallbackQuery):
             if not await can_process_click(user_id, message_id):
                 return
             if not await check_subscription(user_id):
+                await callback.answer('Для голосования необходимо подписаться на канал!')
                 return
             if message_id in user_clicks and user_id in user_clicks[message_id]:
+                await callback.answer('Вы уже голосовали!')
                 return
 
         _, vote_user_id, position = callback.data.split(":")
@@ -933,7 +915,10 @@ async def process_vote(callback: CallbackQuery):
                 await edit_user(us[0],'additional_voices',new_add_voic)
             else:
                 user_clicks[message_id].add(user_id)
-        
+        try:
+            await callback.answer('Ваш голос учтен!')
+        except Exception as cb_error:
+            logging.error(f"Error sending callback answer: {cb_error}")
         asyncio.create_task(update_points(vote_user_id))
 
         # Запускаем монитор админа в отдельном таске, если нужно

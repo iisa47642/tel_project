@@ -119,10 +119,13 @@ class TaskManager:
                     users = await get_all_users()
                     users_id = [i[0] for i in users]
                     for id_u in users_id:
-                        await self.bot.send_message(
-                        id_u,
-                        f"⚠️ Внимание! Баттл начнется через 1 час (в {battle_time.strftime('%H:%M')})!"
+                        try:
+                            await self.bot.send_message(
+                            id_u,
+                            f"⚠️ Внимание! Баттл начнется через 1 час (в {battle_time.strftime('%H:%M')})!"
                     )
+                        except Exception as e:
+                            print('Не удалось отправить сообщение пользователю ' + str(e))
                     logging.info("Notification sent successfully")
 
                 # Ждем немного перед следующей итерацией

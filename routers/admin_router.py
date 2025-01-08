@@ -8,7 +8,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
 from aiogram.types import Message, CallbackQuery, InputMediaPhoto
 from config.config import load_config
-import keyboards
+
 from filters.isAdmin import is_admin
 from keyboards.admin_keyboards import *
 from database.db import *
@@ -27,6 +27,13 @@ _bot: Bot = None
 def setup_router(dp, bot: Bot):
     global _bot
     _bot = bot
+
+
+async def get_config():
+        dirname = os.path.dirname(__file__)
+        filename = os.path.abspath(os.path.join(dirname, '..', 'config/config.env'))
+        config = load_config(filename)
+        return config
 
 async def gen_mode_aplic(application):
     if application:
@@ -155,7 +162,9 @@ async def decline(call: CallbackQuery):
         application = application[0]
         user_id = application[0]
         try:
-            await _bot.send_message(user_id, text="❌ Ваша фотография отклонена. Изучите <a href='https://telegra.ph/Pravila-fotobatla-11-25'>правила</a> и попробуйте снова.", parse_mode="HTML")
+            config = await get_config()
+            rule_link = config.tg_bot.rule_link
+            await _bot.send_message(user_id, text=f"❌ Ваша фотография отклонена. Изучите <a href='{rule_link}'>правила</a> и попробуйте снова.", parse_mode="HTML")
         except Exception as e:
                 print(f"Ошибка при отправке личного сообщения: {e}")
         if delMessage:

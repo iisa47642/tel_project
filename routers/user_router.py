@@ -34,8 +34,8 @@ async def cmd_start(message: Message,state: FSMContext,command: Command):
             payload = decode_payload(args)
             referrer_id = int(payload)
             user_id = message.from_user.id
-            await create_user(user_id, "user")
-            if user_id != referrer_id and not get_user(user_id):
+            if (user_id != referrer_id) and not (await get_user(user_id)):
+                await create_user(user_id, "user")
                 await edit_user(user_id, 'ref_owner', referrer_id)
     else:
         await create_user(message.from_user.id, "user")
@@ -49,7 +49,7 @@ async def cmd_battle(message: Message, state: FSMContext):
     application = await select_application(user_id)
     user_on_battle = await select_user_on_battle(user_id)
     if not application and not user_on_battle:
-        await message.answer("📷 Отправь сюда свою фотку. Помни, что она должна быть вертикальной!")
+        await message.answer("📷 Отправь сюда свою фотку. Помни, что она должна быть вертикальной!\n\nЕсли вы хотите прервать заполнение анкеты - отправьте команду /cancel")
         await state.set_state(FSMFillForm.fill_photo)
     elif application:
         await message.answer("Ваша завка уже находиться на рассмотрении")
@@ -94,7 +94,7 @@ async def warning_not_photo(message: Message):
     )
 
 
-@user_router.message(lambda message: message.text == "⚡️Поддержка⚡️", StateFilter(default_state))
+@user_router.message(lambda message: message.text == "⚡️Поддержка", StateFilter(default_state))
 async def support(message: Message, state: FSMContext):
     await message.answer(
         text=
@@ -115,13 +115,13 @@ async def profile(message: Message, state: FSMContext):
     
     await message.answer(
         text=
-        f"ID: {message.from_user.id}\n"+
-        f"Ник: @{message.from_user.username}\n"+
-        f"Выйгранных фотобатлов: {buttle_win} \n"+
-        f"Общее число фотобатлов: {plays_buttle} \n"+
-        f"Выйгранных дуэлей: {dual_win}\n\n"+
-        f"Дополнительные голоса: {additional_voices}\n"
-        f"Приглашенных рефералов: {referals}"
+        f"🆔 `{message.from_user.id}`\n"+
+        f"🎮 Ник: @{message.from_user.username}\n\n"+
+        f"🎟 Сыграно фотобатлов: {plays_buttle} \n"+
+        f"🥇 Выиграно фотобатлов: {buttle_win} \n"+
+        f"🏆 Выиграно дуэлей: {dual_win}\n\n"+
+        f"🎤 Дополнительные голоса: {additional_voices}\n"
+        f"🧬 Приглашенных рефералов: {referals}"
     )
     
 # хендлер для создания рефералок 

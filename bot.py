@@ -1,5 +1,5 @@
 # bot.py
-from aiogram import Bot, Dispatcher, F
+from aiogram import Bot, Dispatcher
 from aiogram.filters import StateFilter, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state

@@ -31,8 +31,6 @@ class SchedulerManager:
                 misfire_grace_time=300
             )
 
-            # Запускаем задачу уведомлений сразу при старте
-            await self.task_manager.start_notification_task()
             
             # Запускаем планировщик
             if not self.scheduler.running:
@@ -116,6 +114,8 @@ class SchedulerManager:
     async def check_and_schedule_battle(self):
         """Проверка и планирование следующего баттла"""
         try:
+            # Запускаем задачу уведомлений сразу при старте
+            await self.task_manager.start_notification_task()
             logging.info("Checking battle schedule...")
             if self.task_manager.battle_active:
                 logging.info("Battle is currently active, skipping scheduling")
