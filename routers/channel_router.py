@@ -431,14 +431,14 @@ async def announce_winner(bot: Bot, channel_id: int, winners):
     if len(winners)==1:
         winner = winners[0]
         media = [
-        InputMediaPhoto(media=winner['photo_id'], caption='🥇Поздравляем победителя!🥇\n\n🏆 Можешь забрать свой приз, написав нам сюда (на слове сюда должна быть ссылка)\n\n 🏆🧸 Проигравшим не отчаиваться, ведь новый день - новые возможности 🧸\n\n💛 Следующий батл начнется завтра в то же время, отправляй заявку! 💛')
+        InputMediaPhoto(media=winner['photo_id'], caption="🥇Поздравляем победителя!🥇\n\n🏆 Можешь забрать свой приз, написав нам <a href='https://t.me/isaev_isa712'>сюда</a>\n\n 🏆🧸 Проигравшим не отчаиваться, ведь новый день - новые возможности 🧸\n\n💛 Следующий батл начнется завтра в то же время, отправляй заявку! 💛", parse_mode="HTML")
     ]
         
     if len(winners)==2:
         winner1 = winners[0]
         winner2 = winners[1]
         media = [
-        InputMediaPhoto(media=winner1['photo_id'], caption=f'🥇Поздравляем победителей!🥇\n\n🏆 Можете забрать свой приз, написав нам сюда (на слове сюда должна быть ссылка)\n\n 🏆🧸 Проигравшим не отчаиваться, ведь новый день - новые возможности 🧸\n\n💛 Следующий батл начнется завтра в то же время, отправляй заявку! 💛'),
+        InputMediaPhoto(media=winner1['photo_id'], caption=f"🥇Поздравляем победителей!🥇\n\n🏆 Можете забрать свой приз, написав нам <a href='https://t.me/isaev_isa712'>сюда</a>\n\n 🏆🧸 Проигравшим не отчаиваться, ведь новый день - новые возможности 🧸\n\n💛 Следующий батл начнется завтра в то же время, отправляй заявку! 💛", parse_mode="HTML"),
         
         InputMediaPhoto(media=winner2['photo_id'], caption=f"")
     ]

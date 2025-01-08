@@ -38,7 +38,7 @@ async def gen_mode_aplic(application):
         plays_buttle = user[3]
         referals = user[4]
         additional_voices = user[5]
-
+        
         #select photo by user_id
         
         photo_id = application[0][1]
@@ -105,6 +105,10 @@ async def apply(call: CallbackQuery):
     if len(application) != 0:
         application = application[0]
         user_id = application[0]
+        try:
+            await _bot.send_message(user_id, text=('✅ Поздравляем! Ваша фотография одобрена к участию в фотобатле! Я сообщу о начале.'))
+        except Exception as e:
+                print(f"Ошибка при отправке личного сообщения: {e}")
         photo_id = application[1]
         ref_owner_id = (await get_user(user_id))
         if ref_owner_id:
@@ -118,8 +122,8 @@ async def apply(call: CallbackQuery):
             await edit_user(user_id, 'ref_owner', 0)
             try:
                 await _bot.send_message(ref_owner_id, text=(
-                    f"Пользователь {user_id}, зарегистрированный по вашей ссылке получил одобрение на "+
-                    f'баттл, вы получаете 3 дополнительных голоса, сейчас количество ваших голосов {additional_voices_owner+3}'
+                    f"🎊 Поздравляем! Реферал подал заявку и вы получили три голоса на этот баттл.\n\n" +
+                    '🪄 В любом раунде вы можете 3 раза нажать на кнопку голосования, чтобы зачислить дополнительные голоса.'
                     ))
             except Exception as e:
                 print(f"Ошибка при отправке личного сообщения: {e}")
@@ -150,6 +154,10 @@ async def decline(call: CallbackQuery):
     if len(application) != 0:
         application = application[0]
         user_id = application[0]
+        try:
+            await _bot.send_message(user_id, text="❌ Ваша фотография отклонена. Изучите <a href='https://telegra.ph/Pravila-fotobatla-11-25'>правила</a> и попробуйте снова.", parse_mode="HTML")
+        except Exception as e:
+                print(f"Ошибка при отправке личного сообщения: {e}")
         if delMessage:
             await _bot.send_message(call.from_user.id, "Заявки закончились")
             await call.message.delete()
