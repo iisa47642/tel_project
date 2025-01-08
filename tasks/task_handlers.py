@@ -10,7 +10,7 @@ from math import log
 import pytz
 
 from routers.channel_router import make_some_magic, send_battle_pairs, end_round, announce_winner, delete_previous_messages, get_new_participants
-from database.db import get_participants, remove_losers, save_message_ids, delete_users_in_batl, select_all_admins, select_battle_settings, delete_users_points, update_admin_battle_points, update_points,users_plays_buttle_update,users_buttle_win_update
+from database.db import clear_users_in_batl, delete_users_add_voices, get_participants, remove_losers, save_message_ids, delete_users_in_batl, select_all_admins, select_battle_settings, delete_users_points, update_admin_battle_points, update_points,users_plays_buttle_update,users_buttle_win_update
 
 from config.config import load_config
 from routers.channel_router import send_battle_pairs, end_round, announce_winner, delete_previous_messages
@@ -225,19 +225,22 @@ class TaskManager:
             # if not self.battle_active:
             #     break
             if 2 < len(participants)<=4:
+                round_txt = f"Начинается полуфинал!"
                 start_message = await self.bot.send_message(
                 self.channel_id,
-                f"Начинается полуфинал!"
+                round_txt
             )
             elif len(participants)==2:
+                round_txt = f"Начинается финал!"
                 start_message = await self.bot.send_message(
                 self.channel_id,
-                f"Начинается финал!"
+                round_txt
             )
             else:
+                round_txt = f"Начинается раунд {round_number}!"
                 start_message = await self.bot.send_message(
                 self.channel_id,
-                f"Начинается раунд {round_number}!"
+                round_txt
             )
             # if not self.battle_active:  # Проверка после отправки сообщения о раунде
             #     await delete_previous_messages(self.bot, self.channel_id)
@@ -246,7 +249,7 @@ class TaskManager:
                 break
             await save_message_ids([start_message.message_id])
             
-            message_ids = await send_battle_pairs(self.bot, self.channel_id, participants)
+            message_ids = await send_battle_pairs(self.bot, self.channel_id, participants,self.prize, round_txt,self.round_duration, self.min_votes_for_single)
             await save_message_ids(message_ids)
             if not self.battle_active:
                 break
@@ -276,7 +279,7 @@ class TaskManager:
                     if new_participants:
                         logging.info(f"Adding {len(new_participants)} new participants to the battle")
                         participants.extend(new_participants)
-                        new_message_ids = await send_battle_pairs(self.bot, self.channel_id, new_participants)
+                        new_message_ids = await send_battle_pairs(self.bot, self.channel_id, new_participants,self.prize, round_txt,self.round_duration,self.min_votes_for_single)
                         await save_message_ids(new_message_ids)
                 except Exception as e:
                     logging.error(f"Error while checking new participants: {e}")
@@ -301,7 +304,8 @@ class TaskManager:
         # Объявляем победителя
         final_message_ids = await announce_winner(self.bot, self.channel_id, winners)
         await save_message_ids(final_message_ids)
-        await delete_users_in_batl()
+        await delete_users_add_voices()
+        await clear_users_in_batl()
         BATTLE_SETTINGS = await select_battle_settings()
         self.min_votes_for_single = BATTLE_SETTINGS[2]
 

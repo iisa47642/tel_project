@@ -68,7 +68,8 @@ tune_battle_admin_kb = ReplyKeyboardMarkup(
         [KeyboardButton(text="Продолжительность раунда"),KeyboardButton(text="Сумма приза")],
         [KeyboardButton(text="Минимальное количество голосов"), KeyboardButton(text="Интервал между раундами")],
         [KeyboardButton(text="Текущие настройки"),KeyboardButton(text="Время начала баттла")],
-        [KeyboardButton(text="Автоматическая победа"),KeyboardButton(text="Назад")]
+        [KeyboardButton(text="Автоматическая победа"),KeyboardButton(text="Добавить информацию к посту")],
+        [KeyboardButton(text="Назад")]
     ],
     resize_keyboard=True
 )
@@ -80,6 +81,15 @@ back_admin_kb = ReplyKeyboardMarkup(
     resize_keyboard=True
 )
 
+
+# Клавиатура управления информацией
+battle_info_kb = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton(text="Изменить сообщение"), KeyboardButton(text="Удалить сообщение")],
+        [KeyboardButton(text="Посмотреть сообщение"), KeyboardButton(text="Назад в общие настройки")]
+    ],
+    resize_keyboard=True
+)
 
 #######################     InlineKeyboards          ##########################################
 

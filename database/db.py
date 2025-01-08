@@ -54,7 +54,8 @@ async def create_tables():
             min_vote_total INTEGER,
             round_interval INTEGER,
             time_of_run INTEGER,
-            is_autowin INTEGER 
+            is_autowin INTEGER,
+            info_message TEXT
         )
         ''')
         await db.execute('''
@@ -257,7 +258,7 @@ async def delete_applications():
 # изменение настроек
 async def edit_battle_settings(parameter: str, value):
     allowed_parameters = ['round_duration','prize_amount',
-            'min_vote_total','round_interval', 'time_of_run','is_autowin']
+            'min_vote_total','round_interval', 'time_of_run','is_autowin', 'info_message']
     
     if parameter in allowed_parameters:
         async with sq.connect("bot_database.db") as db:
@@ -265,7 +266,7 @@ async def edit_battle_settings(parameter: str, value):
                 async with db.execute("SELECT * FROM battle_settings") as cursor:
                     existing = await cursor.fetchall()
                     if not existing:
-                        await db.execute("INSERT INTO battle_settings VALUES(?, ?, ?, ?, ?, ?)", (7200,1000,5,1800,50400, 1))
+                        await db.execute("INSERT INTO battle_settings VALUES(?, ?, ?, ?, ?, ?, ?)", (7200,1000,5,1800,50400, 1,None))
                         await db.commit()
                             
                     query = f"UPDATE battle_settings SET {parameter} = ?"
@@ -357,7 +358,7 @@ async def select_battle_settings():
         async with db.execute('SELECT * FROM battle_settings') as cursor:
             flag = await cursor.fetchall()
             if not flag:
-                await db.execute("INSERT INTO battle_settings VALUES(?, ?, ?, ?, ?, ?)", (7200,1000,5,1800,50400,1))
+                await db.execute("INSERT INTO battle_settings VALUES(?, ?, ?, ?, ?, ?,?)", (7200,1000,5,1800,50400,1,None))
                 await db.commit()
                 # Делаем новый SELECT после вставки
                 async with db.execute('SELECT * FROM battle_settings') as new_cursor:
@@ -560,3 +561,29 @@ async def select_participants_no_id_null():
         cursor = await db.execute("SELECT user_id, photo_id, points FROM battle WHERE is_participant = 1 AND user_id != 0")
         participants = await cursor.fetchall()
         return [{'user_id': p[0], 'photo_id': p[1]} for p in participants]
+
+
+async def delete_users_add_voices():
+    async with sq.connect("bot_database.db") as db:
+        await db.execute("UPDATE users SET additional_voices = 0")
+        await db.commit()
+        
+        
+        
+async def update_info_message(message_txt):
+    async with sq.connect("bot_database.db") as db:
+            await db.execute('UPDATE battle_settings SET info_message = ?', (message_txt,))
+            await db.commit()
+
+
+async def delete_info_message():
+    async with sq.connect("bot_database.db") as db:
+            await db.execute('UPDATE battle_settings SET info_message = NULL')
+            await db.commit()
+            
+            
+async def select_info_message():
+    async with sq.connect("bot_database.db") as db:
+            cursor = await db.execute('SELECT info_message FROM battle_settings')
+            result = await cursor.fetchone()
+            return result

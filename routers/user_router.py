@@ -35,7 +35,7 @@ async def cmd_start(message: Message,state: FSMContext,command: Command):
             referrer_id = int(payload)
             user_id = message.from_user.id
             await create_user(user_id, "user")
-            if user_id != referrer_id:
+            if user_id != referrer_id and not get_user(user_id):
                 await edit_user(user_id, 'ref_owner', referrer_id)
     else:
         await create_user(message.from_user.id, "user")
@@ -43,13 +43,13 @@ async def cmd_start(message: Message,state: FSMContext,command: Command):
 
 
 @user_router.message(Command("battle"), StateFilter(default_state))
-@user_router.message(F.text=="Принять участие",StateFilter(default_state))
+@user_router.message(F.text=="🔥Принять участие",StateFilter(default_state))
 async def cmd_battle(message: Message, state: FSMContext):
     user_id = message.from_user.id
     application = await select_application(user_id)
     user_on_battle = await select_user_on_battle(user_id)
     if not application and not user_on_battle:
-        await message.answer("Отправь мне свое фото для баттла.")
+        await message.answer("📷 Отправь сюда свою фотку. Помни, что она должна быть вертикальной!")
         await state.set_state(FSMFillForm.fill_photo)
     elif application:
         await message.answer("Ваша завка уже находиться на рассмотрении")
@@ -73,14 +73,14 @@ async def process_photo_sent(message: Message, state: FSMContext, largest_photo:
         data = await state.get_data()
 
         await message.answer(
-            text='Спасибо!\n\nОжидайте сообщения о начале раунда'
+            text='🏵️ Спасибо! Бот сообщит о начале баттла.'
         )
         await create_application(message.from_user.id, data["photo_id"])
         await state.clear()
     else:
         await message.answer(
-            text='Фотография должна быть вертикальной. Пожалуйста, отправьте другую фотографию.\n\n Если вы хотите прервать '
-             'заполнение анкеты - отправьте команду /cancel'
+            text='❗️Фотография должна быть вертикальной. Пожалуйста,отправьте другую фотографию или обрежьте эту.\n\n'
+                'Если вы хотите прервать заполнение анкеты - отправьте команду /cancel'
         )
 
 
@@ -94,16 +94,15 @@ async def warning_not_photo(message: Message):
     )
 
 
-@user_router.message(lambda message: message.text == "Поддержка", StateFilter(default_state))
+@user_router.message(lambda message: message.text == "⚡️Поддержка⚡️", StateFilter(default_state))
 async def support(message: Message, state: FSMContext):
     await message.answer(
         text=
-        "Если у вас есть какие-либо вопросы, "+
-        "не стесняйтесь и воспользуйтесь этими ссылками.",
+        '✉️ Если у вас есть какие-либо вопросы, не стесняйтесь и воспользуйтесь кнопками ниже.',
         reply_markup=support_user_kb
     )
 
-@user_router.message(lambda message: message.text == "Профиль", StateFilter(default_state))
+@user_router.message(lambda message: message.text == "🎗️Профиль", StateFilter(default_state))
 async def profile(message: Message, state: FSMContext):
     
     user = await get_user(message.from_user.id)
@@ -126,15 +125,17 @@ async def profile(message: Message, state: FSMContext):
     )
     
 # хендлер для создания рефералок 
-@user_router.message(lambda message: message.text == "Получить голоса", StateFilter(default_state))
+@user_router.message(lambda message: message.text == "🍪Получить голоса", StateFilter(default_state))
 async def mt_referal_menu (message: Message, state: FSMContext, bot: Bot):
     link = await create_start_link(bot,str(message.from_user.id), encode=True)
     await message.answer(
-        text=f"Ваша реферальная ссылка {link}"
+        text=f'🎁 Пригласи друга - получи голоса!\n\n' +
+             f'🔗 Ваша реферальная ссылка: {link}\n\n' +
+             f'🔑 3 голоса будут зачислены вам, как только человек, которого вы привели, отправит фото и оно будет принято. Чтобы получить их, просто нажмите на кнопку 3 раза.'
     )
     
 
-@user_router.message(lambda message: message.text == "Наши каналы и спонсоры")
+@user_router.message(lambda message: message.text == "✨Наши каналы и спонсоры")
 async def show_channels_for_admin(message: Message):
     try:
         # Получаем названия и ссылки на каналы из базы данных
@@ -147,7 +148,7 @@ async def show_channels_for_admin(message: Message):
             return
         
         # Генерируем сообщение
-        response = "Наши каналы и спонсоры:\n\n"
+        response = "✨ Наши каналы и спонсоры ✨:\n\n"
         for channel in channels:
             response += f"🔗 <b>{channel['name']}</b>: <a href='{channel['link']}'>ссылка</a>\n"
         if (await is_admin(message)):
@@ -163,7 +164,7 @@ async def show_channels_for_admin(message: Message):
 
 @user_router.message()
 async def echo(message: Message):
-    await message.answer('Для продолжения воспользуйтесь кнопками ниже или отправьте команду /battle для участия в баттле.')
+    await message.answer('Я вас не понимаю 😅 Для продолжения воспользуйтесь кнопками ниже или отправьте команду /battle для участия в баттле.')
 
 
 

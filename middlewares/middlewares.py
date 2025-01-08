@@ -83,7 +83,7 @@ class UserCheckMiddleware(BaseMiddleware):
         except Exception as e:
             print("Не удалось получить id пользователя " + e)
         existing_user = await get_user(user_id=user_id)
-        if not existing_user and event.text != '/start':
+        if not existing_user and not event.text.startswith('/start'):
             await event.answer("Пожалуйста, используйте команду /start, чтобы начать работу с ботом.")
             return
         

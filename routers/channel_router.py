@@ -15,14 +15,14 @@ from aiogram.exceptions import TelegramRetryAfter, TelegramBadRequest
 from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, InputMediaPhoto
 
 from config.config import load_config
-from database.db import create_user, create_user_in_batl, edit_user, get_current_votes, get_participants, get_user, select_admin_photo, update_admin_battle_points, update_points, \
+from database.db import create_user, create_user_in_batl, edit_user, get_current_votes, get_participants, get_user, select_admin_photo, select_info_message, update_admin_battle_points, update_points, \
     get_round_results, get_message_ids, clear_message_ids,\
     select_battle_settings, select_all_admins,users_dual_win_update
 from routers.globals_var import (
     vote_states, user_clicks, pair_locks, vote_states_locks,
     user_last_click, click_counters, click_reset_times
 )
-
+import routers.globals_var
 from filters.isAdmin import is_admin
 
 _bot: Bot = None  # Placeholder for the bot instance
@@ -31,7 +31,7 @@ def setup_router(dp, bot: Bot):
     global _bot
     _bot = bot
 
-ROUND_DURATION = 300
+# ROUND_DURATION = 300
 END_PHASE_THRESHOLD = 0.85  # Последние 15% времени считаются концом раунда
 MIN_REQUIRED_VOTES = 5  # Минимальное количество голосов для прохождения
 MIN_VOTE_INCREMENT = 1   # Минимальный прирост голосов
@@ -86,26 +86,28 @@ channel_router = Router()
 # pair_locks = defaultdict(asyncio.Lock)
 # vote_states_locks = defaultdict(asyncio.Lock)
 
-async def reset_vote_states():
-    """
-    Сбрасывает глобальные переменные, связанные с голосованием.
-    """
-    global vote_states, user_clicks, last_updates, message_states, update_locks, pair_locks, vote_states_locks
+# async def reset_vote_states():
+#     """
+#     Сбрасывает глобальные переменные, связанные с голосованием.
+#     """
+#     global vote_states, user_clicks, last_updates, message_states, update_locks, pair_locks, vote_states_locks
 
-    vote_states = {}  # Хранение состояний голосования
-    user_clicks = {}  # Хранение информации о голосованиях пользователей
-    # last_updates = defaultdict(lambda: datetime.min)  # Последние обновления
-    # message_states = defaultdict(dict)  # Состояния сообщений
-    # update_locks = defaultdict(asyncio.Lock)  # Лок для обновлений
-    pair_locks = defaultdict(asyncio.Lock)  # Лок для пар
-    vote_states_locks = defaultdict(asyncio.Lock)  # Лок для состояний голосования
+#     vote_states = {}  # Хранение состояний голосования
+#     user_clicks = {}  # Хранение информации о голосованиях пользователей
+#     # last_updates = defaultdict(lambda: datetime.min)  # Последние обновления
+#     # message_states = defaultdict(dict)  # Состояния сообщений
+#     # update_locks = defaultdict(asyncio.Lock)  # Лок для обновлений
+#     pair_locks = defaultdict(asyncio.Lock)  # Лок для пар
+#     vote_states_locks = defaultdict(asyncio.Lock)  # Лок для состояний голосования
 
-    print("Vote states and related globals have been reset.")
+#     print("Vote states and related globals have been reset.")
 
 async def init_vote_state(message_id: int, admin_id: int, admin_position: str, opponent_id: int):
     """
     Инициализирует состояние голосования для сообщения с админом
     """
+    ROUND_DURATION = routers.globals_var.ROUND_DURATION
+    print(ROUND_DURATION)
     vote_states[message_id] = {
         'admin_id': admin_id,
         'admin_position': admin_position,
@@ -118,7 +120,7 @@ async def init_vote_state(message_id: int, admin_id: int, admin_position: str, o
         'is_single': admin_position == "middle"
     }
 
-async def send_battle_pairs(bot: Bot, channel_id: int, participants):
+async def send_battle_pairs(bot: Bot, channel_id: int, participants, prize, round_txt, round_duration, min_votes):
     """
     Отправляет пары участников в канал для голосования.
     """
@@ -126,14 +128,14 @@ async def send_battle_pairs(bot: Bot, channel_id: int, participants):
     
     for i in range(0, len(participants), 2):
         if i + 1 < len(participants):
-            pair_message_ids = await send_pair(bot, channel_id, participants[i], participants[i+1])
+            pair_message_ids = await send_pair(bot, channel_id, participants[i], participants[i+1], prize, round_txt,round_duration)
         else:
-            pair_message_ids = await send_single(bot, channel_id, participants[i])
+            pair_message_ids = await send_single(bot, channel_id, participants[i], prize, round_txt,round_duration, min_votes)
         message_ids.extend(pair_message_ids)
     
     return message_ids
 
-async def send_pair(bot: Bot, channel_id: int, participant1, participant2):
+async def send_pair(bot: Bot, channel_id: int, participant1, participant2, prize, round_txt, round_duration):
     """
     Отправляет пару участников в канал.
     """
@@ -149,8 +151,35 @@ async def send_pair(bot: Bot, channel_id: int, participant1, participant2):
         InlineKeyboardButton(text=f"Правый: 0",
                               callback_data=f"vote:{participant2['user_id']}:right")]
     ])
-    vote_message = await bot.send_message(channel_id, 
-                                          f"[Голосуйте за понравившегося участника!](t.me/c/{str(channel_id)[4:]}/{media_message[0].message_id})",
+    if 'раунд' in round_txt:
+        num = 1
+        for i in round_txt:
+            if i.isdigit():
+                num = int(i)
+        round_txt = f'{num} раунд'
+    elif 'полуфинал' in round_txt:
+        round_txt = 'Полуфинал'
+    elif 'финал' in round_txt:
+        round_txt = 'Финал'
+    end_hour = round_duration//60
+    end_min = round_duration % 60
+    if end_hour == 0:
+        end_text = f'{end_min} минут(у)'
+    elif end_min == 0:
+        end_text = f'{end_hour} часа(ов)'
+    elif end_hour != 0 and end_min != 0:
+        end_text = f'{end_hour} часа(ов) ' + f'{end_min} минут(у)'
+    addit_msg = await select_info_message()
+    if addit_msg and addit_msg[0]:
+        addit_msg = addit_msg[0]
+    else:
+        addit_msg = ''
+    vote_message = await bot.send_message(channel_id,
+                                          f'👑{round_txt}👑\n\n'+
+                                          f'⏱️Итоги через {end_text}⏱️\n\n'+
+                                          f"[⛓️Ссылка на голосование⛓️](t.me/c/{str(channel_id)[4:]}/{media_message[0].message_id})\n\n"+
+                                          f'💵Приз: {prize} ₽💵\n\n'
+                                          f'{addit_msg}',
                                           reply_markup=keyboard,
                                           parse_mode="Markdown")
     ADMIN_ID=0
@@ -179,7 +208,7 @@ async def send_pair(bot: Bot, channel_id: int, participant1, participant2):
         
     return [msg.message_id for msg in media_message] + [vote_message.message_id]
 
-async def send_single(bot: Bot, channel_id: int, participant):
+async def send_single(bot: Bot, channel_id: int, participant, prize ,round_txt , round_duration, min_votes):
     """
     Отправляет одиночного участника в канал.
     """
@@ -192,8 +221,36 @@ async def send_single(bot: Bot, channel_id: int, participant):
                               f"Голосов сейчас: 0"
                               , callback_data=f"vote:{participant['user_id']}:middle")]
     ])
+    if 'раунд' in round_txt:
+        num = 1
+        for i in round_txt:
+            if i.isdigit():
+                num = int(i)
+        round_txt = f'{num} раунд'
+    elif 'полуфинал' in round_txt:
+        round_txt = 'Полуфинал'
+    elif 'финал' in round_txt:
+        round_txt = 'Финал'
+    end_hour = round_duration//60
+    end_min = round_duration % 60
+    if end_hour == 0:
+        end_text = f'{end_min} минут(у)'
+    elif end_min == 0:
+        end_text = f'{end_hour} часа(ов)'
+    elif end_hour != 0 and end_min != 0:
+        end_text = f'{end_hour} часа(ов) ' + f'{end_min} минут(у)'
+    addit_msg = await select_info_message()
+    if addit_msg and addit_msg[0]:
+        addit_msg = addit_msg[0]
+    else:
+        addit_msg = ''
     vote_message = await bot.send_message(channel_id,
-                                          f"[Голосуйте за участника!](t.me/c/{str(channel_id)[4:]}/{photo_message.message_id})",
+                                          f'👑{round_txt}👑\n\n'
+                                          f'⏱️Итоги через {end_text}⏱️\n\n'
+                                          f"[⛓️ Ссылка на голосование ⛓️](t.me/c/{str(channel_id)[4:]}/{photo_message.message_id})\n\n"
+                                          f'☀️ Не хватило соперника, поэтому необходимо набрать {min_votes} реакций!\n\n'
+                                          f'💵Приз: {prize} ₽💵\n\n'
+                                          f'{addit_msg}',
                                           reply_markup=keyboard,
                                           parse_mode="Markdown")
     
@@ -258,8 +315,7 @@ async def end_round(bot: Bot, channel_id: int, min_votes_for_single: int):
                     try:
                         await bot.send_message(
                         partic['user_id'],
-                        f"Поздравляем! Вы сыграли в ничью "
-                        f"со счетом {participant1['votes']}:{participant2['votes']}. Вы проходите в следующий раунд!"
+                        f"🎉 Поздравляем, вы успешно прошли в следующий раунд! Продолжайте в том же духе и выиграете!"
                     )
                     except Exception as e:
                         print(f"Ошибка при отправке личного сообщения: {e}")
@@ -278,13 +334,13 @@ async def end_round(bot: Bot, channel_id: int, min_votes_for_single: int):
             try:
                 await bot.send_message(
                     winner['user_id'],
-                    f"Поздравляем! Вы победили участника №{loser['user_id']} "
-                    f"со счетом {winner['votes']}:{loser['votes']}. Вы проходите в следующий раунд!"
+                    f"🎉 Поздравляем, вы успешно прошли в следующий раунд! Продолжайте в том же духе и выиграете!"
                 )
+                asyncio.sleep(0.2)
                 await bot.send_message(
                     loser['user_id'],
-                    f"К сожалению, вы проиграли участнику №{winner['user_id']} "
-                    f"со счетом {loser['votes']}:{winner['votes']}. Спасибо за участие!"
+                    f"😢 К сожалению, вы потерпели поражение в фотобатле, так как ваш соперник набрал больше реакций\n " +
+                    f"🍀 Однако, вы можете принять участие в следующем фотобатле, отправив мне /battle и победить!"
                 )
             except Exception as e:
                 print(f"Ошибка при отправке личного сообщения: {e}")
@@ -307,7 +363,7 @@ async def end_round(bot: Bot, channel_id: int, min_votes_for_single: int):
                 try:
                     await bot.send_message(
                         participant['user_id'],
-                        f"Поздравляем! Вы набрали {participant['votes']} голосов и проходите в следующий раунд!"
+                        f"🎉 Поздравляем, вы успешно прошли в следующий раунд! Продолжайте в том же духе и выиграете!"
                     )
                 except Exception as e:
                     print(f"Ошибка при отправке личного сообщения: {e}")
@@ -320,7 +376,7 @@ async def end_round(bot: Bot, channel_id: int, min_votes_for_single: int):
                 try:
                     await bot.send_message(
                         participant['user_id'],
-                        f"К сожалению, вы выбываете из конкурса, набрав {participant['votes']} голосов. Спасибо за участие!"
+                        f'😢 К сожалению, вы потерпели поражение в фотобатле, вы выбываете из конкурса, набрав {participant['votes']} голосов из {min_votes_for_single}.\n🍀 Однако, вы можете принять участие в следующем фотобатле, отправив мне /battle и победить!'
                     )
                 except Exception as e:
                     print(f"Ошибка при отправке личного сообщения: {e}")
@@ -343,13 +399,19 @@ async def announce_winner(bot: Bot, channel_id: int, winners):
     Объявляет победителя баттла.
     """
     # Отправляем личное сообщение победителю
+    ADMIN_ID = await select_all_admins()
+    admin_ids = []
+    if ADMIN_ID:
+        admin_ids = [i[0] for i in ADMIN_ID]
+    admin_ids += await get_super_admin_ids()
+    
     for winner in winners:
         try:
             secret_code = randint(1000,9999)
-            if len(winners)==1:
-                await bot.send_message(winner['user_id'], f"Поздравляем! Вы победили в баттле! Ваш секретный код {secret_code}. Обратитесь в поддержку за получением приза")
-            if len(winners)==2:
-                await bot.send_message(winner['user_id'], f"Поздравляем! Вы сыграли в ничью в баттле с другим участником! Ваш секретный код {secret_code}. Обратитесь в поддержку за получением приза")
+            # if len(winners)==1:
+            await bot.send_message(winner['user_id'], f"❤️‍🔥 Вы победили в баттле! Ваш секретный код - {secret_code}. Напишите его в поддержку вместе с номером карты и ждите приз!")
+            # if len(winners)==2:
+            #     await bot.send_message(winner['user_id'], f"Поздравляем! Вы сыграли в ничью в баттле с другим участником! Ваш секретный код {secret_code}. Обратитесь в поддержку за получением приза")
         except Exception as e:
             logging.error(f"Failed to send congratulation message to winner (ID: {winner['user_id']}): {e}")
             # Отправляем сообщение администратору о проблеме
@@ -360,26 +422,24 @@ async def announce_winner(bot: Bot, channel_id: int, winners):
                     f"Ошибка: {str(e)}"
                 )
                 
-                ADMIN_ID = await select_all_admins()
-                admin_ids = []
-                if ADMIN_ID:
-                    admin_ids = [i[0] for i in ADMIN_ID]
-                admin_ids += await get_super_admin_ids()
                 for admin_id in admin_ids:
                     await bot.send_message(admin_id, error_message)
             except Exception as admin_error:
                 logging.error(f"Failed to notify admin about winner message error: {admin_error}")
+    for admin_id in admin_ids:
+        await bot.send_message(admin_id, f'Секретный код победителя: {secret_code}')
     if len(winners)==1:
         winner = winners[0]
         media = [
-        InputMediaPhoto(media=winner['photo_id'], caption=f"Поздравляем участника №{winner['user_id']}! Победитель баттла!")
+        InputMediaPhoto(media=winner['photo_id'], caption='🥇Поздравляем победителя!🥇\n\n🏆 Можешь забрать свой приз, написав нам сюда (на слове сюда должна быть ссылка)\n\n 🏆🧸 Проигравшим не отчаиваться, ведь новый день - новые возможности 🧸\n\n💛 Следующий батл начнется завтра в то же время, отправляй заявку! 💛')
     ]
         
     if len(winners)==2:
         winner1 = winners[0]
         winner2 = winners[1]
         media = [
-        InputMediaPhoto(media=winner1['photo_id'], caption=f"Поздравляем участников №{winner1['user_id']} и №{winner2['user_id']}! Сыгравших баттл в ничью!"),
+        InputMediaPhoto(media=winner1['photo_id'], caption=f'🥇Поздравляем победителей!🥇\n\n🏆 Можете забрать свой приз, написав нам сюда (на слове сюда должна быть ссылка)\n\n 🏆🧸 Проигравшим не отчаиваться, ведь новый день - новые возможности 🧸\n\n💛 Следующий батл начнется завтра в то же время, отправляй заявку! 💛'),
+        
         InputMediaPhoto(media=winner2['photo_id'], caption=f"")
     ]
     winner_message = await bot.send_media_group(channel_id, media)

@@ -115,6 +115,7 @@ async def apply(call: CallbackQuery):
             referals = owner[4]
             await edit_user(ref_owner_id, 'additional_voices', additional_voices_owner+3)
             await edit_user(ref_owner_id, 'referals',  referals+1)
+            await edit_user(user_id, 'ref_owner', 0)
             try:
                 await _bot.send_message(ref_owner_id, text=(
                     f"Пользователь {user_id}, зарегистрированный по вашей ссылке получил одобрение на "+
@@ -158,7 +159,7 @@ async def decline(call: CallbackQuery):
             photo = values[0]
             caption = values[1]
             reply_markup = values[2]
-            await call.message.edit_caption(photo = photo,caption=caption, reply_markup=reply_markup)
+            await call.message.edit_media(media=InputMediaPhoto(media=photo, caption=caption), reply_markup=reply_markup)
     else:
         await _bot.send_message(call.from_user.id, "Заявки закончились")
 
@@ -182,7 +183,7 @@ async def ban(call: CallbackQuery):
             photo = values[0]
             caption = values[1]
             reply_markup = values[2]
-            await call.message.edit_caption(photo = photo,caption=caption, reply_markup=reply_markup)
+            await call.message.edit_media(media=InputMediaPhoto(media=photo, caption=caption), reply_markup=reply_markup)
     else:
         await _bot.send_message(call.from_user.id, "Заявки закончились")
 
@@ -233,6 +234,7 @@ async def clear_battle(message: Message):
             if users_on_battle:
                 for user in users_on_battle:
                     await create_application(user['user_id'],user['photo_id'])
+                await clear_users_in_batl()
             # Обновляем сообщение с подтверждением
             await _bot.send_message(message.from_user.id, text="Баттл успешно остановлен.")
             
@@ -708,3 +710,52 @@ async def process_channel_deletion(message: Message, state: FSMContext):
 
     # Выходим из состояния
     await state.clear()
+
+
+
+
+@admin_router.message(F.text == "Добавить информацию к посту")
+async def add_info_command(message: Message):
+    await message.answer("Выберите действие:", reply_markup=battle_info_kb)
+
+@admin_router.message(F.text == "Изменить сообщение")
+async def change_info_command(message: Message, state: FSMContext):
+    await message.answer("Введите новый текст сообщения:", reply_markup=ReplyKeyboardMarkup(
+        keyboard=[[KeyboardButton(text="Назад в общие настройки")]],
+        resize_keyboard=True
+    ))
+    await state.set_state(FSMFillForm.waiting_for_text)
+
+@admin_router.message(FSMFillForm.waiting_for_text)
+async def process_battle_info(message: Message, state: FSMContext):
+    if message.text == "Назад в общие настройки":
+        await state.clear()
+        await message.answer("Возврат к настройкам баттла", reply_markup=tune_battle_admin_kb)
+        return
+    
+    if not message.text:
+        await message.answer("Пожалуйста, отправьте текстовое сообщение")
+        return
+    
+    await update_info_message(message.text)
+    
+    await message.answer("Информация успешно обновлена!", reply_markup=tune_battle_admin_kb)
+    await state.clear()
+
+@admin_router.message(F.text == "Удалить сообщение")
+async def delete_info_command(message: Message):
+    await delete_info_message()
+    await message.answer("Информация удалена!", reply_markup=tune_battle_admin_kb)
+
+@admin_router.message(F.text == "Посмотреть сообщение")
+async def view_info_command(message: Message):
+    result = await select_info_message()
+    
+    if result and result[0]:
+        await message.answer(f"Текущее сообщение:\n\n{result[0]}")
+    else:
+        await message.answer("Информационное сообщение не задано")
+
+@admin_router.message(F.text == "Назад в общие настройки")
+async def back_to_settings_command(message: Message):
+    await message.answer("Возврат к настройкам баттла", reply_markup=tune_battle_admin_kb)
