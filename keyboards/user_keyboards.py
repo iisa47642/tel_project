@@ -17,9 +17,9 @@ def get_config():
 
 main_user_kb = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text="⚡️Поддержка")],
-        [KeyboardButton(text="🔥Принять участие"),KeyboardButton(text="✨Наши каналы и спонсоры")],
-        [KeyboardButton(text="🍪Получить голоса"),KeyboardButton(text="🎗️Профиль")]
+        [KeyboardButton(text="🔥Принять участие")],
+        [KeyboardButton(text="🎗️Профиль"),KeyboardButton(text="✨Наши каналы и спонсоры")],
+        [KeyboardButton(text="🍪Получить голоса"),KeyboardButton(text="⚡️Поддержка")]
     ],
     resize_keyboard=True
 )

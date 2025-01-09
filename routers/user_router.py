@@ -115,14 +115,14 @@ async def profile(message: Message, state: FSMContext):
     
     await message.answer(
         text=
-        f"🆔 `{message.from_user.id}`\n"+
-        f"🎮 Ник: @{message.from_user.username}\n\n"+
-        f"🎟 Сыграно фотобатлов: {plays_buttle} \n"+
+        f"🛰 ID: <code>{message.from_user.id}</code>\n"+
+        f"👽 User: @{message.from_user.username}\n\n"+
+        f"🎮 Сыграно фотобатлов: {plays_buttle} \n"+
         f"🥇 Выиграно фотобатлов: {buttle_win} \n"+
-        f"🏆 Выиграно дуэлей: {dual_win}\n\n"+
-        f"🎤 Дополнительные голоса: {additional_voices}\n"
-        f"🧬 Приглашенных рефералов: {referals}"
-    )
+        f"⚔ Выиграно дуэлей: {dual_win}\n\n"+
+        f"🔑 Дополнительные голоса: {additional_voices}\n"
+        f"💸 Приглашенных рефералов: {referals}"
+    ,parse_mode='HTML')
     
 # хендлер для создания рефералок 
 @user_router.message(lambda message: message.text == "🍪Получить голоса", StateFilter(default_state))

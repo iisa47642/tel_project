@@ -288,9 +288,9 @@ class TaskManager:
                     logging.error(f"Error while checking new participants: {e}")
 
             end_values = await end_round(self.bot, self.channel_id, self.min_votes_for_single)
-            end_message_ids = end_values[0]
-            await save_message_ids(end_message_ids)
-            losers = end_values[1]
+            # end_message_ids = end_values[0]
+            # await save_message_ids(end_message_ids)
+            losers = end_values[0]
 
             await remove_losers(losers)
             round_number += 1
