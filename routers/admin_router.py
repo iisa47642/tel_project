@@ -292,59 +292,132 @@ async def mailing_everybody(message: Message, state: FSMContext):
     await message.answer(text="Введите сообщение для рассылки",reply_markup=back_admin_kb)
     await state.set_state(FSMFillForm.fill_message_for_all)
 
-@admin_router.message(F.text,StateFilter(FSMFillForm.fill_message_for_all))
-async def enter_mailing_everybody(message: Message, state: FSMContext):
-    txt = message.text
-    # возможно, исключить админов из списка
-    users = await get_all_users()
-    
+# Хэндлер для рассылки всем пользователям (с поддержкой пересланных сообщений)
+@admin_router.message(F.text | F.forward_from_chat, StateFilter(FSMFillForm.fill_message_for_all))
+async def enter_mailing_everybody(message: Message, state: FSMContext, bot: Bot):
+    """
+    Обработчик для рассылки пересланных сообщений из канала всем пользователям.
+    """
+    # Проверяем, что сообщение переслано из канала
+    if message.forward_from_chat and message.forward_from_message_id:
+        from_chat_id = message.forward_from_chat.id  # ID канала
+        message_id = message.forward_from_message_id # Оригинальный ID сообщения в канале
+    elif message.text:
+        content = message.text
+    else:
+        await message.answer("Ошибка: сообщение не содержит данных для пересылки.")
+        return
+
+    # Получаем список пользователей
+    users = await get_all_users()  # Функция должна возвращать список [(user_id,), ...]
     users_id = [user[0] for user in users]
+
+    # Рассылка сообщения
     for user_id in users_id:
-            try:
-                await _bot.send_message(user_id,text=txt)
-            except Exception as e:
-                print(e)
-    await message.answer(text="Отправили всем пользователям",reply_markup=mailing_admin_kb)
+        try:
+            if message.forward_from_chat:
+                # Пересылаем сообщение из канала
+                await bot.forward_message(chat_id=user_id, from_chat_id=from_chat_id, message_id=message_id)
+            else:
+                # Отправляем обычное текстовое сообщение
+                await bot.send_message(chat_id=user_id, text=content, parse_mode="HTML")
+        except Exception as e:
+            print(f"Ошибка отправки пользователю {user_id}: {e}")
+
+    # Ответ админу
+    await message.answer("Сообщение отправлено всем пользователям!", reply_markup=mailing_admin_kb)
     await state.clear()
+
+    
+    
     
 @admin_router.message(lambda message: message.text == "Участникам, чьи фото находятся на модерации",StateFilter(default_state))
 async def mailing_on_moderation(message: Message, state: FSMContext):
     await message.answer(text="Введите сообщение для рассылки",reply_markup=back_admin_kb)
     await state.set_state(FSMFillForm.fill_message_for_moder)
 
-@admin_router.message(F.text,StateFilter(FSMFillForm.fill_message_for_moder))
-async def enter_mailing_on_moderation(message: Message, state: FSMContext):
-    txt = message.text
-    # возможно, исключить админов из списка
-    users = await select_all_applications()
+
+
+# Хэндлер для рассылки участникам, чьи фото на модерации (с поддержкой пересланных сообщений)
+@admin_router.message(F.text | F.forward_from_chat, StateFilter(FSMFillForm.fill_message_for_moder))
+async def enter_mailing_on_moderation(message: Message, state: FSMContext, bot: Bot):
+    """
+    Обработчик для рассылки участникам, чьи фото на модерации.
+    Поддерживает текстовые сообщения и пересланные сообщения из каналов.
+    """
+    # Проверяем, пересланное это сообщение или обычный текст
+    if message.forward_from_chat and message.forward_from_message_id:
+        from_chat_id = message.forward_from_chat.id  # ID канала
+        message_id = message.forward_from_message_id  # Оригинальный ID сообщения в канале
+    elif message.text:
+        content = message.text  # Обычный текст сообщения
+    else:
+        await message.answer("Ошибка: неподдерживаемый тип сообщения.")
+        return
+
+    # Получаем список пользователей
+    users = await select_all_applications()  # Функция должна возвращать список [(user_id,), ...]
     users_id = [user[0] for user in users]
+
+    # Рассылка сообщения
     for user_id in users_id:
-            try:
-                await _bot.send_message(user_id,text=txt)
-            except Exception as e:
-                print(e)
-    await message.answer(text="Отправили всем участникам, чьи фото находятся на модерации",reply_markup=mailing_admin_kb)
+        try:
+            if message.forward_from_chat:
+                # Пересылаем сообщение из канала
+                await bot.forward_message(chat_id=user_id, from_chat_id=from_chat_id, message_id=message_id)
+            else:
+                # Отправляем обычное текстовое сообщение
+                await bot.send_message(chat_id=user_id, text=content, parse_mode="HTML")
+        except Exception as e:
+            print(f"Ошибка отправки пользователю {user_id}: {e}")
+
+    # Ответ админу
+    await message.answer("Сообщение отправлено участникам, чьи фото находятся на модерации", reply_markup=mailing_admin_kb)
     await state.clear()
+
 
 @admin_router.message(lambda message: message.text == "Активным участникам текущего баттла",StateFilter(default_state))
 async def mailing_active_participants(message: Message, state: FSMContext):
     await message.answer(text="Введите сообщение для рассылки",reply_markup=back_admin_kb)
     await state.set_state(FSMFillForm.fill_message_for_user_on_battle)
     
-@admin_router.message(F.text,StateFilter(FSMFillForm.fill_message_for_user_on_battle))
-async def enter_mailing_on_moderation(message: Message, state: FSMContext):
-    txt = message.text
-    # возможно, исключить админов из списка
-    users = await select_all_battle()
-   
+# Хэндлер для рассылки участникам текущего баттла (с поддержкой пересланных сообщений)
+@admin_router.message(F.text | F.forward_from_chat, StateFilter(FSMFillForm.fill_message_for_user_on_battle))
+async def enter_mailing_on_battle(message: Message, state: FSMContext, bot: Bot):
+    """
+    Обработчик для рассылки участникам текущего баттла.
+    Поддерживает текстовые сообщения и пересланные сообщения из каналов.
+    """
+    # Проверяем, пересланное это сообщение или обычный текст
+    if message.forward_from_chat and message.forward_from_message_id:
+        from_chat_id = message.forward_from_chat.id  # ID канала
+        message_id = message.forward_from_message_id  # Оригинальный ID сообщения в канале
+    elif message.text:
+        content = message.text  # Обычный текст сообщения
+    else:
+        await message.answer("Ошибка: неподдерживаемый тип сообщения.")
+        return
+
+    # Получаем список пользователей
+    users = await select_all_battle()  # Функция должна возвращать список [(user_id,), ...]
     users_id = [user[0] for user in users]
+
+    # Рассылка сообщения
     for user_id in users_id:
-            try:
-                await _bot.send_message(user_id,text=txt)
-            except Exception as e:
-                print(e)
-    await message.answer(text="Отправили всем активным участникам текущего баттла", reply_markup=mailing_admin_kb)
+        try:
+            if message.forward_from_chat:
+                # Пересылаем сообщение из канала
+                await bot.forward_message(chat_id=user_id, from_chat_id=from_chat_id, message_id=message_id)
+            else:
+                # Отправляем обычное текстовое сообщение
+                await bot.send_message(chat_id=user_id, text=content, parse_mode="HTML")
+        except Exception as e:
+            print(f"Ошибка отправки пользователю {user_id}: {e}")
+
+    # Ответ админу
+    await message.answer("Сообщение отправлено всем активным участникам текущего баттла", reply_markup=mailing_admin_kb)
     await state.clear()
+
     
 @admin_router.message(StateFilter(FSMFillForm.fill_message_for_all))
 @admin_router.message(StateFilter(FSMFillForm.fill_message_for_moder))

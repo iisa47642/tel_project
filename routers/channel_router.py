@@ -138,11 +138,17 @@ async def send_pair(bot: Bot, channel_id: int, participant1, participant2, prize
     end_hour = round_duration//60
     end_min = round_duration % 60
     if end_hour == 0:
-        end_text = f'{end_min} минут(у)'
+        end_text = f'{end_min} мин'
     elif end_min == 0:
-        end_text = f'{end_hour} часа(ов)'
+        if end_hour == 1:
+            end_text = f'{end_hour} час'
+        elif 2 <= end_hour <= 4:
+            end_text = f'{end_hour} часа'
     elif end_hour != 0 and end_min != 0:
-        end_text = f'{end_hour} часа(ов) ' + f'{end_min} минут(у)'
+        if end_hour == 1:
+            end_text = f'{end_hour} час' + f'{end_min} мин'
+        elif 2 <= end_hour <= 4:
+            end_text = f'{end_hour} часа ' + f'{end_min} мин'
     addit_msg = await select_info_message()
     if addit_msg and addit_msg[0]:
         addit_msg = addit_msg[0]
@@ -151,11 +157,11 @@ async def send_pair(bot: Bot, channel_id: int, participant1, participant2, prize
     vote_message = await bot.send_message(channel_id,
                                           f'👑{round_txt}👑\n\n'+
                                           f'⏱️Итоги через {end_text}⏱️\n\n'+
-                                          f"[⛓️Ссылка на голосование⛓️](t.me/c/{str(channel_id)[4:]}/{media_message[0].message_id})\n\n"+
+                                          f"<a href='t.me/c/{str(channel_id)[4:]}/{media_message[0].message_id}'>⛓️Ссылка на голосование⛓️</a>\n\n"+
                                           f'💵Приз: {prize} ₽💵\n\n'
                                           f'{addit_msg}',
                                           reply_markup=keyboard,
-                                          parse_mode="Markdown")
+                                          parse_mode="HTML")
     ADMIN_ID=0
     if participant1['user_id'] == ADMIN_ID:
         await init_vote_state(
