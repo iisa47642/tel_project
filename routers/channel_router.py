@@ -13,6 +13,7 @@ from aiogram.exceptions import TelegramBadRequest
 from aiogram import Bot, Router, F
 from aiogram.exceptions import TelegramRetryAfter, TelegramBadRequest
 from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, InputMediaPhoto
+import pytz
 
 from config.config import load_config
 from database.db import create_user, create_user_in_batl, edit_user, get_current_votes, get_participants, get_user, select_admin_photo, select_info_message, update_admin_battle_points, update_points, \
@@ -94,7 +95,7 @@ async def init_vote_state(message_id: int, admin_id: int, admin_position: str, o
         'is_single': admin_position == "middle"
     }
 
-async def send_battle_pairs(bot: Bot, channel_id: int, participants, prize, round_txt, round_duration, min_votes):
+async def send_battle_pairs(bot: Bot, channel_id: int, participants, prize, round_txt, round_duration, min_votes, current_round_start):
     """
     Отправляет пары участников в канал для голосования.
     """
@@ -102,14 +103,14 @@ async def send_battle_pairs(bot: Bot, channel_id: int, participants, prize, roun
     
     for i in range(0, len(participants), 2):
         if i + 1 < len(participants):
-            pair_message_ids = await send_pair(bot, channel_id, participants[i], participants[i+1], prize, round_txt,round_duration)
+            pair_message_ids = await send_pair(bot, channel_id, participants[i], participants[i+1], prize, round_txt,round_duration, current_round_start)
         else:
-            pair_message_ids = await send_single(bot, channel_id, participants[i], prize, round_txt,round_duration, min_votes)
+            pair_message_ids = await send_single(bot, channel_id, participants[i], prize, round_txt,round_duration, min_votes, current_round_start)
         message_ids.extend(pair_message_ids)
     
     return message_ids
 
-async def send_pair(bot: Bot, channel_id: int, participant1, participant2, prize, round_txt, round_duration):
+async def send_pair(bot: Bot, channel_id: int, participant1, participant2, prize, round_txt, round_duration, current_round_start):
     """
     Отправляет пару участников в канал.
     """
@@ -135,8 +136,27 @@ async def send_pair(bot: Bot, channel_id: int, participant1, participant2, prize
         round_txt = 'Полуфинал'
     elif 'финал' in round_txt:
         round_txt = 'Финал'
-    end_hour = round_duration//60
-    end_min = round_duration % 60
+        
+        
+        
+    round_end = current_round_start + timedelta(minutes=round_duration)
+    now = datetime.now(current_round_start.tzinfo)
+    time_left = round_end - now
+
+    if now.hour < 10 or now.hour >= 23:  # Если раунд начался после полуночи
+        tomorrow = now.date() + timedelta(days=1)
+        round_end_time = pytz.timezone('Europe/Moscow').localize(datetime.combine(tomorrow, time(hour=10)))
+        wait_time = (round_end_time - now).total_seconds()
+        total_minutes = int(wait_time / 60)
+    else:
+        total_minutes = int(time_left.total_seconds() / 60)
+
+    end_hour = total_minutes // 60
+    end_min = total_minutes % 60
+
+    
+    # end_hour = round_duration//60
+    # end_min = round_duration % 60
     if end_hour == 0:
         end_text = f'{end_min} мин'
     elif end_min == 0:
@@ -144,11 +164,16 @@ async def send_pair(bot: Bot, channel_id: int, participant1, participant2, prize
             end_text = f'{end_hour} час'
         elif 2 <= end_hour <= 4:
             end_text = f'{end_hour} часа'
+        elif end_hour >= 5:
+            end_text = f'{end_hour} часов'
     elif end_hour != 0 and end_min != 0:
         if end_hour == 1:
-            end_text = f'{end_hour} час' + f'{end_min} мин'
+            end_text = f'{end_hour} час ' + f'{end_min} мин'
         elif 2 <= end_hour <= 4:
             end_text = f'{end_hour} часа ' + f'{end_min} мин'
+        elif end_hour >= 5:
+            end_text = f'{end_hour} часов ' + f'{end_min} мин'
+        
     addit_msg = await select_info_message()
     if addit_msg and addit_msg[0]:
         addit_msg = addit_msg[0]
@@ -188,7 +213,7 @@ async def send_pair(bot: Bot, channel_id: int, participant1, participant2, prize
         
     return [msg.message_id for msg in media_message] + [vote_message.message_id]
 
-async def send_single(bot: Bot, channel_id: int, participant, prize ,round_txt , round_duration, min_votes):
+async def send_single(bot: Bot, channel_id: int, participant, prize ,round_txt , round_duration, min_votes, current_round_start):
     """
     Отправляет одиночного участника в канал.
     """
@@ -211,14 +236,38 @@ async def send_single(bot: Bot, channel_id: int, participant, prize ,round_txt ,
         round_txt = 'Полуфинал'
     elif 'финал' in round_txt:
         round_txt = 'Финал'
-    end_hour = round_duration//60
-    end_min = round_duration % 60
+        
+    round_end = current_round_start + timedelta(minutes=round_duration)
+    now = datetime.now(current_round_start.tzinfo)
+    time_left = round_end - now
+
+    if now.hour < 10 or now.hour >= 23:  # Если раунд начался после полуночи
+        tomorrow = now.date() + timedelta(days=1)
+        round_end_time = pytz.timezone('Europe/Moscow').localize(datetime.combine(tomorrow, time(hour=10)))
+        wait_time = (round_end_time - now).total_seconds()
+        total_minutes = int(wait_time / 60)
+    else:
+        total_minutes = int(time_left.total_seconds() / 60)
+
+    end_hour = total_minutes // 60
+    end_min = total_minutes % 60
+    
     if end_hour == 0:
-        end_text = f'{end_min} минут(у)'
+        end_text = f'{end_min} мин'
     elif end_min == 0:
-        end_text = f'{end_hour} часа(ов)'
+        if end_hour == 1:
+            end_text = f'{end_hour} час'
+        elif 2 <= end_hour <= 4:
+            end_text = f'{end_hour} часа'
+        elif end_hour >= 5:
+            end_text = f'{end_hour} часов'
     elif end_hour != 0 and end_min != 0:
-        end_text = f'{end_hour} часа(ов) ' + f'{end_min} минут(у)'
+        if end_hour == 1:
+            end_text = f'{end_hour} час ' + f'{end_min} мин'
+        elif 2 <= end_hour <= 4:
+            end_text = f'{end_hour} часа ' + f'{end_min} мин'
+        elif end_hour >= 5:
+            end_text = f'{end_hour} часов ' + f'{end_min} мин'
     addit_msg = await select_info_message()
     if addit_msg and addit_msg[0]:
         addit_msg = addit_msg[0]
@@ -227,12 +276,12 @@ async def send_single(bot: Bot, channel_id: int, participant, prize ,round_txt ,
     vote_message = await bot.send_message(channel_id,
                                           f'👑{round_txt}👑\n\n'
                                           f'⏱️Итоги через {end_text}⏱️\n\n'
-                                          f"[⛓️ Ссылка на голосование ⛓️](t.me/c/{str(channel_id)[4:]}/{photo_message.message_id})\n\n"
+                                          f"<a href='t.me/c/{str(channel_id)[4:]}/{photo_message.message_id}'>⛓️Ссылка на голосование⛓️</a>\n\n"+
                                           f'☀️ Не хватило соперника, поэтому необходимо набрать {min_votes} реакций!\n\n'
                                           f'💵Приз: {prize} ₽💵\n\n'
                                           f'{addit_msg}',
                                           reply_markup=keyboard,
-                                          parse_mode="Markdown")
+                                          parse_mode="HTML")
     
 
     await init_vote_state(

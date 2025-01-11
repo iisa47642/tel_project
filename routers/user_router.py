@@ -5,6 +5,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
 from aiogram.types import Message, MessageOriginChannel, PhotoSize
 from aiogram.utils.deep_linking import create_start_link, decode_payload
+from config.config import load_config
 from database.db import *
 from keyboards.user_keyboards import main_user_kb, vote_user_kb, support_user_kb
 from keyboards.admin_keyboards import *
@@ -23,10 +24,15 @@ def setup_router(dp, bot: Bot):
 user_router = Router()
 #user_router.message.filter(lambda message: not is_admin(message))
 
-
+async def get_config():
+        dirname = os.path.dirname(__file__)
+        filename = os.path.abspath(os.path.join(dirname, '..', 'config/config.env'))
+        config = load_config(filename)
+        return config
+    
 #-----------
 # Команды для пользователей
-@user_router.message(mode_filter(1,2,3), CommandStart() ,StateFilter(default_state))
+@user_router.message(mode_filter(1,2), CommandStart() ,StateFilter(default_state))
 async def cmd_start(message: Message,state: FSMContext,command: Command):
     # декод рефералки и добавление реферала в бд
     args = message.text.split()[1] if len(message.text.split()) > 1 else None
@@ -39,7 +45,18 @@ async def cmd_start(message: Message,state: FSMContext,command: Command):
                 await edit_user(user_id, 'ref_owner', referrer_id)
     else:
         await create_user(message.from_user.id, "user")
-    await message.reply("Привет! Отправь мне /battle для участия в баттле",reply_markup=main_user_kb)
+    config = await get_config()
+    channel_link = config.tg_bot.channel_link
+    welcome_text = (
+        "⭐️ Добро пожаловать в меню!\n\n"
+        "✨ Чтобы участвовать в баттле, достаточно отправить мне /battle "
+        "или нажать \"🔥Принять участие\"!\n\n"
+        "💫 канал где будет проводиться ФБ:\n"
+        f"{channel_link}\n\n"
+        "🔔 Очень ждем твоей заявки!"
+    )
+    
+    await message.reply(welcome_text, reply_markup=main_user_kb)
 
 
 @user_router.message(Command("battle"), StateFilter(default_state))
@@ -49,12 +66,12 @@ async def cmd_battle(message: Message, state: FSMContext):
     application = await select_application(user_id)
     user_on_battle = await select_user_on_battle(user_id)
     if not application and not user_on_battle:
-        await message.answer("📷 Отправь сюда свою фотку. Помни, что она должна быть вертикальной!\n\nЕсли вы хотите прервать заполнение анкеты - отправьте команду /cancel")
+        await message.answer("📷 Отправь сюда свою фотку. Помните, что она должна быть вертикальной!\n\nЕсли вы хотите прервать заполнение анкеты - отправьте команду /cancel")
         await state.set_state(FSMFillForm.fill_photo)
     elif application:
-        await message.answer("Ваша завка уже находиться на рассмотрении")
+        await message.answer("🔍 Ваша заявка находится на рассмотрении, пожалуйста ожидайте!")
     else:
-        await message.answer("Вы уже зарегистрированы на баттл")
+        await message.answer("✅ Вы уже зарегистрированы на баттл.")
 
 
 
@@ -73,7 +90,7 @@ async def process_photo_sent(message: Message, state: FSMContext, largest_photo:
         data = await state.get_data()
 
         await message.answer(
-            text='🏵️ Спасибо! Бот сообщит о начале баттла.'
+            text='🔍 Ваша заявка отправлена на проверку, пожалуйста ожидайте!'
         )
         await create_application(message.from_user.id, data["photo_id"])
         await state.clear()
@@ -88,9 +105,8 @@ async def process_photo_sent(message: Message, state: FSMContext, largest_photo:
 @user_router.message(StateFilter(FSMFillForm.fill_photo))
 async def warning_not_photo(message: Message):
     await message.answer(
-        text='Пожалуйста, на этом шаге отправьте '
-             'ваше фото\n\nЕсли вы хотите прервать '
-             'заполнение анкеты - отправьте команду /cancel'
+        text='📷 Пожалуйста, на этом шаге отправьте ваше фото!\n\n'
+             'Если вы хотите прервать заполнение анкеты - отправьте команду /cancel'
     )
 
 
@@ -131,7 +147,7 @@ async def mt_referal_menu (message: Message, state: FSMContext, bot: Bot):
     await message.answer(
         text=f'🎁 Пригласи друга - получи голоса!\n\n' +
              f'🔗 Ваша реферальная ссылка: {link}\n\n' +
-             f'🔑 3 голоса будут зачислены вам, как только человек, которого вы привели, отправит фото и оно будет принято. Чтобы получить их, просто нажмите на кнопку 3 раза.'
+             f'🔑 3 голоса будут зачислены вам, как только человек, которого вы привели, отправит фото и оно будет принято.'
     )
     
 
@@ -164,7 +180,7 @@ async def show_channels_for_admin(message: Message):
 
 @user_router.message()
 async def echo(message: Message):
-    await message.answer('Я вас не понимаю 😅 Для продолжения воспользуйтесь кнопками ниже или отправьте команду /battle для участия в баттле.')
-
+    await message.answer('Я вас не понимаю 😅\n\n'
+                        'Для того, чтобы попасть в меню нажмите /start, чтобы зарегистрироваться на баттл нажмите /battle')
 
 

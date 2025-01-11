@@ -78,6 +78,12 @@ class TaskManager:
         # Если баттл не активен - режим 1
         return 1
 
+    async def get_config(self):
+        dirname = os.path.dirname(__file__)
+        filename = os.path.abspath(os.path.join(dirname, '..', 'config/config.env'))
+        config = load_config(filename)
+        return config
+    
     async def notification_before_battle(self):
         while True:
             try:
@@ -111,10 +117,13 @@ class TaskManager:
                     if self.notification_task and self.notification_task.cancelled():
                         break
                     
+                    config = await self.get_config()
+                    bot_link = config.tg_bot.bot_link
                     await self.bot.send_message(
                         self.channel_id,
-                        f"⚠️ Внимание! Баттл начнется через 1 час (в {battle_time.strftime('%H:%M')})!"
-                    )
+                        f"🔥 Принимаю последние фото, кидать сюда: <a href='{bot_link}'>cсылка</a>\n\n"
+                        f"Баттл начнется через 1 час (в {battle_time.strftime('%H:%M')})!"
+                    ,parse_mode='HTML')
                     
                     users = await get_all_users()
                     users_id = [i[0] for i in users]
@@ -252,7 +261,7 @@ class TaskManager:
                 break
             await save_message_ids([start_message.message_id])
             
-            message_ids = await send_battle_pairs(self.bot, self.channel_id, participants,self.prize, round_txt,self.round_duration, self.min_votes_for_single)
+            message_ids = await send_battle_pairs(self.bot, self.channel_id, participants,self.prize, round_txt,self.round_duration, self.min_votes_for_single, self.current_round_start)
             await save_message_ids(message_ids)
             if not self.battle_active:
                 break
@@ -282,7 +291,7 @@ class TaskManager:
                     if new_participants:
                         logging.info(f"Adding {len(new_participants)} new participants to the battle")
                         participants.extend(new_participants)
-                        new_message_ids = await send_battle_pairs(self.bot, self.channel_id, new_participants,self.prize, round_txt,self.round_duration,self.min_votes_for_single)
+                        new_message_ids = await send_battle_pairs(self.bot, self.channel_id, new_participants,self.prize, round_txt,self.round_duration,self.min_votes_for_single, self.current_round_start)
                         await save_message_ids(new_message_ids)
                 except Exception as e:
                     logging.error(f"Error while checking new participants: {e}")

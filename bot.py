@@ -53,13 +53,13 @@ dp.include_router(
 
 
 USER_COMMANDS: List[BotCommand] = [
-    BotCommand(command="start", description="Начать работу с ботом"),
+    BotCommand(command="start", description="Меню"),
     BotCommand(command="battle", description="Регистрация на баттл")
     # Добавьте другие команды для пользователей
 ]
 
 ADMIN_COMMANDS: List[BotCommand] = [
-    BotCommand(command="start", description="Начать работу с ботом"),
+    BotCommand(command="start", description="Меню"),
     BotCommand(command="battle", description="Регистрация на баттл"),
     BotCommand(command="admin", description="Админ-панель")
     # Добавьте другие админские команды
