@@ -1,6 +1,7 @@
 import logging
 import os
 import re
+from typing import List
 
 from aiogram import Router, Bot, F
 from aiogram.filters import Command, StateFilter, CommandObject
@@ -105,6 +106,8 @@ async def photo_moderation(message: Message):
 
 @admin_router.callback_query(lambda query: query.data == "Принять")
 async def apply(call: CallbackQuery):
+    task_manager = TaskManagerInstance.get_instance()
+    current_mode = await task_manager.get_current_mode()
     await call.answer(text="ok", reply_markup=mailing_admin_kb)
     application = (await select_all_applications())
     all_application = application
@@ -137,8 +140,10 @@ async def apply(call: CallbackQuery):
         if delMessage:
             await _bot.send_message(call.from_user.id, "Заявки закончились")
             await call.message.delete()
-        await create_user_in_batl(user_id,photo_id, 'user')
-        
+        if current_mode == 1:
+            await create_user_in_batl(user_id,photo_id, 'user')
+        else:
+            await create_user_in_buffer(user_id,photo_id, 'user')
         await delete_application(user_id)
         # /////
         if len(all_application)>1:
@@ -773,6 +778,115 @@ async def view_info_command(message: Message):
     else:
         await message.answer("Информационное сообщение не задано")
 
-@admin_router.message(F.text == "Назад в общие настройки")
-async def back_to_settings_command(message: Message):
-    await message.answer("Возврат к настройкам баттла", reply_markup=tune_battle_admin_kb)
+
+
+
+
+@admin_router.message(F.text == "Назад к настройкам фото")
+async def back_to_settings_command(message: Message, state: FSMContext):
+    await state.clear()
+    await message.answer("Возврат к настройкам фото", reply_markup=admin_photo_keyboard)
+
+
+@admin_router.message(F.text == "Фотографии админа")
+async def admin_photos_menu(message: Message):
+    await message.answer("Выберите действие:", reply_markup=admin_photo_keyboard)
+
+
+@admin_router.message(F.text == "Добавить фотографии")
+async def add_photos_start(message: Message, state: FSMContext):
+    await message.answer(
+        "Отправьте до 30 вертикальных фотографий разом. Чтобы выйти, нажмите 'Назад' или отправьте /cancel.",
+        reply_markup=ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text="Назад к настройкам фото")]], resize_keyboard=True)
+    )
+    await state.set_state(FSMFillForm.waiting_for_photos)
+
+
+
+@admin_router.message(F.text == "Добавить фотографии")
+async def add_photos_start(message: Message, state: FSMContext):
+    await message.answer(
+        "Отправьте до 30 вертикальных фотографий разом. Чтобы выйти, нажмите 'Назад' или отправьте /cancel.",
+        reply_markup=ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text="Назад к настройкам фото")]], resize_keyboard=True)
+    )
+    await state.set_state(FSMFillForm.waiting_for_photos)
+
+
+@admin_router.message(FSMFillForm.waiting_for_photos, F.photo)
+async def process_photos(message: Message, state: FSMContext, **kwargs):
+    album = kwargs.get('album')  # Получаем альбом из kwargs
+    
+    if album:  # Если это альбом
+        if len(album) > 30:
+            await message.answer("Вы можете отправить не более 30 фотографий за раз")
+            return
+
+        valid_photos = []
+        skipped = 0
+
+        for msg in album:
+            photo = msg.photo[-1]
+            if photo.width < photo.height:
+                valid_photos.append(photo.file_id)
+            else:
+                skipped += 1
+
+        if valid_photos:
+            await save_admin_photo_two(valid_photos)  # Теперь valid_photos передается корректно
+            response = f"Успешно добавлено {len(valid_photos)} фотографий"
+            if skipped > 0:
+                response += f"\nПропущено {skipped} неподходящих фотографий"
+            await message.answer(response)
+        else:
+            await message.answer("Не удалось добавить ни одной фотографии. Убедитесь, что все фотографии вертикальные.")
+
+    else:  # Если одиночное фото
+        photo = message.photo[-1]
+        if photo.width < photo.height:
+            await save_admin_photo(photo.file_id)
+            await message.answer("Фотография успешно добавлена!")
+        else:
+            await message.answer("Фотография должна быть вертикальной")
+
+
+
+            
+            
+@admin_router.message(FSMFillForm.waiting_for_photos)
+async def error_multiple_photos(message: Message, state: FSMContext):
+    await message.answer(
+        text='Пожалуйста, на этом шаге отправьте '
+             'ваше фото\n\nЕсли вы хотите прервать '
+             'заполнение анкеты - отправьте команду /cancel или нажмите на кнопку "Назад к настройкам фото"'    )
+
+
+@admin_router.message(F.text == "Удалить первую фотографию")
+async def delete_first_photo_handler(message: Message):
+    photo_id = await select_admin_photo()
+    if photo_id:
+        await message.answer(f"Фотография с ID {photo_id} была удалена.")
+    else:
+        await message.answer("Нет фотографий для удаления.")
+        
+        
+@admin_router.message(F.text == "Просмотреть первую фотографию")
+async def view_first_photo_handler(message: Message):
+    photo_id = await get_first_photo()
+    if photo_id:
+        await message.answer_photo(photo_id, caption="Самая первая добавленная фотография.")
+    else:
+        await message.answer("Нет фотографий для просмотра.")
+
+
+
+
+@admin_router.message(F.text == "Выложить донабор")
+async def add_participants_from_buffer_to_battle(message: Message):
+    users_buffer = await get_users_in_buffer()
+    if users_buffer:
+        for user in users_buffer:
+            await create_user_in_batl(user['user_id'],user['photo_id'], 'user')
+        await message.answer("Все участники успешно добавлены в баттл")
+        await delete_users_in_buffer()
+    else:
+        await message.answer("Не было найдено участников для добавления в баттл")

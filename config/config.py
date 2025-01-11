@@ -12,7 +12,7 @@ class TgBot:
     user_link: str             # Ссылка на пользователя в Телеграме
     rule_link: str 
     channel_link: str 
-
+    bot_link: str
 @dataclass
 class Config:
     """Общий класс конфигурации"""
@@ -30,7 +30,8 @@ def load_config(path: str = None) -> Config:
             channel_id=int(env.str("CHANNEL_ID")),
             user_link=env.str("USER_LINK"), # Читаем ссылку на пользователя
             rule_link=env.str("RULE_LINK"),
-            channel_link=env.str('CHANNEL_LINK')
+            channel_link=env.str('CHANNEL_LINK'),
+            bot_link=env.str('BOT_LINK')
         ),
     )
 

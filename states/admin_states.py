@@ -16,4 +16,5 @@ class FSMFillForm(StatesGroup):
     add_channel_link = State()  # Состояние для ввода ссылки на канал
     delete_channel_name = State()  # Состояние для ввода названия канала для удаления
     waiting_for_text = State()
+    waiting_for_photos = State()
 

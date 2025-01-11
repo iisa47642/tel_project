@@ -42,7 +42,7 @@ async def create_tables():
         
         await db.execute('''
         CREATE TABLE IF NOT EXISTS admin_photo (
-            id INTEGER PRIMARY KEY,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             photo_id TEXT
         )
         ''')
@@ -80,6 +80,17 @@ async def create_tables():
                 name TEXT NOT NULL,
                 link TEXT NOT NULL
             )
+        ''')
+        
+        await db.execute('''
+        CREATE TABLE IF NOT EXISTS buffer_battle (
+            user_id INTEGER PRIMARY KEY,
+            photo_id TEXT,
+            is_participant,
+            points INTEGER,
+            role TEXT,
+            is_kick INTEGER
+        )
         ''')
 
         await db.commit()
@@ -458,18 +469,31 @@ async def select_user_from_battle(user_id):
                 return existing_user
             return False
 
+# async def select_admin_photo():
+#     async with sq.connect("bot_database.db") as db:
+#         async with db.execute('SELECT id,max(photo_id) FROM admin_photo') as cursor:
+#             photo_id = await cursor.fetchone()
+#             await delete_admin_photo(photo_id[0],photo_id[1])
+#             return photo_id
+
 async def select_admin_photo():
     async with sq.connect("bot_database.db") as db:
-        async with db.execute('SELECT id,max(photo_id) FROM admin_photo') as cursor:
-            photo_id = await cursor.fetchone()
-            await delete_admin_photo(photo_id[0],photo_id[1])
-            return photo_id
+        # Получаем запись с минимальным id
+        async with db.execute('SELECT id, photo_id FROM admin_photo ORDER BY id ASC LIMIT 1') as cursor:
+            photo = await cursor.fetchone()
 
-async def delete_admin_photo(id, photo_id):
+            # Если запись найдена, удаляем её
+            if photo:
+                await delete_admin_photo(photo[0])  # Удаляем по id
+                return photo[1]  # Возвращаем photo_id
+            return None  # Если таблица пуста
+
+
+async def delete_admin_photo(id: int):
     async with sq.connect("bot_database.db") as db:
-        query = f"DELETE FROM admin_photo WHERE photo_id = ? AND id=?"
-        await db.execute(query, (photo_id,id,))
+        await db.execute("DELETE FROM admin_photo WHERE id = ?", (id,))
         await db.commit()
+
 
 
 # async def select_admins()
@@ -587,3 +611,87 @@ async def select_info_message():
             cursor = await db.execute('SELECT info_message FROM battle_settings')
             result = await cursor.fetchone()
             return result
+        
+        
+# Добавление нескольких фотографий в базу данных
+async def add_photos(photo_ids: list[str]):
+    async with sq.connect("bot_database.db") as db:
+        await db.executemany(
+            "INSERT INTO admin_photo (photo_id) VALUES (?)",
+            [(photo_id,) for photo_id in photo_ids]
+        )
+        await db.commit()
+
+
+
+
+# Выбор последней фотографии из базы данных
+async def get_first_photo():
+    async with sq.connect("bot_database.db") as db:
+        # Получаем запись с минимальным id
+        async with db.execute("SELECT photo_id FROM admin_photo ORDER BY id ASC LIMIT 1") as cursor:
+            result = await cursor.fetchone()
+            return result[0] if result else None  # Возвращаем photo_id или None, если таблица пуста
+
+
+# Удаление последней фотографии из базы данных
+async def delete_last_photo():
+    async with sq.connect("bot_database.db") as db:
+        # Получаем ID последней фотографии
+        async with db.execute("SELECT id FROM admin_photo ORDER BY id DESC LIMIT 1") as cursor:
+            last_photo = await cursor.fetchone()
+
+        if last_photo:
+            # Удаляем последнюю фотографию
+            await db.execute("DELETE FROM admin_photo WHERE id = ?", (last_photo[0],))
+            await db.commit()
+            return True
+        return False
+
+
+# Подсчет количества фотографий в базе данных
+# async def count_photos():
+#     async with sq.connect("bot_database.db") as db:
+#         async with db.execute("SELECT COUNT(*) FROM admin_photo") as cursor:
+#             result = await cursor.fetchone()
+#             return result[0]
+
+
+# Функции для работы с БД
+async def save_admin_photo(photo_id: str):
+    async with sq.connect("bot_database.db") as db:
+        await db.execute('INSERT INTO admin_photo (photo_id) VALUES (?)', (photo_id,))
+        await db.commit()
+        
+async def save_admin_photo_two(valid_photos):
+    async with sq.connect("bot_database.db") as db:
+        for photo_id in valid_photos:
+            await db.execute('INSERT INTO admin_photo (photo_id) VALUES (?)', (photo_id,))
+        await db.commit()
+
+
+
+async def create_user_in_buffer(user_id, photo_id, role):
+     async with sq.connect("bot_database.db") as db:
+        async with db.execute(f"SELECT 1 FROM buffer_battle WHERE user_id == '{user_id}'") as cursor:
+            user = await cursor.fetchone()
+            if not user:
+                await cursor.execute("INSERT INTO buffer_battle VALUES(?, ?, ?, ?, ?, ?)", (user_id,photo_id,1,0,role,0))
+                await db.commit()
+                
+                
+                
+async def get_users_in_buffer():
+    async with sq.connect("bot_database.db") as db:
+        cursor = await db.execute("SELECT user_id, photo_id, points FROM buffer_battle WHERE is_participant = 1")
+        participants = await cursor.fetchall()
+        return [{'user_id': p[0], 'photo_id': p[1]} for p in participants]
+    
+    
+async def delete_users_in_buffer():
+    async with sq.connect("bot_database.db") as db:
+        # Проверяем, существует ли пользователь
+            
+            # Удаляем пользователей
+        await db.execute("DELETE FROM buffer_battle", )
+        await db.commit()

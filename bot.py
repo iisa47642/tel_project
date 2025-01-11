@@ -4,7 +4,7 @@ from aiogram.filters import StateFilter, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
 from aiogram.fsm.storage.memory import MemoryStorage
-from middlewares.middlewares import ModeMiddleware, ThrottlingMiddleware, UserCheckMiddleware
+from middlewares.middlewares import AlbumsMiddleware, ModeMiddleware, ThrottlingMiddleware, UserCheckMiddleware
 from aiogram.types import Message
 from config.config import load_config
 from routers import admin_router, channel_router
@@ -117,12 +117,13 @@ async def main():
     await create_tables()
     await channel_router.make_some_magic()
     
-    message_throttling = ThrottlingMiddleware(limit=1.0)  # 2 секунды для сообщений
+    # message_throttling = ThrottlingMiddleware(limit=1.0)  # 2 секунды для сообщений
     callback_throttling = ThrottlingMiddleware(limit=1.0)
     
-    dp.message.middleware(message_throttling)
+    # dp.message.middleware(message_throttling)
     dp.callback_query.middleware(callback_throttling)
-    
+    dp.message.middleware(AlbumsMiddleware(2))
+
     global task_manager
     task_manager = TaskManager()
     await task_manager.initialize()  # Инициализируем настройки

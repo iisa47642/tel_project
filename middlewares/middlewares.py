@@ -1,8 +1,10 @@
 import asyncio
+from collections import defaultdict
+from dataclasses import dataclass
 import os
 
 from aiogram import BaseMiddleware, Bot
-from typing import Callable, Dict, Any, Awaitable, Union
+from typing import Callable, Dict, Any, Awaitable, List, Union
 from aiogram.types import Message, CallbackQuery, TelegramObject
 
 from config.config import load_config
@@ -13,6 +15,13 @@ import logging
 from tasks.task_handlers import TaskManager
 from database.db import select_all_admins
 
+import asyncio
+from typing import Any, Callable, Dict, Awaitable
+
+from aiogram import BaseMiddleware
+from aiogram.types import Message, TelegramObject
+from cachetools import TTLCache
+
 class MiddlewareData:
     _bot: Bot = None
     _task_manager: TaskManager = None
@@ -21,6 +30,59 @@ def setup_router(dp, bot: Bot, tm: TaskManager):
     MiddlewareData._bot = bot
     MiddlewareData._task_manager = tm
 
+
+
+
+
+class AlbumsMiddleware(BaseMiddleware):
+    def __init__(self, wait_time_seconds: int):
+        super().__init__()
+        self.wait_time_seconds = wait_time_seconds
+        self.albums_cache = TTLCache(
+            ttl=float(wait_time_seconds) + 20.0,
+            maxsize=1000
+        )
+        self.lock = asyncio.Lock()
+
+    async def __call__(
+            self,
+            handler: Callable[[TelegramObject, Dict[str, Any]], Awaitable[Any]],
+            event: TelegramObject,
+            data: Dict[str, Any],
+    ) -> Any:
+        if not isinstance(event, Message):
+            return await handler(event, data)
+
+        event: Message
+
+        # Если нет media_group_id (не альбом), просто передаем дальше
+        if event.media_group_id is None:
+            return await handler(event, data)
+
+        album_id: str = event.media_group_id
+
+        async with self.lock:
+            self.albums_cache.setdefault(album_id, list())
+            self.albums_cache[album_id].append(event)
+
+        # Ждем некоторое время, пока соберутся все сообщения альбома
+        await asyncio.sleep(self.wait_time_seconds)
+
+        # Находим наименьший message_id в альбоме
+        my_message_id = smallest_message_id = event.message_id
+
+        for item in self.albums_cache[album_id]:
+            smallest_message_id = min(smallest_message_id, item.message_id)
+
+        # Если текущий message_id не наименьший, пропускаем
+        if my_message_id != smallest_message_id:
+            return
+
+        # Если текущий message_id наименьший,
+        # добавляем все сообщения альбома в data
+        data['album'] = self.albums_cache[album_id]
+
+        return await handler(event, data)
 
 class ThrottlingMiddleware(BaseMiddleware):
     def __init__(self, limit: float = 1.0) -> None:
@@ -93,6 +155,8 @@ class UserCheckMiddleware(BaseMiddleware):
         
         return await handler(event, data)
 
+
+
 class ModeMiddleware(BaseMiddleware):
     def __init__(self) -> None:
         self.previous_mode = None
@@ -133,8 +197,7 @@ class ModeMiddleware(BaseMiddleware):
 
         mode_descriptions = {
             1: "нет активного баттла",
-            2: "период донабора",
-            3: "активный баттл"
+            2: "активный баттл"
         }
         
         if self.previous_mode is not None and self.previous_mode != new_mode:

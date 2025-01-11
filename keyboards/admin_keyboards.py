@@ -69,6 +69,7 @@ tune_battle_admin_kb = ReplyKeyboardMarkup(
         [KeyboardButton(text="Минимальное количество голосов"), KeyboardButton(text="Интервал между раундами")],
         [KeyboardButton(text="Текущие настройки"),KeyboardButton(text="Время начала баттла")],
         [KeyboardButton(text="Автоматическая победа"),KeyboardButton(text="Добавить информацию к посту")],
+        [KeyboardButton(text="Фотографии админа"),KeyboardButton(text="Выложить донабор")],
         [KeyboardButton(text="Назад")]
     ],
     resize_keyboard=True
@@ -87,6 +88,19 @@ battle_info_kb = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text="Изменить сообщение"), KeyboardButton(text="Удалить сообщение")],
         [KeyboardButton(text="Посмотреть сообщение"), KeyboardButton(text="Назад в общие настройки")]
+    ],
+    resize_keyboard=True
+)
+
+
+
+
+admin_photo_keyboard= ReplyKeyboardMarkup(
+     keyboard=[
+    [KeyboardButton(text="Добавить фотографии")],
+    [KeyboardButton(text="Удалить первую фотографию")],
+    [KeyboardButton(text="Просмотреть первую фотографию")],
+    [KeyboardButton(text="Назад")]
     ],
     resize_keyboard=True
 )

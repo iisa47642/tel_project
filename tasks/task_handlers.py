@@ -10,7 +10,7 @@ from math import log
 import pytz
 
 from routers.channel_router import make_some_magic, send_battle_pairs, end_round, announce_winner, delete_previous_messages, get_new_participants
-from database.db import clear_users_in_batl, delete_users_add_voices, get_participants, remove_losers, save_message_ids, delete_users_in_batl, select_all_admins, select_battle_settings, delete_users_points, update_admin_battle_points, update_points,users_plays_buttle_update,users_buttle_win_update
+from database.db import clear_users_in_batl, create_user_in_batl, delete_users_add_voices, delete_users_in_buffer, get_participants, get_users_in_buffer, remove_losers, save_message_ids, delete_users_in_batl, select_all_admins, select_battle_settings, delete_users_points, update_admin_battle_points, update_points,users_plays_buttle_update,users_buttle_win_update
 
 from config.config import load_config
 from routers.channel_router import send_battle_pairs, end_round, announce_winner, delete_previous_messages
@@ -66,14 +66,14 @@ class TaskManager:
 
         # Если баттл активен
         if self.battle_active:
-            if self.first_round_active and self.current_round_start:
+            # if self.first_round_active and self.current_round_start:
                 # Период донабора: от начала раунда до 30 минут до его конца
-                round_end = self.current_round_start + timedelta(minutes=self.round_duration)
-                donabor_end = round_end - timedelta(seconds=30)
+                # round_end = self.current_round_start + timedelta(minutes=self.round_duration)
+                # donabor_end = round_end - timedelta(seconds=30)
                 # donabor_end = round_end - timedelta(minutes=30)
-                if now < donabor_end:
-                    return 2
-            return 3
+                # if now < donabor_end:
+                #     return 2
+            return 2
 
         # Если баттл не активен - режим 1
         return 1
@@ -258,7 +258,7 @@ class TaskManager:
                 break
             # Определяем продолжительность раунда
             # if now.hour < 10 and now.hour >= 0:
-            if now.hour < 10 and now.hour >= 9:  # Если раунд начался после полуночи
+            if now.hour < 10 and now.hour >= 23:  # Если раунд начался после полуночи
                 tomorrow = now.date() + timedelta(days=1)
                 round_end_time = self.timezone.localize(datetime.combine(tomorrow, time(hour=10)))
                 wait_time = (round_end_time - now).total_seconds()
@@ -276,7 +276,7 @@ class TaskManager:
                     if not self.battle_active:
                         return
                     # Проверяем участников каждые 10 секунд
-                    await asyncio.sleep(1)
+                    await asyncio.sleep(10)
 
                     new_participants = await get_new_participants(participants)
                     if new_participants:
@@ -325,7 +325,7 @@ class TaskManager:
                 datetime.combine(next_day, self.DEFAULT_BATTLE_TIME)
             )
 
-            if now.hour >= 9 and now.hour < 10:
+            if now.hour >= 0 and now.hour < 10:
                 self.next_battle_start = TIMEZONE.localize(
                     datetime.combine(next_day, time(hour=10, minute=0))
                 )
@@ -333,7 +333,13 @@ class TaskManager:
             self.channel_id,
             f"Следующий баттл начнется в {self.next_battle_start.strftime('%d/%m, %H:%M')}"
             )
-
+        try:
+            users_buffer = await get_users_in_buffer()
+            for user in users_buffer:
+                await create_user_in_batl(user['user_id'],user['photo_id'], 'user')
+                await delete_users_in_buffer()
+        except Exception as e:
+            print('Не удалось перенести участника из буфера в баттл ' + str(e))
         self.battle_active = False
         self.first_round_active = False
 
@@ -392,7 +398,7 @@ class TaskManager:
                 if now >= battle_time:
                     battle_time += timedelta(days=1)
                 # Проверяем ночное время
-                if battle_time.hour >= 9 and battle_time.hour < 10:
+                if battle_time.hour >= 0 and battle_time.hour < 10:
                     next_day = battle_time.date()
                     # if battle_time.hour >= 3:
                         # 22 быть должно

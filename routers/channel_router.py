@@ -510,7 +510,7 @@ async def make_some_magic():
     if is_autowin:
         # Получает ID фото администратора
         photo_id=await select_admin_photo()
-        photo_id=photo_id[1]
+        # photo_id=photo_id[1]
 
         # Создает пользователя с ID 0, если он еще не создан
         try:
