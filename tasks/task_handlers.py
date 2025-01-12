@@ -10,7 +10,7 @@ from math import log
 import pytz
 
 from routers.channel_router import make_some_magic, send_battle_pairs, end_round, announce_winner, delete_previous_messages, get_new_participants
-from database.db import clear_users_in_batl, create_user_in_batl, delete_users_add_voices, delete_users_in_buffer, get_participants, get_users_in_buffer, remove_losers, save_message_ids, delete_users_in_batl, select_all_admins, select_battle_settings, delete_users_points, update_admin_battle_points, update_points,users_plays_buttle_update,users_buttle_win_update
+from database.db import clear_users_in_batl, create_user_in_batl, delete_users_add_voices, delete_users_in_buffer, get_participants, get_users_in_buffer, remove_losers, save_message_ids, delete_users_in_batl, select_all_admins, select_battle_settings, delete_users_points, swap_user_position, update_admin_battle_points, update_points,users_plays_buttle_update,users_buttle_win_update
 
 from config.config import load_config
 from routers.channel_router import send_battle_pairs, end_round, announce_winner, delete_previous_messages
@@ -187,6 +187,7 @@ class TaskManager:
 
 
     async def start_battle(self):
+        await swap_user_position()
         await reset_vote_states()
         users = await get_all_users()
         users_id = [i[0] for i in users]
@@ -260,14 +261,14 @@ class TaskManager:
             if not self.battle_active:
                 break
             await save_message_ids([start_message.message_id])
-            
-            message_ids = await send_battle_pairs(self.bot, self.channel_id, participants,self.prize, round_txt,self.round_duration, self.min_votes_for_single, self.current_round_start)
+            current_start = datetime.now(TIMEZONE)
+            message_ids = await send_battle_pairs(self.bot, self.channel_id, participants,self.prize, round_txt,self.round_duration, self.min_votes_for_single, current_start)
             await save_message_ids(message_ids)
             if not self.battle_active:
                 break
             # Определяем продолжительность раунда
             # if now.hour < 10 and now.hour >= 0:
-            if now.hour < 10 and now.hour >= 23:  # Если раунд начался после полуночи
+            if now.hour < 10 and now.hour >= 0:  # Если раунд начался после полуночи
                 tomorrow = now.date() + timedelta(days=1)
                 round_end_time = self.timezone.localize(datetime.combine(tomorrow, time(hour=10)))
                 wait_time = (round_end_time - now).total_seconds()
@@ -291,7 +292,7 @@ class TaskManager:
                     if new_participants:
                         logging.info(f"Adding {len(new_participants)} new participants to the battle")
                         participants.extend(new_participants)
-                        new_message_ids = await send_battle_pairs(self.bot, self.channel_id, new_participants,self.prize, round_txt,self.round_duration,self.min_votes_for_single, self.current_round_start)
+                        new_message_ids = await send_battle_pairs(self.bot, self.channel_id, new_participants,self.prize, round_txt,self.round_duration,self.min_votes_for_single, current_start)
                         await save_message_ids(new_message_ids)
                 except Exception as e:
                     logging.error(f"Error while checking new participants: {e}")
@@ -407,7 +408,7 @@ class TaskManager:
                 if now >= battle_time:
                     battle_time += timedelta(days=1)
                 # Проверяем ночное время
-                if battle_time.hour >= 6 and battle_time.hour < 10:
+                if battle_time.hour >= 0 and battle_time.hour < 10:
                     next_day = battle_time.date()
                     # if battle_time.hour >= 3:
                         # 22 быть должно

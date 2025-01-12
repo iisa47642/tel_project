@@ -95,7 +95,7 @@ async def init_vote_state(message_id: int, admin_id: int, admin_position: str, o
         'is_single': admin_position == "middle"
     }
 
-async def send_battle_pairs(bot: Bot, channel_id: int, participants, prize, round_txt, round_duration, min_votes, current_round_start):
+async def send_battle_pairs(bot: Bot, channel_id: int, participants, prize, round_txt, round_duration, min_votes, current_start):
     """
     Отправляет пары участников в канал для голосования.
     """
@@ -103,14 +103,14 @@ async def send_battle_pairs(bot: Bot, channel_id: int, participants, prize, roun
     
     for i in range(0, len(participants), 2):
         if i + 1 < len(participants):
-            pair_message_ids = await send_pair(bot, channel_id, participants[i], participants[i+1], prize, round_txt,round_duration, current_round_start)
+            pair_message_ids = await send_pair(bot, channel_id, participants[i], participants[i+1], prize, round_txt,round_duration, current_start)
         else:
-            pair_message_ids = await send_single(bot, channel_id, participants[i], prize, round_txt,round_duration, min_votes, current_round_start)
+            pair_message_ids = await send_single(bot, channel_id, participants[i], prize, round_txt,round_duration, min_votes, current_start)
         message_ids.extend(pair_message_ids)
     
     return message_ids
 
-async def send_pair(bot: Bot, channel_id: int, participant1, participant2, prize, round_txt, round_duration, current_round_start):
+async def send_pair(bot: Bot, channel_id: int, participant1, participant2, prize, round_txt, round_duration, current_start):
     """
     Отправляет пару участников в канал.
     """
@@ -139,17 +139,18 @@ async def send_pair(bot: Bot, channel_id: int, participant1, participant2, prize
         
         
         
-    round_end = current_round_start + timedelta(minutes=round_duration)
-    now = datetime.now(current_round_start.tzinfo)
-    time_left = round_end - now
+    # round_end = current_start + timedelta(minutes=round_duration)
+    now = datetime.now(current_start.tzinfo)
 
-    if now.hour < 10 or now.hour >= 23:  # Если раунд начался после полуночи
+    if now.hour < 10 and now.hour >= 0:  # Если время между 23:00 и 10:00
         tomorrow = now.date() + timedelta(days=1)
         round_end_time = pytz.timezone('Europe/Moscow').localize(datetime.combine(tomorrow, time(hour=10)))
         wait_time = (round_end_time - now).total_seconds()
         total_minutes = int(wait_time / 60)
     else:
-        total_minutes = int(time_left.total_seconds() / 60)
+        # Используем текущее время как основу для расчета
+        minutes_passed = (now - current_start).total_seconds() / 60
+        total_minutes = round_duration - int(minutes_passed)
 
     end_hour = (total_minutes // 60) % 24
     end_min = total_minutes % 60
@@ -213,7 +214,7 @@ async def send_pair(bot: Bot, channel_id: int, participant1, participant2, prize
         
     return [msg.message_id for msg in media_message] + [vote_message.message_id]
 
-async def send_single(bot: Bot, channel_id: int, participant, prize ,round_txt , round_duration, min_votes, current_round_start):
+async def send_single(bot: Bot, channel_id: int, participant, prize ,round_txt , round_duration, min_votes, current_start):
     """
     Отправляет одиночного участника в канал.
     """
@@ -237,17 +238,17 @@ async def send_single(bot: Bot, channel_id: int, participant, prize ,round_txt ,
     elif 'финал' in round_txt:
         round_txt = 'Финал'
         
-    round_end = current_round_start + timedelta(minutes=round_duration)
-    now = datetime.now(current_round_start.tzinfo)
-    time_left = round_end - now
+    now = datetime.now(current_start.tzinfo)
 
-    if now.hour < 10 or now.hour >= 23:  # Если раунд начался после полуночи
+    if now.hour < 10 and now.hour >= 0:
         tomorrow = now.date() + timedelta(days=1)
         round_end_time = pytz.timezone('Europe/Moscow').localize(datetime.combine(tomorrow, time(hour=10)))
         wait_time = (round_end_time - now).total_seconds()
         total_minutes = int(wait_time / 60)
     else:
-        total_minutes = int(time_left.total_seconds() / 60)
+        # Используем текущее время как основу для расчета
+        minutes_passed = (now - current_start).total_seconds() / 60
+        total_minutes = round_duration - int(minutes_passed)
 
     end_hour = (total_minutes // 60) % 24
     end_min = total_minutes % 60
@@ -467,7 +468,7 @@ async def announce_winner(bot: Bot, channel_id: int, winners):
     if len(winners)==1:
         winner = winners[0]
         media = [
-        InputMediaPhoto(media=winner['photo_id'], caption=f"🥇Поздравляем победителя!🥇\n\n🏆 Можешь забрать свой приз, написав нам <a href='{user_link}'>сюда</a>\n\n 🏆🧸 Проигравшим не отчаиваться, ведь новый день - новые возможности 🧸\n\n💛 Следующий батл начнется завтра в то же время, отправляй заявку! 💛", parse_mode="HTML")
+        InputMediaPhoto(media=winner['photo_id'], caption=f"🥇Поздравляем победителя!🥇\n\n🏆 Можешь забрать свой приз, написав нам <a href='{user_link}'>сюда</a>🏆\n\n🧸 Проигравшим не отчаиваться, ведь новый день - новые возможности 🧸\n\n💛 Следующий батл начнется завтра в то же время, отправляй заявку! 💛", parse_mode="HTML")
     ]
         
     if len(winners)==2:

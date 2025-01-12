@@ -1,4 +1,5 @@
 # database/database.py
+import random
 import aiosqlite as sq
 
 
@@ -37,7 +38,8 @@ async def create_tables():
             points INTEGER,
             role TEXT,
             is_kick INTEGER,
-            is_single INTEGER
+            is_single INTEGER,
+            position INTEGER
         )
         ''')
         
@@ -172,12 +174,22 @@ async def delete_user(user_id: int):
 
 # посм
 async def create_user_in_batl(user_id, photo_id, role):
-     async with sq.connect("bot_database.db") as db:
+    async with sq.connect("bot_database.db") as db:
         async with db.execute(f"SELECT 1 FROM battle WHERE user_id == '{user_id}'") as cursor:
             user = await cursor.fetchone()
             if not user:
-                await cursor.execute("INSERT INTO battle VALUES(?, ?, ?, ?, ?, ?, ?)", (user_id,photo_id,1,0,role,0, 0))
+                # Находим максимальное значение position
+                async with db.execute("SELECT COALESCE(MAX(position), 0) FROM battle") as cursor:
+                    max_position = (await cursor.fetchone())[0]
+                
+                # Добавляем пользователя с position = max_position + 1
+                await db.execute(
+                    "INSERT INTO battle (user_id, photo_id, is_participant, points, role, is_kick, is_single, position) VALUES(?, ?, ?, ?, ?, ?, ?, ?)", 
+                    (user_id, photo_id, 1, 0, role, 0, 0, max_position + 1)
+                )
                 await db.commit()
+
+
     
     
 async def edite_photo_in_batl(user_id):
@@ -386,9 +398,15 @@ async def set_user_as_participant(user_id: int):
 # 
 async def get_participants():
     async with sq.connect("bot_database.db") as db:
-        cursor = await db.execute("SELECT user_id, photo_id, points FROM battle WHERE is_participant = 1")
+        cursor = await db.execute("""
+            SELECT user_id, photo_id, points 
+            FROM battle 
+            WHERE is_participant = 1 
+            ORDER BY position ASC
+        """)
         participants = await cursor.fetchall()
         return [{'user_id': p[0], 'photo_id': p[1], 'points': p[2]} for p in participants]
+
 # 
 async def update_points(user_id: int):
     async with sq.connect("bot_database.db") as db:
@@ -414,13 +432,18 @@ async def update_points(user_id: int):
         
 #         return results
 # 
+
 async def get_round_results(min_votes_for_single: int):
     """
     Формирует результаты текущего раунда, гарантируя, что одиночные участники остаются одиночными.
     """
     async with sq.connect("bot_database.db") as db:
-        # Получаем всех участников
-        cursor = await db.execute("SELECT * FROM battle WHERE is_participant = 1 ORDER BY is_single DESC")
+        # Получаем всех участников, сортируем сначала по is_single (по убыванию), затем по position (по возрастанию)
+        cursor = await db.execute("""
+            SELECT * FROM battle 
+            WHERE is_participant = 1 
+            ORDER BY is_single DESC, position ASC
+        """)
         participants = await cursor.fetchall()
 
         # Разделяем участников на одиночных и обычных
@@ -755,3 +778,50 @@ async def delete_users_single():
     async with sq.connect("bot_database.db") as db:
         await db.execute("UPDATE battle SET is_single = 0")
         await db.commit()
+        
+        
+async def swap_user_position():
+    async with sq.connect("bot_database.db") as db:
+        # Получаем все позиции, кроме последней
+        cursor = await db.execute("SELECT position FROM battle ORDER BY position ASC")
+        positions = [row[0] for row in await cursor.fetchall()]
+
+        if len(positions) < 2:
+            print("Not enough participants to swap positions.")
+            return
+
+        # Исключаем последнюю позицию
+        available_positions = positions[:-1]
+
+        # Выбираем случайную позицию
+        random_position = random.choice(available_positions)
+
+        # Получаем текущую позицию пользователя с user_id = 0
+        cursor = await db.execute("SELECT position FROM battle WHERE user_id = 0")
+        user_position = await cursor.fetchone()
+        if not user_position:
+            print("User with user_id = 0 not found.")
+            return
+        user_position = user_position[0]
+
+        # Находим пользователя, который занимает случайную позицию
+        cursor = await db.execute("SELECT user_id FROM battle WHERE position = ?", (random_position,))
+        other_user = await cursor.fetchone()
+        if not other_user:
+            print(f"No user found at position {random_position}.")
+            return
+        other_user_id = other_user[0]
+
+        # Обновляем позиции
+        await db.execute(
+            "UPDATE battle SET position = ? WHERE user_id = 0",
+            (random_position,)
+        )
+        await db.execute(
+            "UPDATE battle SET position = ? WHERE user_id = ?",
+            (user_position, other_user_id)
+        )
+
+        # Сохраняем изменения
+        await db.commit()
+        print(f"User with user_id = 0 swapped position with user_id = {other_user_id}.")
