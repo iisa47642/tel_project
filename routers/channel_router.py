@@ -16,7 +16,7 @@ from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardBut
 import pytz
 
 from config.config import load_config
-from database.db import create_user, create_user_in_batl, edit_user, get_current_votes, get_participants, get_user, select_admin_photo, select_info_message, update_admin_battle_points, update_points, \
+from database.db import create_user, create_user_in_batl, delete_users_single, edit_user, get_current_votes, get_participants, get_user, select_admin_photo, select_info_message, set_single_user, update_admin_battle_points, update_points, \
     get_round_results, get_message_ids, clear_message_ids,\
     select_battle_settings, select_all_admins,users_dual_win_update
 from routers.globals_var import (
@@ -151,7 +151,7 @@ async def send_pair(bot: Bot, channel_id: int, participant1, participant2, prize
     else:
         total_minutes = int(time_left.total_seconds() / 60)
 
-    end_hour = total_minutes // 60
+    end_hour = (total_minutes // 60) % 24
     end_min = total_minutes % 60
 
     
@@ -249,7 +249,7 @@ async def send_single(bot: Bot, channel_id: int, participant, prize ,round_txt ,
     else:
         total_minutes = int(time_left.total_seconds() / 60)
 
-    end_hour = total_minutes // 60
+    end_hour = (total_minutes // 60) % 24
     end_min = total_minutes % 60
     
     if end_hour == 0:
@@ -412,7 +412,7 @@ async def end_round(bot: Bot, channel_id: int, min_votes_for_single: int):
 
     # Отправляем общий результат в канал
     # result_message = await bot.send_message(channel_id, message)
-    
+    await delete_users_single()
     return [loser_ids]
 
 
@@ -517,17 +517,43 @@ async def get_new_participants(current_participants):
         """
         Проверяет базу данных на наличие новых участников, которых ещё нет в текущем списке.
         """
-        all_participants = await get_participants()  # Получаем всех участников из базы
+        all_participants = await get_participants() # Получаем всех участников из базы
         current_ids = {p['user_id'] for p in current_participants}  # ID текущих участников
 
         # Фильтруем новых участников
         new_participants = [p for p in all_participants if p['user_id'] not in current_ids]
+        single_flag = 0
+        if len(new_participants) % 2 == 1:
+            single_flag = 1
+        if single_flag:
+            sin_user = new_participants[-1]
+            await set_single_user(sin_user['user_id'])
 
         if new_participants:
             logging.info(f"Найдены новые участники: {[p['user_id'] for p in new_participants]}")
 
         return new_participants
+# async def get_new_participants(current_participants):
+#     """
+#     Проверяет базу данных на наличие новых участников, которых ещё нет в текущем списке.
+#     """
+#     all_participants = await get_participants()  # Получаем всех участников из базы
+#     current_ids = {p['user_id'] for p in current_participants}  # ID текущих участников
 
+#     # Фильтруем новых участников
+#     new_participants = [p for p in all_participants if p['user_id'] not in current_ids]
+
+#     # Проверяем, чтобы новые участники не "ломали" одиночные статусы
+#     for participant in current_participants:
+#         if participant.get('is_single'):  # Если участник одиночный
+#             new_participants = [
+#                 p for p in new_participants if p['user_id'] != participant['user_id']
+#             ]
+
+#     if new_participants:
+#         logging.info(f"Найдены новые участники: {[p['user_id'] for p in new_participants]}")
+
+#     return new_participants
 
 async def check_is_admin(callback: CallbackQuery, bot, channel_id, user_id) -> bool:
     dirname = os.path.dirname(__file__)

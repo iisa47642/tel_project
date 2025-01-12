@@ -36,7 +36,8 @@ async def create_tables():
             is_participant,
             points INTEGER,
             role TEXT,
-            is_kick INTEGER
+            is_kick INTEGER,
+            is_single INTEGER
         )
         ''')
         
@@ -89,7 +90,8 @@ async def create_tables():
             is_participant,
             points INTEGER,
             role TEXT,
-            is_kick INTEGER
+            is_kick INTEGER,
+            is_single INTEGER
         )
         ''')
 
@@ -174,7 +176,7 @@ async def create_user_in_batl(user_id, photo_id, role):
         async with db.execute(f"SELECT 1 FROM battle WHERE user_id == '{user_id}'") as cursor:
             user = await cursor.fetchone()
             if not user:
-                await cursor.execute("INSERT INTO battle VALUES(?, ?, ?, ?, ?, ?)", (user_id,photo_id,1,0,role,0))
+                await cursor.execute("INSERT INTO battle VALUES(?, ?, ?, ?, ?, ?, ?)", (user_id,photo_id,1,0,role,0, 0))
                 await db.commit()
     
     
@@ -393,25 +395,71 @@ async def update_points(user_id: int):
         await db.execute("UPDATE battle SET points = points + 1 WHERE user_id = ?", (user_id,))
         await db.commit()
 # 
-async def get_round_results(min_votes_for_single: int):
-    async with sq.connect("bot_database.db") as db:
-        cursor = await db.execute("SELECT * FROM battle WHERE is_participant = 1")
-        participants = await cursor.fetchall()
+# async def get_round_results(min_votes_for_single: int):
+#     async with sq.connect("bot_database.db") as db:
+#         cursor = await db.execute("SELECT * FROM battle WHERE is_participant = 1")
+#         participants = await cursor.fetchall()
         
+#         results = []
+#         for i in range(0, len(participants), 2):
+#             if i + 1 < len(participants):
+#                 results.append([
+#                     {'user_id': participants[i][0], 'votes': participants[i][3], 'is_kick': participants[i][5]},
+#                     {'user_id': participants[i+1][0], 'votes': participants[i+1][3], 'is_kick': participants[i+1][5]}
+#                 ])
+#             else:
+#                 results.append([
+#                     {'user_id': participants[i][0], 'votes': participants[i][3], 'is_kick': participants[i][5]}
+#                 ])
+        
+#         return results
+# 
+async def get_round_results(min_votes_for_single: int):
+    """
+    Формирует результаты текущего раунда, гарантируя, что одиночные участники остаются одиночными.
+    """
+    async with sq.connect("bot_database.db") as db:
+        # Получаем всех участников
+        cursor = await db.execute("SELECT * FROM battle WHERE is_participant = 1 ORDER BY is_single DESC")
+        participants = await cursor.fetchall()
+
+        # Разделяем участников на одиночных и обычных
+        single_participants = []  # Участники с is_single=1
+        paired_participants = []  # Участники с is_single=0
+
+        for participant in participants:
+            user = {
+                'user_id': participant[0],
+                'votes': participant[3],
+                'is_kick': participant[5],
+                'is_single': participant[6],
+            }
+            if user['is_single'] == 1:
+                single_participants.append(user)
+            else:
+                paired_participants.append(user)
+
         results = []
-        for i in range(0, len(participants), 2):
-            if i + 1 < len(participants):
+
+        # Формируем пары из обычных участников
+        for i in range(0, len(paired_participants), 2):
+            if i + 1 < len(paired_participants):
+                # Добавляем пару
                 results.append([
-                    {'user_id': participants[i][0], 'votes': participants[i][3], 'is_kick': participants[i][5]},
-                    {'user_id': participants[i+1][0], 'votes': participants[i+1][3], 'is_kick': participants[i+1][5]}
+                    paired_participants[i],
+                    paired_participants[i + 1]
                 ])
             else:
-                results.append([
-                    {'user_id': participants[i][0], 'votes': participants[i][3], 'is_kick': participants[i][5]}
-                ])
-        
+                # Если остался один участник без пары, добавляем его отдельно
+                results.append([paired_participants[i]])
+
+        # Добавляем одиночных участников в конец результатов
+        for single in single_participants:
+            results.append([single])
+
         return results
-# 
+
+
 
 async def remove_losers(losers: list):
     print(losers)
@@ -676,7 +724,7 @@ async def create_user_in_buffer(user_id, photo_id, role):
         async with db.execute(f"SELECT 1 FROM buffer_battle WHERE user_id == '{user_id}'") as cursor:
             user = await cursor.fetchone()
             if not user:
-                await cursor.execute("INSERT INTO buffer_battle VALUES(?, ?, ?, ?, ?, ?)", (user_id,photo_id,1,0,role,0))
+                await cursor.execute("INSERT INTO buffer_battle VALUES(?, ?, ?, ?, ?, ?, ?)", (user_id,photo_id,1,0,role,0,0))
                 await db.commit()
                 
                 
@@ -694,4 +742,16 @@ async def delete_users_in_buffer():
             
             # Удаляем пользователей
         await db.execute("DELETE FROM buffer_battle", )
+        await db.commit()
+        
+        
+async def set_single_user(user_id: int):
+    async with sq.connect("bot_database.db") as db:
+        await db.execute("UPDATE battle SET is_single = 1 WHERE user_id = ?", (user_id,))
+        await db.commit()
+        
+        
+async def delete_users_single():
+    async with sq.connect("bot_database.db") as db:
+        await db.execute("UPDATE battle SET is_single = 0")
         await db.commit()

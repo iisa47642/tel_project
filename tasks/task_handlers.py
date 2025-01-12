@@ -407,7 +407,7 @@ class TaskManager:
                 if now >= battle_time:
                     battle_time += timedelta(days=1)
                 # Проверяем ночное время
-                if battle_time.hour >= 0 and battle_time.hour < 10:
+                if battle_time.hour >= 6 and battle_time.hour < 10:
                     next_day = battle_time.date()
                     # if battle_time.hour >= 3:
                         # 22 быть должно
