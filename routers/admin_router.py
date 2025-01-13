@@ -56,7 +56,15 @@ async def gen_mode_aplic(application):
         photo=photo_id,
         print(photo)
         try:
-            caption=f"ID: {user_id}\n" + f"Ник: @{await get_username_by_id(user_id)}\n" +f"Выйгранных фотобатлов: {buttle_win} \n" + f"Общее число фотобатлов: {plays_buttle} \n" + f"Выйгранных дуэлей: {dual_win}\n\n" + f"Дополнительные голоса: {additional_voices}\n" f"Приглашенных рефералов: {referals}"
+            caption=(
+                    f"🛰ID: {user_id}\n"
+                    f"👽 User: @{await get_username_by_id(user_id)}\n\n"
+                    f"🎮 Сыграно фотобатлов: {plays_buttle}\n"
+                    f"🥇 Выиграно фотобатлов: {buttle_win}\n"
+                    f"⚔ Выиграно дуэлей: {dual_win}\n\n"
+                    f"🔑 Дополнительные голоса: {additional_voices}\n"
+                    f"💸 Приглашенных рефералов: {referals}"
+                )
         except Exception as e:
             print("Не удалось получить ник пользователя " + e)
         reply_markup=photo_moderation_admin_kb
@@ -91,7 +99,7 @@ async def photo_moderation(message: Message, state: FSMContext):
 
 #########################                       Модерация фотографий                ##########################################
 
-@admin_router.message(lambda message: message.text == "Модерация фотографий")
+@admin_router.message(lambda message: message.text == "📷 Модерация")
 async def photo_moderation(message: Message):
     application = (await select_all_applications())
     if application:
@@ -101,7 +109,7 @@ async def photo_moderation(message: Message):
         reply_markup = values[2]
         await message.answer_photo(photo=photo,caption=caption, reply_markup=reply_markup)
     else:
-        await message.answer(text = 'Заявок нет')
+        await message.answer(text = 'Заявок нет 😶‍🌫')
 
 
 @admin_router.callback_query(lambda query: query.data == "Принять")
@@ -140,7 +148,7 @@ async def apply(call: CallbackQuery):
             except Exception as e:
                 print(f"Ошибка при отправке личного сообщения: {e}")
         if delMessage:
-            await _bot.send_message(call.from_user.id, "Заявки закончились")
+            await _bot.send_message(call.from_user.id, "Заявки закончились 😶‍🌫")
             await call.message.delete()
         if current_mode == 1:
             await create_user_in_batl(user_id,photo_id, 'user')
@@ -175,7 +183,7 @@ async def decline(call: CallbackQuery):
         except Exception as e:
                 print(f"Ошибка при отправке личного сообщения: {e}")
         if delMessage:
-            await _bot.send_message(call.from_user.id, "Заявки закончились")
+            await _bot.send_message(call.from_user.id, "Заявки закончились 😶‍🌫")
             await call.message.delete()
         await delete_application(user_id)
         if len(all_application)>1:
@@ -185,7 +193,7 @@ async def decline(call: CallbackQuery):
             reply_markup = values[2]
             await call.message.edit_media(media=InputMediaPhoto(media=photo, caption=caption), reply_markup=reply_markup)
     else:
-        await _bot.send_message(call.from_user.id, "Заявки закончились")
+        await _bot.send_message(call.from_user.id, "Заявки закончились 😶‍🌫")
 
 
 @admin_router.callback_query(lambda query: query.data == "Забанить")
@@ -198,7 +206,7 @@ async def ban(call: CallbackQuery):
         application = application[0]
         user_id = application[0]
         if delMessage:
-            await _bot.send_message(call.from_user.id, "Заявки закончились")
+            await _bot.send_message(call.from_user.id, "Заявки закончились 😶‍🌫")
             await call.message.delete()
         await edit_user(user_id,'is_ban',1)
         await delete_application(user_id)
@@ -209,13 +217,13 @@ async def ban(call: CallbackQuery):
             reply_markup = values[2]
             await call.message.edit_media(media=InputMediaPhoto(media=photo, caption=caption), reply_markup=reply_markup)
     else:
-        await _bot.send_message(call.from_user.id, "Заявки закончились")
+        await _bot.send_message(call.from_user.id, "Заявки закончились 😶‍🌫")
 
 
 ####################################                    Статистика                      #################################
 
 
-@admin_router.message(lambda message: message.text == "Статистика")
+@admin_router.message(lambda message: message.text == "📊 Статистика")
 async def statistics(message: Message):
     quantity_users = len(await get_all_users())
     quantity_aplic = len(await select_all_applications())
@@ -223,16 +231,16 @@ async def statistics(message: Message):
     
     
     await message.answer(text=
-                         f"Количество зарегистрированных пользователей: {quantity_users}\n"+
-                         f"Количество необработанных заявок: {quantity_aplic}\n"+
-                         f"Количество активных участников баттла: {quantity_battle}\n"
+                         f"📊Количество зарегистрированных пользователей: {quantity_users}\n\n"+
+                         f"⏳Количество необработанных заявок: {quantity_aplic}\n\n"+
+                         f"🎮Количество активных участников баттла: {quantity_battle}"
                          , reply_markup=get_main_admin_kb(message.from_user.id))
 
 
 ####################################                    Очистка баттла                      #################################
 
 
-@admin_router.message(lambda message: message.text == "Очистка баттла")
+@admin_router.message(lambda message: message.text == "💣 Очистка баттла")
 async def clear_battle(message: Message):
     channel_id = get_channel_id()
     try:
@@ -285,13 +293,13 @@ async def clear_battle(message: Message):
 ####################################                    Рассылка                      #################################
 
 
-@admin_router.message(lambda message: message.text == "Рассылка")
+@admin_router.message(lambda message: message.text == "✉️ Рассылка")
 async def mailing(message: Message):
-    await message.answer(text="Рассылка",reply_markup=mailing_admin_kb)
+    await message.answer(text="✉️ Рассылка",reply_markup=mailing_admin_kb)
 
 @admin_router.message(lambda message: message.text == "Всем пользователям" ,StateFilter(default_state))
 async def mailing_everybody(message: Message, state: FSMContext):
-    await message.answer(text="Введите сообщение для рассылки",reply_markup=back_admin_kb)
+    await message.answer(text="🌍 Введите сообщение для рассылки.",reply_markup=back_admin_kb)
     await state.set_state(FSMFillForm.fill_message_for_all)
 
 # Хэндлер для рассылки всем пользователям (с поддержкой пересланных сообщений)
@@ -432,10 +440,10 @@ async def enter_correct_data(message: Message):
 ##############################              Управление администраторами         ########################################
 
 
-@admin_router.message(lambda message: message.text == "Управление администраторами",StateFilter(default_state))
+@admin_router.message(lambda message: message.text == "👮‍♂ Админы",StateFilter(default_state))
 async def amdin_moderation(message: Message):
     if not is_super_admin(message.from_user.id): return
-    await message.answer(text="Управление администраторами",reply_markup=managing_admins_kb)
+    await message.answer(text="👮‍♂ Админы",reply_markup=managing_admins_kb)
 
 @admin_router.message(lambda message: message.text == "Назначить",StateFilter(default_state))
 async def enter_new_admin(message: Message, state: FSMContext):
@@ -446,7 +454,7 @@ async def enter_new_admin(message: Message, state: FSMContext):
 @admin_router.message(StateFilter(FSMFillForm.fill_id_of_new_admin), F.text.regexp(r"^\d+$"))
 async def get_new_admin(message: Message, state: FSMContext):
     if await edit_user_role(int(message.text), "admin"):
-        await message.answer(text="Данные получены",reply_markup=managing_admins_kb)
+        await message.answer(text="😎 Данные получены",reply_markup=managing_admins_kb)
         await state.clear()
     else:
         await message.answer(text="Упс, похоже этот пользователь не подписан на бота.", reply_markup=back_admin_kb)
@@ -466,7 +474,7 @@ async def enter_id_of_old_admin(message: Message, state: FSMContext):
 @admin_router.message(StateFilter(FSMFillForm.fill_id_of_old_admin), F.text.regexp(r"^\d+$"))
 async def get_id_of_old_admin(message: Message, state: FSMContext):
     if await edit_user_role(int(message.text), "user"):
-        await message.answer(text="Данные получены",reply_markup=managing_admins_kb)
+        await message.answer(text="😎 Данные получены",reply_markup=managing_admins_kb)
         await state.clear()
     else:
         await message.answer(text="Упс, похоже этот пользователь не подписан на бота.", reply_markup=back_admin_kb)
@@ -478,7 +486,7 @@ async def get_id_of_old_admin_invalid(message: Message):
 
 ##############################          Настройка баттла                ####################################
 
-@admin_router.message(lambda message: message.text == "Настройка баттла",StateFilter(default_state))
+@admin_router.message(lambda message: message.text == "⚙ Настройка баттла",StateFilter(default_state))
 async def battle_moderation(message: Message):
     await message.answer(text="Настройка баттла",reply_markup=tune_battle_admin_kb)
 
@@ -521,7 +529,7 @@ async def get_duration_of_round(message: Message, state: FSMContext):
     seconds = minutes * 60
     parametr = 'round_duration'
     await edit_battle_settings(parametr, seconds)
-    await message.answer(text="Данные получены",reply_markup=tune_battle_admin_kb)
+    await message.answer(text="😎 Данные получены",reply_markup=tune_battle_admin_kb)
     await state.clear()
 
 @admin_router.message(StateFilter(FSMFillForm.fill_duration_of_battle))
@@ -539,7 +547,7 @@ async def get_amount_of_prize(message: Message, state: FSMContext):
     value = int(message.text)
     parametr = 'prize_amount'
     await edit_battle_settings(parametr, value)
-    await message.answer(text="Данные получены",reply_markup=tune_battle_admin_kb)
+    await message.answer(text="😎 Данные получены",reply_markup=tune_battle_admin_kb)
     await state.clear()
 
 @admin_router.message(StateFilter(FSMFillForm.fill_amount_of_prize))
@@ -558,7 +566,7 @@ async def get_minimal_number_of_votes(message: Message, state: FSMContext):
     value = int(message.text)
     parametr = 'min_vote_total'
     await edit_battle_settings(parametr, value)
-    await message.answer(text="Данные получены",reply_markup=tune_battle_admin_kb)
+    await message.answer(text="😎 Данные получены",reply_markup=tune_battle_admin_kb)
     await state.clear()
 
 @admin_router.message(StateFilter(FSMFillForm.fill_minimal_number_of_votes))
@@ -577,7 +585,7 @@ async def get_interval_between_rounds(message: Message, state: FSMContext):
     seconds = minutes * 60
     parametr = 'round_interval'
     await edit_battle_settings(parametr, seconds)
-    await message.answer(text="Данные получены",reply_markup=tune_battle_admin_kb)
+    await message.answer(text="😎 Данные получены",reply_markup=tune_battle_admin_kb)
     await state.clear()
 
 @admin_router.message(StateFilter(FSMFillForm.fill_interval_between_battles))
@@ -598,7 +606,7 @@ async def get_start_time_of_battle(message: Message, state: FSMContext):
     seconds = hours * 60 * 60 + minutes * 60
     parametr = 'time_of_run'
     await edit_battle_settings(parametr, seconds)
-    await message.answer(text="Данные получены",reply_markup=tune_battle_admin_kb)
+    await message.answer(text="😎 Данные получены",reply_markup=tune_battle_admin_kb)
     await state.clear()
 
 @admin_router.message(StateFilter(FSMFillForm.fill_start_time_of_battle))
@@ -607,7 +615,7 @@ async def get_start_time_of_battle_invalid(message: Message):
 
 @admin_router.message(lambda message: message.text == "Автоматическая победа",StateFilter(default_state))
 async def enter_autowin(message: Message, state: FSMContext):
-    await message.answer(text="Включить автовыигрыш, y/n?",reply_markup=back_admin_kb)
+    await message.answer(text="🥷 Включить автовыигрыш, напиши y - если да, n - если нет!",reply_markup=back_admin_kb)
     await state.set_state(FSMFillForm.fill_autowin_state)
 
 @admin_router.message(StateFilter(FSMFillForm.fill_autowin_state),F.text.regexp(r'^[yYnN]$'))
@@ -619,7 +627,7 @@ async def get_autowin(message: Message, state: FSMContext):
     else:
         await edit_battle_settings("is_autowin", 0)
         await delete_user_in_batl(0)
-    await message.answer(text="Данные получены",reply_markup=tune_battle_admin_kb)
+    await message.answer(text="😎 Данные получены",reply_markup=tune_battle_admin_kb)
     await state.clear()
 
 @admin_router.message(StateFilter(FSMFillForm.fill_autowin_state))
@@ -632,7 +640,7 @@ async def get_autowin_invalid(message: Message):
 
 # --------------
 
-@admin_router.message(F.text == "Список участников")
+@admin_router.message(F.text == "👥 Список участников")
 async def participiants_of_current_battle(message: Message):
     users_on_battle = await select_all_battle()
     if users_on_battle:
@@ -672,23 +680,23 @@ async def handle_prof_command(message: Message):
 
             try:
                 caption = (
-                    f"ID: {user_id}\n"
-                    f"Ник: @{await get_username_by_id(user_id)}\n"
-                    f"Выйгранных фотобатлов: {buttle_win}\n"
-                    f"Общее число фотобатлов: {plays_buttle}\n"
-                    f"Выйгранных дуэлей: {dual_win}\n\n"
-                    f"Дополнительные голоса: {additional_voices}\n"
-                    f"Приглашенных рефералов: {referals}"
+                    f"🛰ID: {user_id}\n"
+                    f"👽 User: @{await get_username_by_id(user_id)}\n\n"
+                    f"🎮 Сыграно фотобатлов: {plays_buttle}\n"
+                    f"🥇 Выиграно фотобатлов: {buttle_win}\n"
+                    f"⚔ Выиграно дуэлей: {dual_win}\n\n"
+                    f"🔑 Дополнительные голоса: {additional_voices}\n"
+                    f"💸 Приглашенных рефералов: {referals}"
                 )
             except Exception as e:
                 print("Не удалось получить ник пользователя. Ошибка:", e)
                 caption = (
-                    f"ID: {user_id}\n"
-                    f"Выйгранных фотобатлов: {buttle_win}\n"
-                    f"Общее число фотобатлов: {plays_buttle}\n"
-                    f"Выйгранных дуэлей: {dual_win}\n\n"
-                    f"Дополнительные голоса: {additional_voices}\n"
-                    f"Приглашенных рефералов: {referals}"
+                    f"🛰ID: {user_id}\n\n"
+                    f"🎮 Сыграно фотобатлов: {plays_buttle}\n"
+                    f"🥇 Выиграно фотобатлов: {buttle_win}\n"
+                    f"⚔ Выиграно дуэлей: {dual_win}\n\n"
+                    f"🔑 Дополнительные голоса: {additional_voices}\n"
+                    f"💸 Приглашенных рефералов: {referals}"
                 )
 
             await message.answer_photo(photo=photo, caption=caption, reply_markup=kick_user_kb)
@@ -744,7 +752,7 @@ async def process_cancel_kick(callback: CallbackQuery):
 
 @admin_router.message(lambda message: message.text == "Добавить канал")
 async def start_adding_channel(message: Message, state: FSMContext):
-    await message.answer("Введите название канала:")
+    await message.answer("🙃 Введите НАЗВАНИЕ канала:")
     await state.set_state(FSMFillForm.add_channel_name)
     
 @admin_router.message(FSMFillForm.add_channel_name)
@@ -756,7 +764,7 @@ async def process_channel_name(message: Message, state: FSMContext):
 
     # Сохраняем название канала во временное состояние
     await state.update_data(channel_name=message.text)
-    await message.answer("Теперь введите ссылку на канал:")
+    await message.answer("🔗 Теперь введите ссылку на канал:")
     await state.set_state(FSMFillForm.add_channel_link)
 
 

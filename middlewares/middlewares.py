@@ -117,11 +117,11 @@ class ThrottlingMiddleware(BaseMiddleware):
             if time_passed < self.rate_limit:
                 if isinstance(event, Message):
                     await event.answer(
-                        f"Пожалуйста, подождите {self.rate_limit - time_passed:.1f} секунд"
+                        f"😤 Пожалуйста, подождите {self.rate_limit - time_passed:.1f} секунд"
                     )
                 elif isinstance(event, CallbackQuery):
                     await event.answer(
-                        f"Пожалуйста, подождите {self.rate_limit - time_passed:.1f} секунд",
+                        f"😤 Пожалуйста, подождите {self.rate_limit - time_passed:.1f} секунд",
                         show_alert=True
                     )
                 return

@@ -158,9 +158,9 @@ async def show_channels_for_admin(message: Message):
         channels = await get_channels_from_db()  # Функция для получения данных из БД
         if not channels:
             if (await is_admin(message)):
-                await message.answer(text="Список каналов пока пуст.",reply_markup=admin_channel_keyboard)
+                await message.answer(text="🥲 Список каналов пока пуст.",reply_markup=admin_channel_keyboard)
             else:
-                await message.answer("Список каналов пока пуст.")
+                await message.answer("🥲 Список каналов пока пуст.")
             return
         
         # Генерируем сообщение

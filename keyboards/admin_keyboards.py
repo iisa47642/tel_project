@@ -9,18 +9,18 @@ from filters.isSuperAdmin import is_super_admin
 
 main_super_admin_kb = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text="Модерация фотографий"),KeyboardButton(text="Рассылка"),KeyboardButton(text="Статистика")],
-        [KeyboardButton(text="Очистка баттла"),KeyboardButton(text="Управление администраторами")],
-        [KeyboardButton(text="Настройка баттла",),KeyboardButton(text="Список участников")]
+        [KeyboardButton(text="📷 Модерация"),KeyboardButton(text="✉️ Рассылка"),KeyboardButton(text="📊 Статистика")],
+        [KeyboardButton(text="💣 Очистка баттла"),KeyboardButton(text="👮‍♂ Админы")],
+        [KeyboardButton(text="⚙ Настройка баттла",),KeyboardButton(text="👥 Список участников")]
     ],
     resize_keyboard=True
 )
 
 main_admin_kb = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text="Модерация фотографий"),KeyboardButton(text="Рассылка"),KeyboardButton(text="Статистика")],
-        [KeyboardButton(text="Очистка баттла"),KeyboardButton(text="Список участников")],
-        [KeyboardButton(text="Настройка баттла",)]
+        [KeyboardButton(text="📷 Модерация"),KeyboardButton(text="✉️ Рассылка"),KeyboardButton(text="📊 Статистика")],
+        [KeyboardButton(text="💣 Очистка баттла"),KeyboardButton(text="👥 Список участников")],
+        [KeyboardButton(text="⚙ Настройка баттла",)]
     ],
     resize_keyboard=True
 )
@@ -110,13 +110,13 @@ admin_photo_keyboard= ReplyKeyboardMarkup(
 
 photo_moderation_admin_kb = InlineKeyboardMarkup(
     inline_keyboard=[
-        [InlineKeyboardButton(text="Принять",callback_data="Принять"), InlineKeyboardButton(text="Отклонить",callback_data="Отклонить")],
-        [InlineKeyboardButton(text="Забанить",callback_data="Забанить")],
+        [InlineKeyboardButton(text="Принять ✅",callback_data="Принять"), InlineKeyboardButton(text="Отклонить ❌",callback_data="Отклонить")],
+        [InlineKeyboardButton(text="Забанить ☠",callback_data="Забанить")],
     ],
     resize_keyboard=True
 )
 kick_user_kb = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text="Кикнуть", callback_data="kick")]
+    [InlineKeyboardButton(text="Кикнуть 💀", callback_data="kick")]
 ])
 
 

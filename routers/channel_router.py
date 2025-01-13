@@ -43,12 +43,12 @@ VOTE_SPEED_FAST = (3, 8)      # Быстрая скорость
 # Константы для задержек в разных фазах (в секундах)
 INITIAL_PHASE_DELAYS = (15.0, 25.0)  # Большие задержки в начальной фазе
 MIDDLE_PHASE_DELAYS = (8.0, 15.0)   # Средние задержки в средней фазе
-FINAL_PHASE_DELAYS = (3.0, 8.0)    # Минимальные задержки в финальной фазе
+FINAL_PHASE_DELAYS = (1.0, 3.0)    # Минимальные задержки в финальной фазе
 
 # Константы для задержек при пошаговом обновлении счета
 INITIAL_PHASE_STEP_DELAYS = (9, 13)
 MIDDLE_PHASE_STEP_DELAYS = (4, 9)
-FINAL_PHASE_STEP_DELAYS = (1.0, 2.0)
+FINAL_PHASE_STEP_DELAYS = (1.0, 3.0)
 
 
 ALLOW_LAG_CHANCE = 0.4  # Вероятность разрешить отставание
@@ -63,7 +63,7 @@ MIN_UPDATE_INTERVAL = 2.0  # Минимальный интервал между 
 FLOOD_CONTROL_RESET = 10# Время сброса флуд-контроля в секундах
 
 MAX_VOTE_DIFFERENCE = 4  # Максимальная разница в голосах
-FINAL_PHASE_MAX_DIFFERENCE = 7  # Максимальная разница в финальной фазе
+FINAL_PHASE_MAX_DIFFERENCE = 25  # Максимальная разница в финальной фазе
 
 CLICK_COOLDOWN = 0.3  # Уменьшаем задержку между кликами до 300мс
 MAX_CLICKS_PER_INTERVAL = 5  # Увеличиваем количество разрешенных кликов
