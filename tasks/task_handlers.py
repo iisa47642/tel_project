@@ -10,7 +10,7 @@ from math import log
 import pytz
 
 from routers.channel_router import make_some_magic, send_battle_pairs, end_round, announce_winner, delete_previous_messages, get_new_participants
-from database.db import clear_users_in_batl, create_user_in_batl, delete_users_add_voices, delete_users_in_buffer, get_participants, get_users_in_buffer, remove_losers, save_message_ids, delete_users_in_batl, select_all_admins, select_battle_settings, delete_users_points, swap_user_position, update_admin_battle_points, update_points,users_plays_buttle_update,users_buttle_win_update
+from database.db import clear_users_in_batl, create_user_in_batl, delete_users_add_voices, delete_users_in_buffer, get_participants, get_users_in_buffer, remove_losers, save_message_ids, delete_users_in_batl, select_all_admins, select_battle_settings, delete_users_points, swap_user_position, swap_user_position_first, update_admin_battle_points, update_points,users_plays_buttle_update,users_buttle_win_update
 
 from config.config import load_config
 from routers.channel_router import send_battle_pairs, end_round, announce_winner, delete_previous_messages
@@ -187,7 +187,6 @@ class TaskManager:
 
 
     async def start_battle(self):
-        await swap_user_position()
         await reset_vote_states()
         users = await get_all_users()
         users_id = [i[0] for i in users]
@@ -211,6 +210,7 @@ class TaskManager:
             # Проверяем отмену в начале каждой итерации
             if not self.battle_active:
                 break
+            await swap_user_position()
             now = datetime.now(TIMEZONE)
             participants = await get_participants()
             # Если баттл был принудительно завершен администратором
@@ -319,6 +319,7 @@ class TaskManager:
         await save_message_ids(final_message_ids)
         await delete_users_add_voices()
         await clear_users_in_batl()
+        await swap_user_position_first()
         BATTLE_SETTINGS = await select_battle_settings()
         self.min_votes_for_single = BATTLE_SETTINGS[2]
 
@@ -339,6 +340,12 @@ class TaskManager:
             #     self.next_battle_start = TIMEZONE.localize(
             #         datetime.combine(next_day, time(hour=10, minute=0))
             #     )
+            if now.hour >= 0 and now.hour < 10:
+                current_day = now.date()  # берем текущую дату
+                self.next_battle_start = TIMEZONE.localize(
+                    datetime.combine(current_day, time(hour=10, minute=0))
+                )
+
         await self.bot.send_message(
             self.channel_id,
             f"Следующий баттл начнется в {self.next_battle_start.strftime('%d/%m, %H:%M')}"
@@ -408,14 +415,20 @@ class TaskManager:
                 if now >= battle_time:
                     battle_time += timedelta(days=1)
                 # Проверяем ночное время
+                # if battle_time.hour >= 0 and battle_time.hour < 10:
+                #     next_day = battle_time.date()
+                #     # if battle_time.hour >= 3:
+                #         # 22 быть должно
+                #     next_day += timedelta(days=1)
+                #     battle_time = self.timezone.localize(
+                #         datetime.combine(next_day, time(hour=10, minute=0))
+                #     )
                 if battle_time.hour >= 0 and battle_time.hour < 10:
-                    next_day = battle_time.date()
-                    # if battle_time.hour >= 3:
-                        # 22 быть должно
-                    next_day += timedelta(days=1)
+                    current_day = battle_time.date()  # берем текущую дату
                     battle_time = self.timezone.localize(
-                        datetime.combine(next_day, time(hour=10, minute=0))
+                        datetime.combine(current_day, time(hour=10, minute=0))
                     )
+
 
                 self.next_battle_start = battle_time
                 logging.info(f"Next battle time set to: {battle_time}")

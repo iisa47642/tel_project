@@ -825,3 +825,15 @@ async def swap_user_position():
         # Сохраняем изменения
         await db.commit()
         print(f"User with user_id = 0 swapped position with user_id = {other_user_id}.")
+        
+        
+
+async def swap_user_position_first():
+    async with sq.connect("bot_database.db") as db:
+        cursor = await db.execute("SELECT position FROM battle WHERE user_id = 0")
+        user_position = await cursor.fetchone()
+        if not user_position:
+            print("User with user_id = 0 not found.")
+            return
+        await db.execute("UPDATE battle SET position = 1 WHERE user_id = 0")
+        await db.commit()
