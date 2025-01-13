@@ -25,7 +25,6 @@ class TaskManager:
         self.min_votes_for_single: int = None  # Минимум голосов для одиночного участника
         self.notification_task = None
         self.battle_task = None
-        self.mode_2_duration = timedelta(hours=1, minutes=30)  # Длительность режима 2
         self.battle_active = False
         self.first_round_active = False
         self.current_round_start = None
@@ -438,82 +437,9 @@ class TaskManager:
             logging.error(f"Error in get_next_battle_time: {e}", exc_info=True)
             raise
 
-# опциональная функция мб иожно и вынести из класса
-    # async def validate_battle_time(self, time: datetime) -> bool:
-    #         """Проверка допустимости времени для баттла"""
-    #         if time.hour >= 22 or time.hour < 10:
-    #             return False
-    #         return True
 
 
 
-
-
-    # async def update_battle_settings(self, settings: dict):
-    #         """Обновление настроек баттла"""
-    #         try:
-    #             self.round_duration = settings.get('round_duration', self.round_duration)
-    #             self.break_duration = settings.get('break_duration', self.break_duration)
-    #             self.min_votes_for_single = settings.get('min_votes', self.min_votes_for_single)
-    #             logging.info(f"Battle settings updated: {settings}")
-    #         except Exception as e:
-    #             logging.error(f"Error updating battle settings: {e}")
-    #             raise
-
-
-
-    # async def check_and_update_battle_schedule(self):
-    #     """Метод для проверки и обновления расписания баттлов"""
-    #     TIMEZONE = pytz.timezone('Europe/Moscow')
-    #     now = datetime.now(TIMEZONE)
-
-    #     if self.next_battle_start:
-    #         # Если следующий баттл запланирован на ночное время
-    #         if self.next_battle_start.hour >= 22 or self.next_battle_start.hour < 10:
-    #             next_day = now.date() + timedelta(days=1)
-    #             self.next_battle_start = datetime.combine(next_day, time(hour=10))
-    #             await self.bot.send_message(
-    #                 self.channel_id,
-    #                 f"Время следующего баттла перенесено на {self.next_battle_start.strftime('%H:%M')}"
-    #             )
-
-    # async def force_next_battle(self, new_time: datetime):
-    #     """Метод для принудительного назначения времени следующего баттла"""
-    #     if 22 <= new_time.hour or new_time.hour < 10:
-    #         raise ValueError("Нельзя назначить баттл на ночное время (22:00-10:00)")
-
-    #     self.next_battle_start = new_time
-    #     await self.bot.send_message(
-    #         self.channel_id,
-    #         f"Время следующего баттла установлено на {new_time.strftime('%H:%M')}"
-    #     )
-
-
-# async def stop_battle(self):
-    #     """Метод для принудительной остановки баттла"""
-    #     self.battle_active = False
-    #     self.first_round_active = False
-    #     await self.bot.send_message(
-    #         self.channel_id,
-    #         "Баттл был принудительно остановлен администратором."
-    #     )
-
-    #     TIMEZONE = pytz.timezone('Europe/Moscow')
-    #     now = datetime.now(TIMEZONE)
-
-    #     # Если текущее время между 22:00 и 10:00, следующий баттл в 10:00
-    #     if now.hour >= 22 or now.hour < 10:
-    #         next_day = now.date() + timedelta(days=1)
-    #         self.next_battle_start = datetime.combine(next_day, time(hour=10))
-    #     else:
-    #         # Иначе через 2 часа
-    #         self.next_battle_start = now + timedelta(hours=2)
-
-    #     await self.bot.send_message(
-    #         self.channel_id,
-    #         f"Следующий баттл начнется в {self.next_battle_start.strftime('%H:%M')}"
-    #     )
-    
     
     
     
