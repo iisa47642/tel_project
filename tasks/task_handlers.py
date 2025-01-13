@@ -269,8 +269,8 @@ class TaskManager:
             # Определяем продолжительность раунда
             # if now.hour < 10 and now.hour >= 0:
             if now.hour < 10 and now.hour >= 0:  # Если раунд начался после полуночи
-                tomorrow = now.date() + timedelta(days=1)
-                round_end_time = self.timezone.localize(datetime.combine(tomorrow, time(hour=10)))
+                today = now.date()
+                round_end_time = self.timezone.localize(datetime.combine(today, time(hour=10)))
                 wait_time = (round_end_time - now).total_seconds()
             else:
                 wait_time = self.round_duration * 60  # Переводим минуты в секунды
@@ -335,10 +335,10 @@ class TaskManager:
                 datetime.combine(next_day, self.DEFAULT_BATTLE_TIME)
             )
 
-            if now.hour >= 0 and now.hour < 10:
-                self.next_battle_start = TIMEZONE.localize(
-                    datetime.combine(next_day, time(hour=10, minute=0))
-                )
+            # if now.hour >= 0 and now.hour < 10:
+            #     self.next_battle_start = TIMEZONE.localize(
+            #         datetime.combine(next_day, time(hour=10, minute=0))
+            #     )
         await self.bot.send_message(
             self.channel_id,
             f"Следующий баттл начнется в {self.next_battle_start.strftime('%d/%m, %H:%M')}"

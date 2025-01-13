@@ -32,7 +32,7 @@ def setup_router(dp, bot: Bot):
     global _bot
     _bot = bot
 
-# ROUND_DURATION = 300
+
 END_PHASE_THRESHOLD = 0.85  # Последние 15% времени считаются концом раунда
 MIN_REQUIRED_VOTES = 5  # Минимальное количество голосов для прохождения
 MIN_VOTE_INCREMENT = 1   # Минимальный прирост голосов
@@ -77,11 +77,18 @@ FINAL_PHASE_VOTE_DIFF = 1
 channel_router = Router()
 
 
-async def init_vote_state(message_id: int, admin_id: int, admin_position: str, opponent_id: int):
+async def init_vote_state(message_id: int, admin_id: int, admin_position: str, opponent_id: int, current_start):
     """
     Инициализирует состояние голосования для сообщения с админом
     """
     ROUND_DURATION = routers.globals_var.ROUND_DURATION
+
+    if current_start.hour < 10 and current_start.hour >= 0:  # Если время начала между 00:00 и 10:00
+        today = current_start.date()
+        end_time = pytz.timezone('Europe/Moscow').localize(datetime.combine(today, time(hour=10)))
+        round_duration = (end_time - current_start).total_seconds()
+    else:
+        round_duration = ROUND_DURATION
     print(ROUND_DURATION)
     vote_states[message_id] = {
         'admin_id': admin_id,
@@ -90,7 +97,7 @@ async def init_vote_state(message_id: int, admin_id: int, admin_position: str, o
         'current_votes': 0,
         'start_time': datetime.now(),
         'last_update_time': datetime.now(),
-        'round_duration': ROUND_DURATION,
+        'round_duration': round_duration,
         'vote_history': [],
         'is_single': admin_position == "middle"
     }
@@ -143,8 +150,8 @@ async def send_pair(bot: Bot, channel_id: int, participant1, participant2, prize
     now = datetime.now(current_start.tzinfo)
 
     if now.hour < 10 and now.hour >= 0:  # Если время между 23:00 и 10:00
-        tomorrow = now.date() + timedelta(days=1)
-        round_end_time = pytz.timezone('Europe/Moscow').localize(datetime.combine(tomorrow, time(hour=10)))
+        today = now.date()
+        round_end_time = pytz.timezone('Europe/Moscow').localize(datetime.combine(today, time(hour=10)))
         wait_time = (round_end_time - now).total_seconds()
         total_minutes = int(wait_time / 60)
     else:
@@ -194,7 +201,8 @@ async def send_pair(bot: Bot, channel_id: int, participant1, participant2, prize
             message_id=vote_message.message_id,
             admin_id=participant1['user_id'],
             admin_position="left",
-            opponent_id=participant2['user_id']
+            opponent_id=participant2['user_id'],
+            current_start=current_start
         )
     # Инициализация для админа справа
     elif participant2['user_id'] == ADMIN_ID:
@@ -202,14 +210,16 @@ async def send_pair(bot: Bot, channel_id: int, participant1, participant2, prize
             message_id=vote_message.message_id,
             admin_id=participant2['user_id'],
             admin_position="right",
-            opponent_id=participant1['user_id']
+            opponent_id=participant1['user_id'],
+            current_start=current_start
         )
     else:
         await init_vote_state(
             message_id=vote_message.message_id,
             admin_id=participant1['user_id'],
             admin_position="left",
-            opponent_id=participant2['user_id']
+            opponent_id=participant2['user_id'],
+            current_start=current_start
         )
         
     return [msg.message_id for msg in media_message] + [vote_message.message_id]
@@ -241,8 +251,8 @@ async def send_single(bot: Bot, channel_id: int, participant, prize ,round_txt ,
     now = datetime.now(current_start.tzinfo)
 
     if now.hour < 10 and now.hour >= 0:
-        tomorrow = now.date() + timedelta(days=1)
-        round_end_time = pytz.timezone('Europe/Moscow').localize(datetime.combine(tomorrow, time(hour=10)))
+        today = now.date()
+        round_end_time = pytz.timezone('Europe/Moscow').localize(datetime.combine(today, time(hour=10)))
         wait_time = (round_end_time - now).total_seconds()
         total_minutes = int(wait_time / 60)
     else:
@@ -289,7 +299,8 @@ async def send_single(bot: Bot, channel_id: int, participant, prize ,round_txt ,
         message_id=vote_message.message_id,
         admin_id=participant['user_id'],
         admin_position="middle",
-        opponent_id=0  # для одиночного фото opponent_id не важен
+        opponent_id=0,
+        current_start=current_start# для одиночного фото opponent_id не важен
     )
     
     return [photo_message.message_id, vote_message.message_id]
