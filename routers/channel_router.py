@@ -1,5 +1,6 @@
 import asyncio
 from collections import defaultdict
+import json
 import logging
 import os
 from random import randint
@@ -31,15 +32,15 @@ _bot: Bot = None  # Placeholder for the bot instance
 def setup_router(dp, bot: Bot):
     global _bot
     _bot = bot
+LAG_UPDATE_INTERVAL = 60
+INITIAL_UPDATE_DELAY = 1  # Начальная задержка при ошибке
+MAX_UPDATE_DELAY = 5      # Максимальная задержка при повторных ошибках
+DELAY_INCREASE_FACTOR = 1.5  # Множитель увеличения задержки
 
-
-END_PHASE_THRESHOLD = 0.8  # Последние 15% времени считаются концом раунда
+END_PHASE_THRESHOLD = 0.2  # Последние 15% времени считаются концом раунда
 MIN_REQUIRED_VOTES = 5  # Минимальное количество голосов для прохождения
 MIN_VOTE_INCREMENT = 1   # Минимальный прирост голосов
 MAX_VOTE_INCREMENT = 2   # Максимальный прирост голосов
-VOTE_SPEED_SLOW = (15, 25)    # Медленная скорость (интервал в секундах)
-VOTE_SPEED_NORMAL = (8, 15)   # Нормальная скорость
-VOTE_SPEED_FAST = (3, 8)      # Быстрая скорость
 # Константы для задержек в разных фазах (в секундах)
 INITIAL_PHASE_DELAYS = (15.0, 25.0)  # Большие задержки в начальной фазе
 MIDDLE_PHASE_DELAYS = (8.0, 15.0)   # Средние задержки в средней фазе
@@ -52,26 +53,25 @@ FINAL_PHASE_STEP_DELAYS = (1.0, 3.0)
 
 
 ALLOW_LAG_CHANCE = 0.4  # Вероятность разрешить отставание
-MIN_LAG_DURATION = 30  # Минимальная продолжительность отставания в секундах
-MAX_LAG_DURATION = 50  # Максимальная продолжительность отставания в секундах
+MIN_LAG_DURATION = 10  # Минимальная продолжительность отставания в секундах
+MAX_LAG_DURATION = 20  # Максимальная продолжительность отставания в секундах
 MAX_LAG_DIFFERENCE = 8  # Максимальная разница в голосах при отставании
-GUARANTEED_WIN_PHASE = 0.8  # Начало фазы гарантированной победы (85% времени раунда)
+MIN_LAG_DIFFERENCE = 1
+GUARANTEED_WIN_PHASE = 0.2  # Начало фазы гарантированной победы (85% времени раунда)
 MIN_WINNING_MARGIN = 3  # Минимальный отрыв для победы
-FINAL_SPRINT_SPEED = (0.2, 0.8)  # Очень быстрые обновления в финальной фазе
 
 MIN_UPDATE_INTERVAL = 2.0  # Минимальный интервал между обновлениями в секундах
 FLOOD_CONTROL_RESET = 10# Время сброса флуд-контроля в секундах
 
-MAX_VOTE_DIFFERENCE = 4  # Максимальная разница в голосах
-FINAL_PHASE_MAX_DIFFERENCE = 25  # Максимальная разница в финальной фазе
-
-CLICK_COOLDOWN = 0.3  # Уменьшаем задержку между кликами до 300мс
+CLICK_COOLDOWN = 1.0  # Уменьшаем задержку между кликами до 300мс
 MAX_CLICKS_PER_INTERVAL = 5  # Увеличиваем количество разрешенных кликов
-RESET_INTERVAL = 2.0  # Интервал сброса счетчика кликов
+RESET_INTERVAL = 5.0  # Интервал сброса счетчика кликов
 
 INITIAL_PHASE_VOTE_DIFF = 7  # В начальной фазе допускаем разницу в 3 голоса
 MIDDLE_PHASE_VOTE_DIFF = 5   # В средней фазе - в 2 голоса
-FINAL_PHASE_VOTE_DIFF = 1 
+FINAL_PHASE_VOTE_DIFF = 1
+MAX_FINAL_PHASE_DIFF = 10
+MAX_LAG_DIFFERENCE = 8  # Максимальная разница при временном отставании
 
 
 channel_router = Router()
@@ -83,7 +83,7 @@ async def init_vote_state(message_id: int, admin_id: int, admin_position: str, o
     """
     ROUND_DURATION = routers.globals_var.ROUND_DURATION
 
-    if current_start.hour < 10 and current_start.hour >= 0:  # Если время начала между 00:00 и 10:00
+    if current_start.hour < 10 and current_start.hour >= 3:  # Если время начала между 00:00 и 10:00
         today = current_start.date()
         end_time = pytz.timezone('Europe/Moscow').localize(datetime.combine(today, time(hour=10)))
         round_duration = (end_time - current_start).total_seconds()
@@ -149,7 +149,7 @@ async def send_pair(bot: Bot, channel_id: int, participant1, participant2, prize
     # round_end = current_start + timedelta(minutes=round_duration)
     now = datetime.now(current_start.tzinfo)
 
-    if now.hour < 10 and now.hour >= 0:  # Если время между 23:00 и 10:00
+    if now.hour < 10 and now.hour >= 3:  # Если время между 23:00 и 10:00
         today = now.date()
         round_end_time = pytz.timezone('Europe/Moscow').localize(datetime.combine(today, time(hour=10)))
         wait_time = (round_end_time - now).total_seconds()
@@ -221,7 +221,7 @@ async def send_pair(bot: Bot, channel_id: int, participant1, participant2, prize
             opponent_id=participant2['user_id'],
             current_start=current_start
         )
-        
+    await asyncio.sleep(5)
     return [msg.message_id for msg in media_message] + [vote_message.message_id]
 
 async def send_single(bot: Bot, channel_id: int, participant, prize ,round_txt , round_duration, min_votes, current_start):
@@ -250,7 +250,7 @@ async def send_single(bot: Bot, channel_id: int, participant, prize ,round_txt ,
         
     now = datetime.now(current_start.tzinfo)
 
-    if now.hour < 10 and now.hour >= 0:
+    if now.hour < 10 and now.hour >= 3:
         today = now.date()
         round_end_time = pytz.timezone('Europe/Moscow').localize(datetime.combine(today, time(hour=10)))
         wait_time = (round_end_time - now).total_seconds()
@@ -302,7 +302,7 @@ async def send_single(bot: Bot, channel_id: int, participant, prize ,round_txt ,
         opponent_id=0,
         current_start=current_start# для одиночного фото opponent_id не важен
     )
-    
+    await asyncio.sleep(5)
     return [photo_message.message_id, vote_message.message_id]
 
 async def end_round(bot: Bot, channel_id: int, min_votes_for_single: int):
@@ -545,27 +545,7 @@ async def get_new_participants(current_participants):
             logging.info(f"Найдены новые участники: {[p['user_id'] for p in new_participants]}")
 
         return new_participants
-# async def get_new_participants(current_participants):
-#     """
-#     Проверяет базу данных на наличие новых участников, которых ещё нет в текущем списке.
-#     """
-#     all_participants = await get_participants()  # Получаем всех участников из базы
-#     current_ids = {p['user_id'] for p in current_participants}  # ID текущих участников
 
-#     # Фильтруем новых участников
-#     new_participants = [p for p in all_participants if p['user_id'] not in current_ids]
-
-#     # Проверяем, чтобы новые участники не "ломали" одиночные статусы
-#     for participant in current_participants:
-#         if participant.get('is_single'):  # Если участник одиночный
-#             new_participants = [
-#                 p for p in new_participants if p['user_id'] != participant['user_id']
-#             ]
-
-#     if new_participants:
-#         logging.info(f"Найдены новые участники: {[p['user_id'] for p in new_participants]}")
-
-#     return new_participants
 
 async def check_is_admin(callback: CallbackQuery, bot, channel_id, user_id) -> bool:
     dirname = os.path.dirname(__file__)
@@ -661,12 +641,13 @@ async def safe_get_vote_state(message_id: int):
     async with vote_states_locks[message_id]:
         return vote_states.get(message_id)
     
+    
 async def safe_update_vote_state(message_id: int, state: dict):
-    """
-    Безопасное обновление состояния голосования
-    """
+    """Безопасное обновление состояния голосования"""
     async with vote_states_locks[message_id]:
         vote_states[message_id] = state
+
+
 
 
 async def update_vote_display(bot: Bot, channel_id: int, message_id: int, state: dict, opponent_votes: int):
@@ -758,12 +739,38 @@ async def gradual_vote_update(bot: Bot, channel_id: int, message_id: int,
             elif "message is not modified" not in str(e):
                 logging.error(f"Error in gradual update: {e}")
 
+async def check_and_update_lag(current_time, progress, allow_lag_until, allowed_gap, round_duration, elapsed_time):
+    """Периодически обновляет параметры отставания"""
+    if progress >= GUARANTEED_WIN_PHASE or elapsed_time >= round_duration:
+        return allow_lag_until, allowed_gap
+
+    # Проверяем, нужно ли обновить отставание
+    #if (allow_lag_until is None or current_time >= allow_lag_until) and allowed_gap is None:  # ИЗНАЧАЛЬНОЕ УСЛОВИЕ (ПРОБЛЕМНОЕ)
+    if allow_lag_until is None or current_time >= allow_lag_until:  # ИСПРАВЛЕННОЕ УСЛОВИЕ
+        if random.random() < ALLOW_LAG_CHANCE:
+            # Временное отставание
+            lag_duration = random.uniform(MIN_LAG_DURATION, MAX_LAG_DURATION)
+            max_allowed_lag_time = round_duration * GUARANTEED_WIN_PHASE - elapsed_time
+            lag_duration = min(lag_duration, max_allowed_lag_time)
+            if lag_duration > 0:
+                allow_lag_until = current_time + timedelta(seconds=lag_duration)
+                print(f'Новое временное отставание на {lag_duration} сек')
+                allowed_gap = None  # Сбрасываем голосовое отставание
+        else:
+            # Голосовое отставание
+            allowed_gap = random.randint(MIN_LAG_DIFFERENCE, MAX_LAG_DIFFERENCE)
+            print(f'Новое голосовое отставание: {allowed_gap}')
+            allow_lag_until = None  # Сбрасываем временное отставание
+
+    return allow_lag_until, allowed_gap
 
 async def admin_vote_monitor(bot: Bot, channel_id: int, message_id: int):
     pair_key = f"{channel_id}:{message_id}"
     allow_lag_until = None
-    update_interval = VOTE_SPEED_NORMAL[0]
     last_update_time = datetime.now()
+    allowed_gap = None
+    current_delay = INITIAL_UPDATE_DELAY
+    print('run_admin_monitor')
     
     while True:
         try:
@@ -787,8 +794,7 @@ async def admin_vote_monitor(bot: Bot, channel_id: int, message_id: int):
                 opponent_votes = await get_current_votes(current_state['opponent_id'])
                 admin_votes = current_state['current_votes']
                 vote_difference = abs(admin_votes - opponent_votes)
-
-                # Определяем допустимую разницу в голосах в зависимости от фазы
+                
                 if progress < 0.3:  # Начальная фаза
                     allowed_difference = INITIAL_PHASE_VOTE_DIFF
                     current_step_delays = INITIAL_PHASE_STEP_DELAYS
@@ -799,87 +805,74 @@ async def admin_vote_monitor(bot: Bot, channel_id: int, message_id: int):
                     allowed_difference = FINAL_PHASE_VOTE_DIFF
                     current_step_delays = FINAL_PHASE_STEP_DELAYS
 
-                # Проверяем необходимость обновления
+                # Обновление параметров отставания
+                if not hasattr(admin_vote_monitor, 'last_lag_update') or \
+                   (current_time - getattr(admin_vote_monitor, 'last_lag_update')).total_seconds() >= LAG_UPDATE_INTERVAL:
+                    allow_lag_until, allowed_gap = await check_and_update_lag(
+                        current_time, progress, allow_lag_until, allowed_gap,
+                        current_state['round_duration'], elapsed_time
+                    )
+                    admin_vote_monitor.last_lag_update = current_time
+
+                # Определяем необходимость и размер обновления
                 needs_update = False
                 if progress >= GUARANTEED_WIN_PHASE:
-                    # В финальной фазе гарантируем победу
-                    if opponent_votes >= admin_votes or (admin_votes - opponent_votes) < MIN_WINNING_MARGIN:
+                    random_gap = random.randint(MIN_WINNING_MARGIN, MAX_FINAL_PHASE_DIFF)
+                    if opponent_votes >= admin_votes or (admin_votes - opponent_votes) < random_gap:
                         needs_update = True
                 else:
-                    # В других фазах обновляем, если разница больше допустимой
-                    # или если соперник впереди и нет активного отставания
-                    if (vote_difference > allowed_difference or 
-                        (opponent_votes > admin_votes and not (allow_lag_until and current_time < allow_lag_until))):
-                        needs_update = True
-
+                    if allow_lag_until and current_time < allow_lag_until:
+                        needs_update = opponent_votes > admin_votes + MAX_LAG_DIFFERENCE
+                    elif allowed_gap is not None:
+                        needs_update = opponent_votes > admin_votes + allowed_gap
+                    else:
+                        needs_update = (opponent_votes > admin_votes) or (vote_difference > allowed_difference)
+                
+                print(f"Состояние: admin={admin_votes}, opponent={opponent_votes}, разница={vote_difference}, needs_update={needs_update}")
                 if needs_update:
-                    # Увеличиваем на 1 голос
+                    # Используем calculate_vote_increment для определения размера обновления
                     new_admin_votes = admin_votes + 1
-                    current_state['current_votes'] = new_admin_votes
-                    await safe_update_vote_state(message_id, current_state)
+                    
+                    success = False
+                    attempts = 0
+                    while not success and attempts < 3:
+                        try:
+                            current_state['current_votes'] = new_admin_votes
+                            await safe_update_vote_state(message_id, current_state)
+                            
+                            await update_vote_display(bot, channel_id, message_id, current_state, opponent_votes)
+                            
+                            success = True
+                            current_delay = INITIAL_UPDATE_DELAY
+                            last_update_time = datetime.now()
+                            print(f"Успешное обновление голосов: {new_admin_votes} ")
+                            
+                        except TelegramBadRequest as e:
+                            attempts += 1
+                            if "Flood control exceeded" in str(e):
+                                current_delay = min(current_delay * DELAY_INCREASE_FACTOR, MAX_UPDATE_DELAY)
+                                print(f"Flood control hit, waiting {current_delay} seconds...")
+                                await asyncio.sleep(current_delay)
+                            elif "message is not modified" not in str(e):
+                                logging.error(f"Error updating keyboard: {e}")
+                                break
+                        except Exception as e:
+                            print(f"Unexpected error while updating: {str(e)}")
+                            current_delay = min(current_delay * DELAY_INCREASE_FACTOR, MAX_UPDATE_DELAY)
+                            await asyncio.sleep(current_delay)
+                            attempts += 1
 
-                    try:
-                        # Создаем новую клавиатуру
-                        if current_state['admin_position'] == 'left':
-                            new_keyboard = InlineKeyboardMarkup(inline_keyboard=[
-                                [InlineKeyboardButton(
-                                    text=f"Левый: {new_admin_votes}",
-                                    callback_data=f"vote:{current_state['admin_id']}:left"
-                                ),
-                                InlineKeyboardButton(
-                                    text=f"Правый: {opponent_votes}",
-                                    callback_data=f"vote:{current_state['opponent_id']}:right"
-                                )]
-                            ])
-                        else:
-                            new_keyboard = InlineKeyboardMarkup(inline_keyboard=[
-                                [InlineKeyboardButton(
-                                    text=f"Левый: {opponent_votes}",
-                                    callback_data=f"vote:{current_state['opponent_id']}:left"
-                                ),
-                                InlineKeyboardButton(
-                                    text=f"Правый: {new_admin_votes}",
-                                    callback_data=f"vote:{current_state['admin_id']}:right"
-                                )]
-                            ])
-
-                        await bot.edit_message_reply_markup(
-                            chat_id=channel_id,
-                            message_id=message_id,
-                            reply_markup=new_keyboard
-                        )
-                        last_update_time = datetime.now()
-
-                        # Используем задержки из констант
+                    if success:
                         await asyncio.sleep(random.uniform(*current_step_delays))
 
-                    except TelegramBadRequest as e:
-                        if "Flood control exceeded" in str(e):
-                            logging.warning("Flood control hit, waiting...")
-                            await asyncio.sleep(FLOOD_CONTROL_RESET)
-                            continue
-                        elif "message is not modified" not in str(e):
-                            logging.error(f"Error updating keyboard: {e}")
-                    except Exception as e:
-                        logging.error(f"Error updating votes: {e}")
-                        await asyncio.sleep(2)
-                        continue
-
-                # Обработка отставания
-                if not progress >= GUARANTEED_WIN_PHASE:
-                    if allow_lag_until is None and random.random() < ALLOW_LAG_CHANCE:
-                        lag_duration = random.uniform(MIN_LAG_DURATION, MAX_LAG_DURATION)
-                        max_allowed_lag_time = current_state['round_duration'] * GUARANTEED_WIN_PHASE - elapsed_time
-                        lag_duration = min(lag_duration, max_allowed_lag_time)
-                        if lag_duration > 0:
-                            allow_lag_until = current_time + timedelta(seconds=lag_duration)
-
-                # Используем правильные задержки между итерациями
+                # Задержка между итерациями
                 await asyncio.sleep(random.uniform(*update_delays))
 
         except Exception as e:
             logging.error(f"Error in admin monitor: {e}")
             await asyncio.sleep(2)
+
+
 
 
 
@@ -928,10 +921,10 @@ async def process_vote(callback: CallbackQuery):
             if not await can_process_click(user_id, message_id):
                 return
             if not await check_subscription(user_id):
-                await callback.answer('Для голосования необходимо подписаться на канал!')
+                await callback.answer('Для голосования необходимо подписаться на канал!',show_alert=True)
                 return
             if message_id in user_clicks and user_id in user_clicks[message_id]:
-                await callback.answer('Вы уже голосовали!')
+                await callback.answer('Вы уже голосовали!', show_alert=True)
                 return
 
         _, vote_user_id, position = callback.data.split(":")
@@ -1009,7 +1002,7 @@ async def process_vote(callback: CallbackQuery):
             else:
                 user_clicks[message_id].add(user_id)
         try:
-            await callback.answer('Ваш голос учтен!')
+            await callback.answer('Ваш голос учтен!', show_alert=True)
         except Exception as cb_error:
             logging.error(f"Error sending callback answer: {cb_error}")
         asyncio.create_task(update_points(vote_user_id))
@@ -1024,17 +1017,29 @@ async def process_vote(callback: CallbackQuery):
                             else left_votes)
 
             if opponent_votes > admin_votes:
-                monitor_task = asyncio.create_task(
-                    admin_vote_monitor(callback.bot, channel_id, message_id)
-                )
+                # monitor_task = asyncio.create_task(
+                #     admin_vote_monitor(callback.bot, channel_id, message_id)
+                # )
                 
+                # Проверяем, не запущен ли уже монитор для этого сообщения
                 if not hasattr(callback.bot, 'monitor_tasks'):
                     callback.bot.monitor_tasks = set()
-                callback.bot.monitor_tasks.add(monitor_task)
-                monitor_task.add_done_callback(
-                    lambda t: callback.bot.monitor_tasks.remove(t) 
-                    if t in callback.bot.monitor_tasks else None
-                )
+                
+                # Проверяем, нет ли уже активного таска для этого сообщения
+                existing_task = next((task for task in callback.bot.monitor_tasks 
+                                    if task.get_name() == f"admin_monitor_{channel_id}_{message_id}"), None)
+                
+                if existing_task is None or existing_task.done():
+                    monitor_task = asyncio.create_task(
+                        admin_vote_monitor(callback.bot, channel_id, message_id),
+                        name=f"admin_monitor_{channel_id}_{message_id}"
+                    )
+                    
+                    callback.bot.monitor_tasks.add(monitor_task)
+                    monitor_task.add_done_callback(
+                        lambda t: callback.bot.monitor_tasks.remove(t) 
+                        if t in callback.bot.monitor_tasks else None
+                    )
 
     except Exception as e:
         logging.error(f"Error processing vote: {e}")

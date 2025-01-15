@@ -187,6 +187,7 @@ class TaskManager:
 
     async def start_battle(self):
         await reset_vote_states()
+        await self.initialize()
         users = await get_all_users()
         users_id = [i[0] for i in users]
         for id_u in users_id:
@@ -267,7 +268,7 @@ class TaskManager:
                 break
             # Определяем продолжительность раунда
             # if now.hour < 10 and now.hour >= 0:
-            if now.hour < 10 and now.hour >= 0:  # Если раунд начался после полуночи
+            if now.hour < 10 and now.hour >= 3:  # Если раунд начался после полуночи
                 today = now.date()
                 round_end_time = self.timezone.localize(datetime.combine(today, time(hour=10)))
                 wait_time = (round_end_time - now).total_seconds()
@@ -422,11 +423,11 @@ class TaskManager:
                 #     battle_time = self.timezone.localize(
                 #         datetime.combine(next_day, time(hour=10, minute=0))
                 #     )
-                if battle_time.hour >= 0 and battle_time.hour < 10:
-                    current_day = battle_time.date()  # берем текущую дату
-                    battle_time = self.timezone.localize(
-                        datetime.combine(current_day, time(hour=10, minute=0))
-                    )
+                # if battle_time.hour >= 0 and battle_time.hour < 10:
+                #     current_day = battle_time.date()  # берем текущую дату
+                #     battle_time = self.timezone.localize(
+                #         datetime.combine(current_day, time(hour=10, minute=0))
+                #     )
 
 
                 self.next_battle_start = battle_time
