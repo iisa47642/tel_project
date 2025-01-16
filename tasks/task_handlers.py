@@ -89,11 +89,11 @@ class TaskManager:
                 TIMEZONE = pytz.timezone('Europe/Moscow')
                 now = datetime.now(TIMEZONE)
 
-                if self.next_battle_start:
-                    battle_time = self.next_battle_start
-                else:
-                    # Используем существующий метод вместо повторного получения настроек
-                    battle_time = await self.get_next_battle_time()
+                # if self.next_battle_start:
+                #     battle_time = self.next_battle_start
+                # else:
+                #     # Используем существующий метод вместо повторного получения настроек
+                battle_time = await self.get_next_battle_time()
 
                 # Убедимся, что battle_time имеет информацию о временной зоне
                 if battle_time.tzinfo is None:

@@ -32,33 +32,35 @@ _bot: Bot = None  # Placeholder for the bot instance
 def setup_router(dp, bot: Bot):
     global _bot
     _bot = bot
-LAG_UPDATE_INTERVAL = 60
+    
+    
+LAG_UPDATE_INTERVAL = 180
 INITIAL_UPDATE_DELAY = 1  # Начальная задержка при ошибке
 MAX_UPDATE_DELAY = 5      # Максимальная задержка при повторных ошибках
 DELAY_INCREASE_FACTOR = 1.5  # Множитель увеличения задержки
 
-END_PHASE_THRESHOLD = 0.2  # Последние 15% времени считаются концом раунда
+END_PHASE_THRESHOLD = 0.85  # Последние 15% времени считаются концом раунда
 MIN_REQUIRED_VOTES = 5  # Минимальное количество голосов для прохождения
 MIN_VOTE_INCREMENT = 1   # Минимальный прирост голосов
 MAX_VOTE_INCREMENT = 2   # Максимальный прирост голосов
 # Константы для задержек в разных фазах (в секундах)
-INITIAL_PHASE_DELAYS = (15.0, 25.0)  # Большие задержки в начальной фазе
-MIDDLE_PHASE_DELAYS = (8.0, 15.0)   # Средние задержки в средней фазе
-FINAL_PHASE_DELAYS = (1.0, 3.0)    # Минимальные задержки в финальной фазе
+INITIAL_PHASE_DELAYS = (60.0, 80.0)  # Большие задержки в начальной фазе
+MIDDLE_PHASE_DELAYS = (40.0, 50.0)   # Средние задержки в средней фазе
+FINAL_PHASE_DELAYS = (5.0, 15.0)    # Минимальные задержки в финальной фазе
 
 # Константы для задержек при пошаговом обновлении счета
-INITIAL_PHASE_STEP_DELAYS = (9, 13)
-MIDDLE_PHASE_STEP_DELAYS = (4, 9)
-FINAL_PHASE_STEP_DELAYS = (1.0, 3.0)
+INITIAL_PHASE_STEP_DELAYS = (30, 40)
+MIDDLE_PHASE_STEP_DELAYS = (20, 25)
+FINAL_PHASE_STEP_DELAYS = (5.0, 15.0)
 
 
 ALLOW_LAG_CHANCE = 0.4  # Вероятность разрешить отставание
-MIN_LAG_DURATION = 10  # Минимальная продолжительность отставания в секундах
-MAX_LAG_DURATION = 20  # Максимальная продолжительность отставания в секундах
+MIN_LAG_DURATION = 50  # Минимальная продолжительность отставания в секундах
+MAX_LAG_DURATION = 200  # Максимальная продолжительность отставания в секундах
 MAX_LAG_DIFFERENCE = 8  # Максимальная разница в голосах при отставании
 MIN_LAG_DIFFERENCE = 1
-GUARANTEED_WIN_PHASE = 0.2  # Начало фазы гарантированной победы (85% времени раунда)
-MIN_WINNING_MARGIN = 3  # Минимальный отрыв для победы
+GUARANTEED_WIN_PHASE = 0.85  # Начало фазы гарантированной победы (85% времени раунда)
+MIN_WINNING_MARGIN = 5  # Минимальный отрыв для победы
 
 MIN_UPDATE_INTERVAL = 2.0  # Минимальный интервал между обновлениями в секундах
 FLOOD_CONTROL_RESET = 10# Время сброса флуд-контроля в секундах
@@ -70,7 +72,7 @@ RESET_INTERVAL = 5.0  # Интервал сброса счетчика клик�
 INITIAL_PHASE_VOTE_DIFF = 7  # В начальной фазе допускаем разницу в 3 голоса
 MIDDLE_PHASE_VOTE_DIFF = 5   # В средней фазе - в 2 голоса
 FINAL_PHASE_VOTE_DIFF = 1
-MAX_FINAL_PHASE_DIFF = 10
+MAX_FINAL_PHASE_DIFF = 15
 MAX_LAG_DIFFERENCE = 8  # Максимальная разница при временном отставании
 
 
@@ -121,6 +123,7 @@ async def send_pair(bot: Bot, channel_id: int, participant1, participant2, prize
     """
     Отправляет пару участников в канал.
     """
+    await asyncio.sleep(8)
     media = [
         InputMediaPhoto(media=participant1['photo_id'], caption=f""),
         InputMediaPhoto(media=participant2['photo_id'], caption=f"")
@@ -221,7 +224,6 @@ async def send_pair(bot: Bot, channel_id: int, participant1, participant2, prize
             opponent_id=participant2['user_id'],
             current_start=current_start
         )
-    await asyncio.sleep(5)
     return [msg.message_id for msg in media_message] + [vote_message.message_id]
 
 async def send_single(bot: Bot, channel_id: int, participant, prize ,round_txt , round_duration, min_votes, current_start):
@@ -229,6 +231,7 @@ async def send_single(bot: Bot, channel_id: int, participant, prize ,round_txt ,
     Отправляет одиночного участника в канал.
     """
     # f"Участник №{participant['user_id']}"
+    await asyncio.sleep(8)
     photo_message = await bot.send_photo(channel_id, participant['photo_id'], caption="")
 
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
@@ -302,7 +305,6 @@ async def send_single(bot: Bot, channel_id: int, participant, prize ,round_txt ,
         opponent_id=0,
         current_start=current_start# для одиночного фото opponent_id не важен
     )
-    await asyncio.sleep(5)
     return [photo_message.message_id, vote_message.message_id]
 
 async def end_round(bot: Bot, channel_id: int, min_votes_for_single: int):
@@ -503,6 +505,7 @@ async def delete_previous_messages(bot: Bot, channel_id: int):
             await bot.delete_message(channel_id, msg_id)
         except Exception as e:
             print(f"Не удалось удалить сообщение {msg_id}: {e}")
+        await asyncio.sleep(8)
     await clear_message_ids()
 
 
@@ -1002,7 +1005,7 @@ async def process_vote(callback: CallbackQuery):
             else:
                 user_clicks[message_id].add(user_id)
         try:
-            await callback.answer('Ваш голос учтен!', show_alert=True)
+            await callback.answer('Ваш голос учтен! ✅\n\n(При отписке от канала - голос пропадает)', show_alert=True)
         except Exception as cb_error:
             logging.error(f"Error sending callback answer: {cb_error}")
         asyncio.create_task(update_points(vote_user_id))

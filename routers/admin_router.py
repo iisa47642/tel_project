@@ -228,13 +228,24 @@ async def statistics(message: Message):
     quantity_users = len(await get_all_users())
     quantity_aplic = len(await select_all_applications())
     quantity_battle = len(await select_all_battle())
+    quantity_buffer = len(await get_users_in_buffer())
     
     
-    await message.answer(text=
-                         f"📊Количество зарегистрированных пользователей: {quantity_users}\n\n"+
-                         f"⏳Количество необработанных заявок: {quantity_aplic}\n\n"+
-                         f"🎮Количество активных участников баттла: {quantity_battle}"
-                         , reply_markup=get_main_admin_kb(message.from_user.id))
+    task_manager = TaskManagerInstance.get_instance()
+    current_mode = await task_manager.get_current_mode()
+    if current_mode == 2:
+        await message.answer(text=
+                            f"📊Количество зарегистрированных пользователей: {quantity_users}\n\n"+
+                            f"⏳Количество необработанных заявок: {quantity_aplic}\n\n"+
+                            f"⏳Количество ожидающих: {quantity_buffer}\n\n"+
+                            f"🎮Количество активных участников баттла: {quantity_battle}"
+                            , reply_markup=get_main_admin_kb(message.from_user.id))
+    else:
+        await message.answer(text=
+                            f"📊Количество зарегистрированных пользователей: {quantity_users}\n\n"+
+                            f"⏳Количество необработанных заявок: {quantity_aplic}\n\n"+
+                            f"⏳Количество ожидающих: {quantity_battle}"
+                            , reply_markup=get_main_admin_kb(message.from_user.id))
 
 
 ####################################                    Очистка баттла                      #################################
@@ -386,10 +397,73 @@ async def enter_mailing_on_moderation(message: Message, state: FSMContext, bot: 
     await state.clear()
 
 
-@admin_router.message(lambda message: message.text == "Активным участникам текущего баттла",StateFilter(default_state))
+
+
+
+@admin_router.message(lambda message: message.text == "Участникам, ожидающих баттл",StateFilter(default_state))
 async def mailing_active_participants(message: Message, state: FSMContext):
     await message.answer(text="Введите сообщение для рассылки",reply_markup=back_admin_kb)
-    await state.set_state(FSMFillForm.fill_message_for_user_on_battle)
+    await state.set_state(FSMFillForm.fill_message_for_user_on_except)
+    
+# Хэндлер для рассылки участникам текущего баттла (с поддержкой пересланных сообщений)
+@admin_router.message(F.text | F.forward_from_chat, StateFilter(FSMFillForm.fill_message_for_user_on_except))
+async def enter_mailing_on_battle(message: Message, state: FSMContext, bot: Bot):
+    """
+    Обработчик для рассылки участникам текущего баттла.
+    Поддерживает текстовые сообщения и пересланные сообщения из каналов.
+    """
+    # Проверяем, пересланное это сообщение или обычный текст
+    task_manager = TaskManagerInstance.get_instance()
+    current_mode = await task_manager.get_current_mode()
+    if message.forward_from_chat and message.forward_from_message_id:
+        from_chat_id = message.forward_from_chat.id  # ID канала
+        message_id = message.forward_from_message_id  # Оригинальный ID сообщения в канале
+    elif message.text:
+        content = message.text  # Обычный текст сообщения
+    else:
+        await message.answer("Ошибка: неподдерживаемый тип сообщения.")
+        return
+
+    # Получаем список пользователей
+    if current_mode == 1:
+        users = await select_all_battle()  # Функция должна возвращать список [(user_id,), ...]
+        users_id = [user[0] for user in users]
+    else:
+        users = await get_users_in_buffer()
+        users_id = [user['user_id'] for user in users] 
+        
+
+    # Рассылка сообщения
+    for user_id in users_id:
+        try:
+            if message.forward_from_chat:
+                # Пересылаем сообщение из канала
+                await bot.forward_message(chat_id=user_id, from_chat_id=from_chat_id, message_id=message_id)
+            else:
+                # Отправляем обычное текстовое сообщение
+                await bot.send_message(chat_id=user_id, text=content, parse_mode="HTML")
+        except Exception as e:
+            print(f"Ошибка отправки пользователю {user_id}: {e}")
+
+    # Ответ админу
+    await message.answer("Сообщение отправлено всем участникам, ожидающих баттл", reply_markup=mailing_admin_kb)
+    await state.clear()
+
+
+
+
+
+
+
+@admin_router.message(lambda message: message.text == "Активным участникам текущего баттла",StateFilter(default_state))
+async def mailing_active_participants(message: Message, state: FSMContext):
+    task_manager = TaskManagerInstance.get_instance()
+    current_mode = await task_manager.get_current_mode()
+    if current_mode != 2:
+        await message.answer("В данный момент баттл не идёт",reply_markup=back_admin_kb)
+    else:
+        await message.answer(text="Введите сообщение для рассылки",reply_markup=back_admin_kb)
+        await state.set_state(FSMFillForm.fill_message_for_user_on_battle)
     
 # Хэндлер для рассылки участникам текущего баттла (с поддержкой пересланных сообщений)
 @admin_router.message(F.text | F.forward_from_chat, StateFilter(FSMFillForm.fill_message_for_user_on_battle))
@@ -399,6 +473,11 @@ async def enter_mailing_on_battle(message: Message, state: FSMContext, bot: Bot)
     Поддерживает текстовые сообщения и пересланные сообщения из каналов.
     """
     # Проверяем, пересланное это сообщение или обычный текст
+    task_manager = TaskManagerInstance.get_instance()
+    current_mode = await task_manager.get_current_mode()
+    if current_mode != 2:
+        await message.answer("В данный момент баттл не идёт")
+        return
     if message.forward_from_chat and message.forward_from_message_id:
         from_chat_id = message.forward_from_chat.id  # ID канала
         message_id = message.forward_from_message_id  # Оригинальный ID сообщения в канале

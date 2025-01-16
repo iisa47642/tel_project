@@ -48,6 +48,7 @@ mailing_admin_kb = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text="Всем пользователям")],
         [KeyboardButton(text="Участникам, чьи фото находятся на модерации")],
+        [KeyboardButton(text="Участникам, ожидающих баттл")],
         [KeyboardButton(text="Активным участникам текущего баттла")],
         [KeyboardButton(text="Назад")]
     ],
