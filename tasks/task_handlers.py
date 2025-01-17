@@ -304,7 +304,7 @@ class TaskManager:
                 break
             # Определяем продолжительность раунда
             # if now.hour < 10 and now.hour >= 0:
-            if now.hour < 10 and now.hour >= 0:  # Если раунд начался после полуночи
+            if now.hour < 10 and now.hour >= 1:  # Если раунд начался после полуночи
                 today = now.date()
                 round_end_time = self.timezone.localize(datetime.combine(today, time(hour=10)))
                 wait_time = (round_end_time - now).total_seconds()
@@ -381,7 +381,7 @@ class TaskManager:
             #     self.next_battle_start = TIMEZONE.localize(
             #         datetime.combine(next_day, time(hour=10, minute=0))
             #     )
-            if now.hour >= 0 and now.hour < 10:
+            if now.hour >= 1 and now.hour < 10:
                 current_day = now.date()  # берем текущую дату
                 self.next_battle_start = TIMEZONE.localize(
                     datetime.combine(current_day, time(hour=10, minute=0))

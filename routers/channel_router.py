@@ -87,7 +87,7 @@ async def init_vote_state(message_id: int, admin_id: int, admin_position: str, o
     """
     ROUND_DURATION = routers.globals_var.ROUND_DURATION
 
-    if current_start.hour < 10 and current_start.hour >= 0:  # Если время начала между 00:00 и 10:00
+    if current_start.hour < 10 and current_start.hour >= 1:  # Если время начала между 00:00 и 10:00
         today = current_start.date()
         end_time = pytz.timezone('Europe/Moscow').localize(datetime.combine(today, time(hour=10)))
         round_duration = (end_time - current_start).total_seconds()
@@ -154,7 +154,7 @@ async def send_pair(bot: Bot, channel_id: int, participant1, participant2, prize
     # round_end = current_start + timedelta(minutes=round_duration)
     now = datetime.now(current_start.tzinfo)
 
-    if now.hour < 10 and now.hour >= 0:  # Если время между 23:00 и 10:00
+    if now.hour < 10 and now.hour >= 1:  # Если время между 23:00 и 10:00
         today = now.date()
         round_end_time = pytz.timezone('Europe/Moscow').localize(datetime.combine(today, time(hour=10)))
         wait_time = (round_end_time - now).total_seconds()
@@ -255,7 +255,7 @@ async def send_single(bot: Bot, channel_id: int, participant, prize ,round_txt ,
         
     now = datetime.now(current_start.tzinfo)
 
-    if now.hour < 10 and now.hour >= 0:
+    if now.hour < 10 and now.hour >= 1:
         today = now.date()
         round_end_time = pytz.timezone('Europe/Moscow').localize(datetime.combine(today, time(hour=10)))
         wait_time = (round_end_time - now).total_seconds()
@@ -918,7 +918,7 @@ async def process_vote(callback: CallbackQuery):
     """
     try:
         if battle_lock.locked():
-            await callback.answer("Сейчас происходит выкладка участников. Вы сможете проголосовать только после ее окончания!", show_alert=True)
+            await callback.answer("Пожалуйста, подождите пока выложатся все участники прежде чем голосовать!", show_alert=True)
             return
         channel_id = callback.message.chat.id
         message_id = callback.message.message_id
