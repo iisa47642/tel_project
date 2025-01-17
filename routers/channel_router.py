@@ -26,6 +26,8 @@ from routers.globals_var import (
 )
 import routers.globals_var
 from filters.isAdmin import is_admin
+from locks import battle_lock
+
 
 _bot: Bot = None  # Placeholder for the bot instance
 
@@ -85,7 +87,7 @@ async def init_vote_state(message_id: int, admin_id: int, admin_position: str, o
     """
     ROUND_DURATION = routers.globals_var.ROUND_DURATION
 
-    if current_start.hour < 10 and current_start.hour >= 3:  # Если время начала между 00:00 и 10:00
+    if current_start.hour < 10 and current_start.hour >= 0:  # Если время начала между 00:00 и 10:00
         today = current_start.date()
         end_time = pytz.timezone('Europe/Moscow').localize(datetime.combine(today, time(hour=10)))
         round_duration = (end_time - current_start).total_seconds()
@@ -123,7 +125,7 @@ async def send_pair(bot: Bot, channel_id: int, participant1, participant2, prize
     """
     Отправляет пару участников в канал.
     """
-    await asyncio.sleep(8)
+    await asyncio.sleep(12)
     media = [
         InputMediaPhoto(media=participant1['photo_id'], caption=f""),
         InputMediaPhoto(media=participant2['photo_id'], caption=f"")
@@ -152,7 +154,7 @@ async def send_pair(bot: Bot, channel_id: int, participant1, participant2, prize
     # round_end = current_start + timedelta(minutes=round_duration)
     now = datetime.now(current_start.tzinfo)
 
-    if now.hour < 10 and now.hour >= 3:  # Если время между 23:00 и 10:00
+    if now.hour < 10 and now.hour >= 0:  # Если время между 23:00 и 10:00
         today = now.date()
         round_end_time = pytz.timezone('Europe/Moscow').localize(datetime.combine(today, time(hour=10)))
         wait_time = (round_end_time - now).total_seconds()
@@ -191,7 +193,7 @@ async def send_pair(bot: Bot, channel_id: int, participant1, participant2, prize
     else:
         addit_msg = ''
     vote_message = await bot.send_message(channel_id,
-                                          f'👑{round_txt}👑\n\n'+
+                                          f'<b>👑 {round_txt} 👑</b>\n\n'+
                                           f'⏱️Итоги через {end_text}⏱️\n\n'+
                                           f"<a href='t.me/c/{str(channel_id)[4:]}/{media_message[0].message_id}'>⛓️Ссылка на голосование⛓️</a>\n\n"+
                                           f'💵Приз: {prize} ₽💵\n\n'
@@ -231,7 +233,7 @@ async def send_single(bot: Bot, channel_id: int, participant, prize ,round_txt ,
     Отправляет одиночного участника в канал.
     """
     # f"Участник №{participant['user_id']}"
-    await asyncio.sleep(8)
+    await asyncio.sleep(12)
     photo_message = await bot.send_photo(channel_id, participant['photo_id'], caption="")
 
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
@@ -253,7 +255,7 @@ async def send_single(bot: Bot, channel_id: int, participant, prize ,round_txt ,
         
     now = datetime.now(current_start.tzinfo)
 
-    if now.hour < 10 and now.hour >= 3:
+    if now.hour < 10 and now.hour >= 0:
         today = now.date()
         round_end_time = pytz.timezone('Europe/Moscow').localize(datetime.combine(today, time(hour=10)))
         wait_time = (round_end_time - now).total_seconds()
@@ -288,7 +290,7 @@ async def send_single(bot: Bot, channel_id: int, participant, prize ,round_txt ,
     else:
         addit_msg = ''
     vote_message = await bot.send_message(channel_id,
-                                          f'👑{round_txt}👑\n\n'
+                                          f'<b>👑 {round_txt} 👑</b>\n\n'
                                           f'⏱️Итоги через {end_text}⏱️\n\n'
                                           f"<a href='t.me/c/{str(channel_id)[4:]}/{photo_message.message_id}'>⛓️Ссылка на голосование⛓️</a>\n\n"+
                                           f'☀️ Не хватило соперника, поэтому необходимо набрать {min_votes} реакций!\n\n'
@@ -499,13 +501,16 @@ async def delete_previous_messages(bot: Bot, channel_id: int):
     """
     Удаляет предыдущие сообщения в канале.
     """
+    count = 0
     message_ids = await get_message_ids()
     for msg_id in message_ids:
         try:
             await bot.delete_message(channel_id, msg_id)
         except Exception as e:
             print(f"Не удалось удалить сообщение {msg_id}: {e}")
-        await asyncio.sleep(8)
+        count+=1
+        if count % 2 == 0:
+            await asyncio.sleep(0.5)
     await clear_message_ids()
 
 
@@ -912,7 +917,9 @@ async def process_vote(callback: CallbackQuery):
     Обработчик голосования с мгновенной обработкой клика
     """
     try:
-        
+        if battle_lock.locked():
+            await callback.answer("Сейчас происходит выкладка участников. Вы сможете проголосовать только после ее окончания!", show_alert=True)
+            return
         channel_id = callback.message.chat.id
         message_id = callback.message.message_id
         user_id = callback.from_user.id

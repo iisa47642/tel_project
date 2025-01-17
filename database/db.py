@@ -837,3 +837,21 @@ async def swap_user_position_first():
             return
         await db.execute("UPDATE battle SET position = 1 WHERE user_id = 0")
         await db.commit()
+        
+        
+async def update_admin_photo_in_battle(photo_id):
+    async with sq.connect('bot_database.db') as db:
+        # Проверяем существование записи
+        cursor = await db.execute('SELECT 1 FROM battle WHERE user_id = 0')
+        exists = await cursor.fetchone()
+        
+        if exists:
+            # Если запись существует, обновляем photo_id
+            await db.execute('''
+                UPDATE battle 
+                SET photo_id = ? 
+                WHERE user_id = 0
+            ''', (photo_id,))
+            await db.commit()
+            return True
+        return False
