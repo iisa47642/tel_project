@@ -1,8 +1,9 @@
 import logging
 import os
 import re
+import string
 from typing import List
-
+from datetime import datetime
 from aiogram import Router, Bot, F
 from aiogram.filters import Command, StateFilter, CommandObject
 from aiogram.fsm.context import FSMContext
@@ -14,7 +15,7 @@ from filters.isAdmin import is_admin
 from keyboards.admin_keyboards import *
 from database.db import *
 from routers.channel_router import delete_previous_messages, make_some_magic, get_channel_id
-from states.admin_states import FSMFillForm
+from states.admin_states import FSMFillForm, FSMNotification
 from tasks import scheduler_manager
 from utils.task_manager import TaskManagerInstance
 from keyboards.user_keyboards import main_user_kb
@@ -616,14 +617,14 @@ async def get_duration_of_round_invalid(message: Message):
     await message.answer(text="Вы ввели неверные данные. Пожалуйста, попробуйте снова.",reply_markup=back_admin_kb)
 
 
-@admin_router.message(lambda message: message.text == "Сумма приза",StateFilter(default_state))
+@admin_router.message(lambda message: message.text == "Приз",StateFilter(default_state))
 async def enter_amount_of_prize(message: Message, state: FSMContext):
-    await message.answer(text="Введите сумму приза",reply_markup=back_admin_kb)
+    await message.answer(text="Выберите приз",reply_markup=back_admin_kb)
     await state.set_state(FSMFillForm.fill_amount_of_prize)
 
-@admin_router.message(StateFilter(FSMFillForm.fill_amount_of_prize),F.text.regexp(r"^\d+$"))
+@admin_router.message(StateFilter(FSMFillForm.fill_amount_of_prize))
 async def get_amount_of_prize(message: Message, state: FSMContext):
-    value = int(message.text)
+    value = str(message.text)
     parametr = 'prize_amount'
     await edit_battle_settings(parametr, value)
     await message.answer(text="😎 Данные получены",reply_markup=tune_battle_admin_kb)
@@ -912,10 +913,10 @@ async def change_info_command(message: Message, state: FSMContext):
 
 @admin_router.message(FSMFillForm.waiting_for_text)
 async def process_battle_info(message: Message, state: FSMContext):
-    if message.text == "Назад в общие настройки":
-        await state.clear()
-        await message.answer("Возврат к настройкам баттла", reply_markup=tune_battle_admin_kb)
-        return
+    # if message.text == "Назад в общие настройки":
+    #     await state.clear()
+    #     await message.answer("Возврат к настройкам баттла", reply_markup=tune_battle_admin_kb)
+    #     return
     
     if not message.text:
         await message.answer("Пожалуйста, отправьте текстовое сообщение")
@@ -925,6 +926,12 @@ async def process_battle_info(message: Message, state: FSMContext):
     
     await message.answer("Информация успешно обновлена!", reply_markup=tune_battle_admin_kb)
     await state.clear()
+    
+@admin_router.message(F.text == "Назад в общие настройки")
+async def process_battle_info_cancel(message: Message, state: FSMContext):
+    await state.clear()
+    await message.answer("Возврат к настройкам баттла", reply_markup=tune_battle_admin_kb)
+    return
 
 @admin_router.message(F.text == "Удалить сообщение")
 async def delete_info_command(message: Message):
@@ -1052,3 +1059,138 @@ async def add_participants_from_buffer_to_battle(message: Message):
         await delete_users_in_buffer()
     else:
         await message.answer("Не было найдено участников для добавления в баттл")
+        
+        
+        
+@admin_router.message(lambda message: message.text == "📧 Уведомления")
+async def mailing(message: Message):
+    await message.answer(text="📧 Уведомления",reply_markup=get_admin_keyboard_notif())
+
+
+async def generate_unique_code():
+    """Генерация уникального 4-значного кода"""
+    while True:
+        code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
+        if not await check_notification_code_exists(code):
+            return code
+
+@admin_router.message(F.text == "Добавить уведомление")
+async def add_notification_start(message: Message, state: FSMContext):
+    try:
+        await message.answer(
+            "Введите текст уведомления, которое будет отправляться пользователям:"
+        )
+        await state.set_state(FSMNotification.waiting_for_message)
+    except Exception as e:
+        logging.error(f"Error in add_notification_start: {e}")
+        await message.answer("Произошла ошибка. Попробуйте позже.")
+
+@admin_router.message(StateFilter(FSMNotification.waiting_for_message))
+async def process_notification_message(message: Message, state: FSMContext):
+    try:
+        await state.update_data(message=message.text)
+        await message.answer(
+            "Введите время для ежедневного уведомления в формате ЧЧ:ММ (например, 14:30):"
+        )
+        await state.set_state(FSMNotification.waiting_for_time)
+    except Exception as e:
+        logging.error(f"Error in process_notification_message: {e}")
+        await message.answer("Произошла ошибка. Попробуйте позже.")
+        await state.clear()
+
+@admin_router.message(StateFilter(FSMNotification.waiting_for_time))
+async def process_notification_time(message: Message, state: FSMContext):
+    try:
+        # Проверяем корректность формата времени
+        time_str = message.text
+        time_obj = datetime.strptime(time_str, "%H:%M").time()
+        
+        data = await state.get_data()
+        notification_message = data['message']
+        code = await generate_unique_code()
+        
+        # Дополнительный вывод в лог
+        logging.info(f"Adding notification: {code} - {notification_message} - {time_str}")
+        
+        # Сохраняем уведомление в БД
+        await add_notification(code, notification_message, time_str)
+        
+        # Дополнительный вывод в лог
+        logging.info(f"Scheduling notification: {code} - {notification_message} - {time_obj}")
+        
+        await scheduler_manager.add_notification_job(code, notification_message, time_obj)
+        await message.answer(
+            f"✅ Уведомление успешно добавлено!\n\n"
+            f"📝 Код: {code}\n"
+            f"⏰ Время: {message.text}\n"
+            f"📜 Текст: {notification_message}\n\n"
+            f"Уведомление будет отправляться ежедневно в указанное время.",
+            reply_markup=get_admin_keyboard_notif()
+        )
+        await state.clear()
+        
+    except ValueError:
+        await message.answer(
+            "❌ Неверный формат времени. Пожалуйста, используйте формат ЧЧ:ММ"
+        )
+    except Exception as e:
+        logging.error(f"Error in process_notification_time: {e}")
+        await message.answer("Произошла ошибка. Попробуйте позже.")
+        await state.clear()
+
+@admin_router.message(F.text == "Список уведомлений")
+async def view_notifications(message: Message):
+    try:
+        notifications = await get_all_notifications()
+        if not notifications:
+            await message.answer(
+                "📝 Список уведомлений пуст",
+                reply_markup=get_admin_keyboard_notif()
+            )
+            return
+
+        text = "📋 Список активных уведомлений:\n\n"
+        for notif in notifications:
+            text += f"🔹 Код: {notif[1]}\n"
+            text += f"⏰ Время: {notif[3]}\n"
+            text += f"📜 Текст: {notif[2]}\n"
+            text += "─────────────────\n"
+
+        await message.answer(
+            text,
+            reply_markup=get_notifications_keyboard()
+        )
+    except Exception as e:
+        logging.error(f"Error in view_notifications: {e}")
+        await message.answer("Произошла ошибка. Попробуйте позже.")
+
+@admin_router.message(F.text == "Удалить уведомление")
+async def delete_notification_start(message: Message, state: FSMContext):
+    try:
+        await message.answer(
+            "Введите код уведомления, которое хотите удалить:"
+        )
+        await state.set_state(FSMNotification.waiting_for_code)
+    except Exception as e:
+        logging.error(f"Error in delete_notification_start: {e}")
+        await message.answer("Произошла ошибка. Попробуйте позже.")
+
+
+@admin_router.message(StateFilter(FSMNotification.waiting_for_code))
+async def delete_notifications(message: Message, state: FSMContext):
+    try:
+        code = message.text
+        notification = await get_notification_by_code(code)
+        if notification:
+            await delete_notification(code)
+            await scheduler_manager.remove_notification_job(code)
+            await message.answer(f"Уведомление с кодом {code} успешно удалено.")
+        else:
+            await message.answer(f"Уведомление с кодом {code} не найдено.")
+        await state.clear()
+    except Exception as e:
+        logging.error(f"Error deleting notification: {e}")
+        await message.answer("Произошла ошибка. Попробуйте позже.")
+        await state.clear()
+
+

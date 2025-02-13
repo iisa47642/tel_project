@@ -153,12 +153,12 @@ class TaskManager:
                         f"(в {battle_time.strftime('%H:%M')})!"
                     )
 
-                    await self.bot.send_message(
+                    notif_mes = await self.bot.send_message(
                         self.channel_id,
                         channel_message,
                         parse_mode='HTML'
                     )
-                    
+                    await save_message_ids([notif_mes.message_id])
                     users = await get_all_users()
                     users_id = [i[0] for i in users]
                     for id_u in users_id:
@@ -225,11 +225,14 @@ class TaskManager:
         await self.initialize()
         users = await get_all_users()
         users_id = [i[0] for i in users]
+        config = await self.get_config()
+        channel_link = config.tg_bot.channel_link
         for id_u in users_id:
             try:
                 await self.bot.send_message(
                     id_u,
-                    f"⚠️ Внимание! Баттл начался!"
+                    f"⚠️ Внимание! Баттл начался! <a href='{channel_link}'>Канал</a>",
+                    parse_mode='HTML'
                 )
             except Exception as e:
                 logging.error(f'Не удалось отправить сообщение пользователю {id_u}: {str(e)}')
@@ -381,17 +384,24 @@ class TaskManager:
             #     self.next_battle_start = TIMEZONE.localize(
             #         datetime.combine(next_day, time(hour=10, minute=0))
             #     )
-            if now.hour >= 1 and now.hour < 10:
+            if now.time() <= self.DEFAULT_BATTLE_TIME:
                 current_day = now.date()  # берем текущую дату
                 self.next_battle_start = TIMEZONE.localize(
-                    datetime.combine(current_day, time(hour=10, minute=0))
+                    datetime.combine(current_day, self.DEFAULT_BATTLE_TIME)
                 )
         config = await self.get_config()
         bot_link = config.tg_bot.bot_link
-        await self.bot.send_message(
+        if self.next_battle_start.date() == now.date():
+            message_text = f"👑 Следующий баттл (сегодня в {self.next_battle_start.strftime('%H:%M')})! Фото сюда: <a href='{bot_link}'>cсылка</a>"
+        else:
+            message_text = f"👑 Следующий баттл (завтра в {self.next_battle_start.strftime('%H:%M')})! Фото сюда: <a href='{bot_link}'>cсылка</a>"
+
+        end_ms = await self.bot.send_message(
             self.channel_id,
-            f"👑 Следующий баттл (завтра в {self.next_battle_start.strftime('%H:%M')})! Фото сюда: <a href='{bot_link}'>cсылка</a>"
-            ,parse_mode='HTML')
+            message_text,
+            parse_mode='HTML'
+        )
+        await save_message_ids([end_ms.message_id])
         try:
             users_buffer = await get_users_in_buffer()
             for user in users_buffer:

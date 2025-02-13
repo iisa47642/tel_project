@@ -4,7 +4,7 @@ from aiogram import Bot
 import pytz
 from typing import Optional
 from datetime import datetime, time, timedelta
-from database.db import clear_users_in_batl
+from database.db import clear_users_in_batl, get_all_notifications, get_all_users
 from routers.channel_router import delete_previous_messages
 from tasks.task_handlers import TaskManager
 import logging
@@ -30,6 +30,17 @@ class SchedulerManager:
                 name='Schedule_checker',
                 misfire_grace_time=300
             )
+            
+            # Добавляем задачу для проверки и обновления расписания
+            self.scheduler.add_job(
+                self.check_and_schedule_notifications,
+                'interval',
+                minutes=1,
+                seconds=0,
+                name='Notification_checker',
+                misfire_grace_time=300
+            )
+
 
             
             # Запускаем планировщик
@@ -155,9 +166,77 @@ class SchedulerManager:
         except Exception as e:
             logging.error(f"Error in check_and_schedule_battle: {e}", exc_info=True)
 
+    async def add_notification_job(self, code: str, message: str, time: time):
+        """Добавление задачи уведомления"""
+        try:
+            users = await get_all_users()
+            user_ids = [user[0] for user in users]
+            
+            # Дополнительный вывод в лог
+            logging.info(f"Adding notification job: {code} at {time}")
+            
+            self.scheduler.add_job(
+                self.send_notification,
+                'cron',
+                hour=time.hour,
+                minute=time.minute,
+                id=f'notification_{code}',
+                args=[code, user_ids, message],
+                replace_existing=True
+            )
+        except Exception as e:
+            logging.error(f"Error adding notification job: {code} at {time}", exc_info=True)
 
 
 
+    async def send_notification(self, notification_id, user_ids, message):
+        try:
+            if not isinstance(message, str):
+                logging.error(f"Invalid message type for notification {notification_id}: {type(message)}")
+                return
+
+            for user_id in user_ids:
+                try:
+                    await self.task_manager.bot.send_message(chat_id=user_id, text=message)
+                except Exception as e:
+                    logging.error(f"Error sending notification {notification_id}: {e}")
+                logging.info(f"Notification sent: {notification_id} - {message}")
+        except Exception as e:
+            logging.error(f"Error sending notification {notification_id}: {e}")
+
+
+    
+    async def check_and_schedule_notifications(self):
+        try:
+            notifications = await get_all_notifications()
+            for notification in notifications:
+                notification_id, code, message, time_str = notification
+                time_obj = datetime.strptime(time_str, "%H:%M").time()
+                time_obj = self.timezone.localize(datetime.combine(datetime.now().date(), time_obj))  # Преобразуем время в локальное время Москвы
+                current_time = datetime.now(self.timezone)  # Получаем текущее время в таймзоне Москвы
+
+                if time_obj.time() == current_time.time():
+                    users = await get_all_users()  # Функция должна возвращать список [(user_id,), ...]
+                    user_ids = [user[0] for user in users]
+                    self.scheduler.add_job(
+                        self.send_notification,
+                        'date',
+                        run_date=current_time,
+                        args=(notification_id, message, user_ids),
+                        id=f'notification_{code}',
+                        replace_existing=True,
+                    )
+                    logging.info(f"Scheduled notification: {code} - {message}")
+        except Exception as e:
+            logging.error(f"Error in check_and_schedule_notifications: {e}", exc_info=True)
+
+
+    async def remove_notification_job(self, code: str):
+        try:
+            self.scheduler.remove_job(f'notification_{code}')
+            logging.info(f"Removed notification job: {code}")
+        except Exception as e:
+            logging.error(f"Error removing notification job: {code}", exc_info=True)
 
 
 

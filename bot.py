@@ -114,6 +114,10 @@ async def update_bot_commands(bot: Bot):
 
 
 async def main():
+    updates = await bot.get_updates(offset=-1)
+    if updates:
+        last_update_id = updates[-1].update_id
+        await bot.get_updates(offset=last_update_id + 1)
     await create_tables()
     await channel_router.make_some_magic()
     
@@ -135,15 +139,18 @@ async def main():
 
     logging.basicConfig(
         level=logging.INFO,
-        format='%(asctime)s - %(levelname)s - %(message)s'
-    )
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        handlers=[
+        logging.FileHandler("bot.log", encoding="utf-8"),  # Логи будут записываться в файл bot.log
+        logging.StreamHandler()  # Логи также будут выводиться в консоль
+    ])
     #await create_tables()
     # Запускаем бота
     scheduler_manager.task_manager = task_manager
     await scheduler_manager.setup(bot)  # Настраиваем планировщик
     await setup_bot_commands(bot)
     try:
-        await dp.start_polling(bot)  # 1
+        await dp.start_polling(bot, offset=-1, allowed_updates=[])  # 1
     finally:
         try:
             # Очищаем общие команды

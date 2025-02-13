@@ -11,7 +11,8 @@ main_super_admin_kb = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text="📷 Модерация"),KeyboardButton(text="✉️ Рассылка"),KeyboardButton(text="📊 Статистика")],
         [KeyboardButton(text="💣 Очистка баттла"),KeyboardButton(text="👮‍♂ Админы")],
-        [KeyboardButton(text="⚙ Настройка баттла",),KeyboardButton(text="👥 Список участников")]
+        [KeyboardButton(text="⚙ Настройка баттла"),KeyboardButton(text="👥 Список участников")],
+        [KeyboardButton(text="📧 Уведомления")]
     ],
     resize_keyboard=True
 )
@@ -20,7 +21,7 @@ main_admin_kb = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text="📷 Модерация"),KeyboardButton(text="✉️ Рассылка"),KeyboardButton(text="📊 Статистика")],
         [KeyboardButton(text="💣 Очистка баттла"),KeyboardButton(text="👥 Список участников")],
-        [KeyboardButton(text="⚙ Настройка баттла",)]
+        [KeyboardButton(text="⚙ Настройка баттла"),KeyboardButton(text="📧 Уведомления")]
     ],
     resize_keyboard=True
 )
@@ -66,7 +67,7 @@ managing_admins_kb = ReplyKeyboardMarkup(
 
 tune_battle_admin_kb = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text="Продолжительность раунда"),KeyboardButton(text="Сумма приза")],
+        [KeyboardButton(text="Продолжительность раунда"),KeyboardButton(text="Приз")],
         [KeyboardButton(text="Минимальное количество голосов"), KeyboardButton(text="Интервал между раундами")],
         [KeyboardButton(text="Текущие настройки"),KeyboardButton(text="Время начала баттла")],
         [KeyboardButton(text="Автоматическая победа"),KeyboardButton(text="Добавить информацию к посту")],
@@ -130,3 +131,19 @@ confirm_kick_kb = InlineKeyboardMarkup(inline_keyboard=[
 
 def get_main_admin_kb(user_id):
     return main_super_admin_kb if is_super_admin(user_id) else main_admin_kb
+
+
+def get_admin_keyboard_notif():
+    buttons = [
+        [KeyboardButton(text="Добавить уведомление"), KeyboardButton(text="Список уведомлений")],
+        [KeyboardButton(text="Удалить уведомление"), KeyboardButton(text="Назад")]
+    ]
+    keyboard = ReplyKeyboardMarkup(keyboard=buttons, resize_keyboard=True)
+    return keyboard
+
+def get_notifications_keyboard():
+    buttons = [
+        [KeyboardButton(text="Удалить уведомление"), KeyboardButton(text="Назад")]
+    ]
+    keyboard = ReplyKeyboardMarkup(keyboard=buttons, resize_keyboard=True)
+    return keyboard

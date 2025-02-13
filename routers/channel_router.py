@@ -36,10 +36,10 @@ def setup_router(dp, bot: Bot):
     _bot = bot
     
     
-LAG_UPDATE_INTERVAL = 180
-INITIAL_UPDATE_DELAY = 1  # Начальная задержка при ошибке
-MAX_UPDATE_DELAY = 5      # Максимальная задержка при повторных ошибках
-DELAY_INCREASE_FACTOR = 1.5  # Множитель увеличения задержки
+LAG_UPDATE_INTERVAL = 180 # Периодичность проверки отставания(с вероятностью в ALLOW_LAG_CHANCE)
+INITIAL_UPDATE_DELAY = 5  # Начальная задержка при ошибке
+MAX_UPDATE_DELAY = 30      # Максимальная задержка при повторных ошибках
+DELAY_INCREASE_FACTOR = 2  # Множитель увеличения задержки
 
 END_PHASE_THRESHOLD = 0.85  # Последние 15% времени считаются концом раунда
 MIN_REQUIRED_VOTES = 5  # Минимальное количество голосов для прохождения
@@ -196,10 +196,34 @@ async def send_pair(bot: Bot, channel_id: int, participant1, participant2, prize
                                           f'<b>👑 {round_txt} 👑</b>\n\n'+
                                           f'⏱️Итоги через {end_text}⏱️\n\n'+
                                           f"<a href='t.me/c/{str(channel_id)[4:]}/{media_message[0].message_id}'>⛓️Ссылка на голосование⛓️</a>\n\n"+
-                                          f'💵Приз: {prize} ₽💵\n\n'
+                                          f'💵Приз: {prize} 💵\n\n'
                                           f'{addit_msg}',
                                           reply_markup=keyboard,
                                           parse_mode="HTML")
+        # Формируем ссылку на пост с голосованием
+    vote_link = f"https://t.me/c/{str(channel_id)[4:]}/{vote_message.message_id}"
+    
+    # Отправляем ссылки участникам
+    notification_text = (
+        f"🎯 <b>Началось новое голосование с вашим участием!</b>\n\n"
+        f"🔗 <a href='{vote_link}'>Ссылка на пост с голосованием</a>\n\n"
+        f"⏱️ Продолжительность: {end_text}"
+    )
+    
+    try:
+        await bot.send_message(participant1['user_id'], 
+                             notification_text, 
+                             parse_mode="HTML")
+    except Exception as e:
+        logging.error(f"Failed to send notification to participant1 {participant1['user_id']}: {e}")
+    
+    try:
+        await bot.send_message(participant2['user_id'], 
+                             notification_text, 
+                             parse_mode="HTML")
+    except Exception as e:
+        logging.error(f"Failed to send notification to participant2 {participant2['user_id']}: {e}")
+    
     ADMIN_ID=0
     if participant1['user_id'] == ADMIN_ID:
         await init_vote_state(
@@ -293,13 +317,28 @@ async def send_single(bot: Bot, channel_id: int, participant, prize ,round_txt ,
                                           f'<b>👑 {round_txt} 👑</b>\n\n'
                                           f'⏱️Итоги через {end_text}⏱️\n\n'
                                           f"<a href='t.me/c/{str(channel_id)[4:]}/{photo_message.message_id}'>⛓️Ссылка на голосование⛓️</a>\n\n"+
-                                          f'☀️ Не хватило соперника, поэтому необходимо набрать {min_votes} реакций!\n\n'
-                                          f'💵Приз: {prize} ₽💵\n\n'
+                                          f'☀️ Не хватило соперника, поэтому необходимо набрать {min_votes} голосов!\n\n'
+                                          f'💵Приз: {prize} 💵\n\n'
                                           f'{addit_msg}',
                                           reply_markup=keyboard,
                                           parse_mode="HTML")
     
-
+    vote_link = f"https://t.me/c/{str(channel_id)[4:]}/{vote_message.message_id}"
+    
+    # Отправляем ссылки участникам
+    notification_text = (
+        f"🎯 <b>Началось новое голосование с вашим участием!</b>\n\n"
+        f"🔗 <a href='{vote_link}'>Ссылка на пост с голосованием</a>\n\n"
+        f"⏱️ Продолжительность: {end_text}"
+    )
+    
+    try:
+        await bot.send_message(participant['user_id'], 
+                             notification_text, 
+                             parse_mode="HTML")
+    except Exception as e:
+        logging.error(f"Failed to send notification to participant1 {participant['user_id']}: {e}")
+        
     await init_vote_state(
         message_id=vote_message.message_id,
         admin_id=participant['user_id'],
@@ -358,6 +397,7 @@ async def end_round(bot: Bot, channel_id: int, min_votes_for_single: int):
                 # )
                 for partic in pair:
                     try:
+                        await users_dual_win_update(partic['user_id'])
                         await bot.send_message(
                         partic['user_id'],
                         f"🎉 Поздравляем, вы успешно прошли в следующий раунд! Продолжайте в том же духе и выиграете!"
@@ -406,6 +446,7 @@ async def end_round(bot: Bot, channel_id: int, min_votes_for_single: int):
                 #     f"Участник №{participant['user_id']} проходит дальше с {participant['votes']} голосами\n"
                 # )
                 try:
+                    await users_dual_win_update(participant['user_id'])
                     await bot.send_message(
                         participant['user_id'],
                         f"🎉 Поздравляем, вы успешно прошли в следующий раунд! Продолжайте в том же духе и выиграете!"
@@ -693,7 +734,7 @@ async def update_vote_display(bot: Bot, channel_id: int, message_id: int, state:
                         callback_data=f"vote:{state['admin_id']}:right"
                     )]
                 ])
-
+        
         await bot.edit_message_reply_markup(
             chat_id=channel_id,
             message_id=message_id,
@@ -703,8 +744,10 @@ async def update_vote_display(bot: Bot, channel_id: int, message_id: int, state:
     except TelegramBadRequest as e:
         if "message is not modified" not in str(e):
             logging.error(f"Telegram error: {e}")
+        raise
     except Exception as e:
         logging.error(f"Error updating vote display: {e}")
+        raise
 
         
 def get_phase_delays(progress: float) -> tuple:

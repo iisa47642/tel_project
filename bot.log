@@ -1,0 +1,8 @@
+2025-02-13 13:01:05,192 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-02-13 13:01:05,192 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-02-13 13:01:05,193 - INFO - Added job "Schedule_checker" to job store "default"
+2025-02-13 13:01:05,193 - INFO - Added job "Notification_checker" to job store "default"
+2025-02-13 13:01:05,193 - INFO - Scheduler started
+2025-02-13 13:01:05,193 - INFO - Scheduler started successfully
+2025-02-13 13:01:05,523 - INFO - Start polling
+2025-02-13 13:01:05,577 - INFO - Run polling for bot @WW_EDU_bot id=7599529676 - 'WW-бот'

@@ -18,4 +18,9 @@ class FSMFillForm(StatesGroup):
     delete_channel_name = State()  # Состояние для ввода названия канала для удаления
     waiting_for_text = State()
     waiting_for_photos = State()
+    
+class FSMNotification(StatesGroup):
+    waiting_for_message = State()
+    waiting_for_time = State()
+    waiting_for_code = State()
 

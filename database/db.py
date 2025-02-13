@@ -53,7 +53,7 @@ async def create_tables():
         await db.execute('''
         CREATE TABLE IF NOT EXISTS battle_settings (
             round_duration INTEGER,
-            prize_amount INTEGER,
+            prize_amount TEXT,
             min_vote_total INTEGER,
             round_interval INTEGER,
             time_of_run INTEGER,
@@ -95,6 +95,15 @@ async def create_tables():
             is_kick INTEGER,
             is_single INTEGER
         )
+        ''')
+        
+        await db.execute('''
+            CREATE TABLE IF NOT EXISTS notifications (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                code TEXT NOT NULL UNIQUE,
+                message TEXT NOT NULL,
+                time TEXT NOT NULL
+            )
         ''')
 
         await db.commit()
@@ -855,3 +864,39 @@ async def update_admin_photo_in_battle(photo_id):
             await db.commit()
             return True
         return False
+
+
+
+async def add_notification(code: str, message: str, notification_time: str):
+    async with sq.connect('bot_database.db') as db:
+        await db.execute(
+            'INSERT INTO notifications (code, message, time) VALUES (?, ?, ?)',
+            (code, message, notification_time)
+        )
+        await db.commit()
+
+async def get_all_notifications():
+    async with sq.connect('bot_database.db') as db:
+        async with db.execute('SELECT * FROM notifications') as cursor:
+            return await cursor.fetchall()
+
+async def delete_notification(code: str):
+    async with sq.connect('bot_database.db') as db:
+        await db.execute('DELETE FROM notifications WHERE code = ?', (code,))
+        await db.commit()
+
+async def get_notification_by_code(code: str):
+    async with sq.connect('bot_database.db') as db:
+        async with db.execute(
+            'SELECT * FROM notifications WHERE code = ?', 
+            (code,)
+        ) as cursor:
+            return await cursor.fetchone()
+
+async def check_notification_code_exists(code: str) -> bool:
+    async with sq.connect('bot_database.db') as db:
+        async with db.execute(
+            'SELECT 1 FROM notifications WHERE code = ?', 
+            (code,)
+        ) as cursor:
+            return bool(await cursor.fetchone())
