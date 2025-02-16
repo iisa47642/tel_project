@@ -15,14 +15,15 @@ from states.user_states import FSMFillForm
 from filters.isAdmin import is_admin
 from keyboards import user_keyboards
 
-_bot: Bot = None  # Placeholder for the bot instance
+_bot: Bot = None
 
 def setup_router(dp, bot: Bot):
     global _bot
     _bot = bot
 
+
 user_router = Router()
-#user_router.message.filter(lambda message: not is_admin(message))
+
 
 async def get_config():
         dirname = os.path.dirname(__file__)

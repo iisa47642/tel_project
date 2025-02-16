@@ -1,7 +1,7 @@
 # database/database.py
 import random
 import aiosqlite as sq
-
+import json
 
 # -------------------- Функция для создания таблиц
 async def create_tables():
@@ -102,7 +102,9 @@ async def create_tables():
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 code TEXT NOT NULL UNIQUE,
                 message TEXT NOT NULL,
-                time TEXT NOT NULL
+                time TEXT NOT NULL,
+                entities TEXT DEFAULT NULL,
+                target TEXT NOT NULL DEFAULT 'private'
             )
         ''')
 
@@ -865,20 +867,40 @@ async def update_admin_photo_in_battle(photo_id):
             return True
         return False
 
+def entity_to_dict(entity):
+    return {
+        'type': entity.type,
+        'offset': entity.offset,
+        'length': entity.length,
+        'url': entity.url,
+        'user': str(entity.user) if entity.user else None,
+        'language': entity.language,
+        'custom_emoji_id': entity.custom_emoji_id
+    }
 
+async def add_notification(code: str, message: str, notification_time: str, entities=None, target="private"):
+    if entities:
+        entities_list = [entity_to_dict(entity) for entity in entities]
+        entities_json = json.dumps(entities_list)
+    else:
+        entities_json = None
 
-async def add_notification(code: str, message: str, notification_time: str):
     async with sq.connect('bot_database.db') as db:
         await db.execute(
-            'INSERT INTO notifications (code, message, time) VALUES (?, ?, ?)',
-            (code, message, notification_time)
+            'INSERT INTO notifications (code, message, time, entities, target) VALUES (?, ?, ?, ?, ?)',
+            (code, message, notification_time, entities_json, target)
         )
         await db.commit()
+
 
 async def get_all_notifications():
     async with sq.connect('bot_database.db') as db:
         async with db.execute('SELECT * FROM notifications') as cursor:
-            return await cursor.fetchall()
+            notifications = await cursor.fetchall()
+            return [
+                (id, code, message, time, json.loads(entities) if entities else None, target)
+                for id, code, message, time, entities, target in notifications
+            ]
 
 async def delete_notification(code: str):
     async with sq.connect('bot_database.db') as db:
@@ -891,7 +913,11 @@ async def get_notification_by_code(code: str):
             'SELECT * FROM notifications WHERE code = ?', 
             (code,)
         ) as cursor:
-            return await cursor.fetchone()
+            row = await cursor.fetchone()
+            if row:
+                id, code, message, time, entities, target = row
+                return id, code, message, time, json.loads(entities) if entities else None, target
+            return None
 
 async def check_notification_code_exists(code: str) -> bool:
     async with sq.connect('bot_database.db') as db:

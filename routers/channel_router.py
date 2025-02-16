@@ -45,6 +45,7 @@ END_PHASE_THRESHOLD = 0.85  # Последние 15% времени считаю
 MIN_REQUIRED_VOTES = 5  # Минимальное количество голосов для прохождения
 MIN_VOTE_INCREMENT = 1   # Минимальный прирост голосов
 MAX_VOTE_INCREMENT = 2   # Максимальный прирост голосов
+
 # Константы для задержек в разных фазах (в секундах)
 INITIAL_PHASE_DELAYS = (60.0, 80.0)  # Большие задержки в начальной фазе
 MIDDLE_PHASE_DELAYS = (40.0, 50.0)   # Средние задержки в средней фазе
@@ -87,7 +88,7 @@ async def init_vote_state(message_id: int, admin_id: int, admin_position: str, o
     """
     ROUND_DURATION = routers.globals_var.ROUND_DURATION
 
-    if current_start.hour < 10 and current_start.hour >= 1:  # Если время начала между 00:00 и 10:00
+    if current_start.hour < 10 and current_start.hour >= 0:  # Если время начала между 00:00 и 10:00
         today = current_start.date()
         end_time = pytz.timezone('Europe/Moscow').localize(datetime.combine(today, time(hour=10)))
         round_duration = (end_time - current_start).total_seconds()
@@ -154,7 +155,7 @@ async def send_pair(bot: Bot, channel_id: int, participant1, participant2, prize
     # round_end = current_start + timedelta(minutes=round_duration)
     now = datetime.now(current_start.tzinfo)
 
-    if now.hour < 10 and now.hour >= 1:  # Если время между 23:00 и 10:00
+    if now.hour < 10 and now.hour >= 0:  # Если время между 23:00 и 10:00
         today = now.date()
         round_end_time = pytz.timezone('Europe/Moscow').localize(datetime.combine(today, time(hour=10)))
         wait_time = (round_end_time - now).total_seconds()

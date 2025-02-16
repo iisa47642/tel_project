@@ -1,13 +1,19 @@
 import asyncio
+import json
+import os
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from aiogram import Bot
 import pytz
 from typing import Optional
 from datetime import datetime, time, timedelta
+from config.config import load_config
 from database.db import clear_users_in_batl, get_all_notifications, get_all_users
 from routers.channel_router import delete_previous_messages
 from tasks.task_handlers import TaskManager
 import logging
+from aiogram.types import MessageEntity
+
+
 
 class SchedulerManager:
     def __init__(self):
@@ -50,7 +56,13 @@ class SchedulerManager:
         except Exception as e:
             logging.error(f"Error in scheduler setup: {str(e)}")
             raise
-        
+    
+    async def get_config(self):
+        dirname = os.path.dirname(__file__)
+        filename = os.path.abspath(os.path.join(dirname, '..', 'config/config.env'))
+        config = load_config(filename)
+        return config
+    
     async def start_battle_wrapper(self):
         """Обертка для запуска баттла с сохранением Task"""
         try:
@@ -166,9 +178,12 @@ class SchedulerManager:
         except Exception as e:
             logging.error(f"Error in check_and_schedule_battle: {e}", exc_info=True)
 
-    async def add_notification_job(self, code: str, message: str, time: time):
+    async def add_notification_job(self, code: str, message: str, time: time, entities=None, target="private"):
         """Добавление задачи уведомления"""
-        try:
+        try:  
+        
+            # Преобразуем строку времени в объект `datetime.time`
+            time_obj = datetime.strptime(time, "%H:%M").time()
             users = await get_all_users()
             user_ids = [user[0] for user in users]
             
@@ -178,10 +193,10 @@ class SchedulerManager:
             self.scheduler.add_job(
                 self.send_notification,
                 'cron',
-                hour=time.hour,
-                minute=time.minute,
+                hour=time_obj.hour,  # Теперь берем `hour` из time_obj
+                minute=time_obj.minute,  # Теперь берем `minute` из time_obj
                 id=f'notification_{code}',
-                args=[code, user_ids, message],
+                args=[code, user_ids, message, entities, target],
                 replace_existing=True
             )
         except Exception as e:
@@ -189,20 +204,71 @@ class SchedulerManager:
 
 
 
-    async def send_notification(self, notification_id, user_ids, message):
+    async def send_notification(self, notification_id, user_ids, message, entities=None, target="private"):
         try:
+            config = await self.get_config()
+            CHANNEL_ID = config.tg_bot.channel_id
+            
             if not isinstance(message, str):
                 logging.error(f"Invalid message type for notification {notification_id}: {type(message)}")
                 return
 
-            for user_id in user_ids:
+            # Инициализируем entities_obj как None
+            entities_obj = None
+            
+            if entities:
                 try:
-                    await self.task_manager.bot.send_message(chat_id=user_id, text=message)
+                    # Если entities уже является списком MessageEntity объектов
+                    if isinstance(entities[0], MessageEntity):
+                        entities_obj = entities
+                    # Если entities - это JSON строка
+                    elif isinstance(entities, str):
+                        entities_dicts = json.loads(entities)
+                        entities_obj = [MessageEntity(
+                            type=entity['type'],
+                            offset=entity['offset'],
+                            length=entity['length'],
+                            url=entity.get('url'),
+                            user=entity.get('user'),
+                            language=entity.get('language'),
+                            custom_emoji_id=entity.get('custom_emoji_id')
+                        ) for entity in entities_dicts]
+                except json.JSONDecodeError as e:
+                    logging.error(f"Error decoding entities JSON for notification {notification_id}: {e}")
                 except Exception as e:
-                    logging.error(f"Error sending notification {notification_id}: {e}")
-                logging.info(f"Notification sent: {notification_id} - {message}")
+                    logging.error(f"Error processing entities for notification {notification_id}: {e}")
+                    logging.error(f"Entities type: {type(entities)}")
+                    if isinstance(entities, list):
+                        logging.error(f"First entity type: {type(entities[0])}")
+
+            if target == "private":
+                for user_id in user_ids:
+                    try:
+                        await self.task_manager.bot.send_message(
+                            chat_id=user_id, 
+                            text=message, 
+                            entities=entities_obj,
+                            parse_mode='HTML'
+                        )
+                        logging.info(f"Notification sent to user {user_id}: {notification_id} - {message}")
+                    except Exception as e:
+                        logging.error(f"Error sending notification {notification_id} to user {user_id}: {e}")
+            
+            elif target == "channel":
+                try:
+                    await self.task_manager.bot.send_message(
+                        chat_id=CHANNEL_ID,
+                        text=message,
+                        entities=entities_obj,
+                        parse_mode='HTML'
+                    )
+                    logging.info(f"Notification sent to channel: {notification_id} - {message}")
+                except Exception as e:
+                    logging.error(f"Error sending notification {notification_id} to channel: {e}")
+
         except Exception as e:
             logging.error(f"Error sending notification {notification_id}: {e}")
+
 
 
     
@@ -210,7 +276,7 @@ class SchedulerManager:
         try:
             notifications = await get_all_notifications()
             for notification in notifications:
-                notification_id, code, message, time_str = notification
+                notification_id, code, message, time_str, entities, target = notification  # Разбираем все столбцы
                 time_obj = datetime.strptime(time_str, "%H:%M").time()
                 time_obj = self.timezone.localize(datetime.combine(datetime.now().date(), time_obj))  # Преобразуем время в локальное время Москвы
                 current_time = datetime.now(self.timezone)  # Получаем текущее время в таймзоне Москвы
@@ -222,7 +288,7 @@ class SchedulerManager:
                         self.send_notification,
                         'date',
                         run_date=current_time,
-                        args=(notification_id, message, user_ids),
+                        args=(notification_id, user_ids, message, entities, target),  # Теперь передаем все аргументы,
                         id=f'notification_{code}',
                         replace_existing=True,
                     )

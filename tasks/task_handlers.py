@@ -307,7 +307,7 @@ class TaskManager:
                 break
             # Определяем продолжительность раунда
             # if now.hour < 10 and now.hour >= 0:
-            if now.hour < 10 and now.hour >= 1:  # Если раунд начался после полуночи
+            if now.hour < 10 and now.hour >= 0:  # Если раунд начался после полуночи
                 today = now.date()
                 round_end_time = self.timezone.localize(datetime.combine(today, time(hour=10)))
                 wait_time = (round_end_time - now).total_seconds()

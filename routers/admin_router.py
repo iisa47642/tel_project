@@ -1068,9 +1068,9 @@ async def mailing(message: Message):
 
 
 async def generate_unique_code():
-    """Генерация уникального 4-значного кода"""
+    """Генерация уникального 1-значного кода"""
     while True:
-        code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
+        code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=1))
         if not await check_notification_code_exists(code):
             return code
 
@@ -1088,7 +1088,9 @@ async def add_notification_start(message: Message, state: FSMContext):
 @admin_router.message(StateFilter(FSMNotification.waiting_for_message))
 async def process_notification_message(message: Message, state: FSMContext):
     try:
-        await state.update_data(message=message.text)
+        text = message.text
+        entities = message.entities  # Получаем разметку
+        await state.update_data(message=text, entities=entities)
         await message.answer(
             "Введите время для ежедневного уведомления в формате ЧЧ:ММ (например, 14:30):"
         )
@@ -1104,30 +1106,39 @@ async def process_notification_time(message: Message, state: FSMContext):
         # Проверяем корректность формата времени
         time_str = message.text
         time_obj = datetime.strptime(time_str, "%H:%M").time()
-        
+
         data = await state.get_data()
         notification_message = data['message']
-        code = await generate_unique_code()
+        entities = data.get('entities', None)
+
+        await state.update_data(time=time_str)
         
-        # Дополнительный вывод в лог
-        logging.info(f"Adding notification: {code} - {notification_message} - {time_str}")
+        # # Дополнительный вывод в лог
+        # logging.info(f"Adding notification: {code} - {notification_message} - {time_str}")
         
-        # Сохраняем уведомление в БД
-        await add_notification(code, notification_message, time_str)
+        # # Сохраняем уведомление в БД
+        # await add_notification(code, notification_message, time_str, entities)
         
-        # Дополнительный вывод в лог
-        logging.info(f"Scheduling notification: {code} - {notification_message} - {time_obj}")
+        # # Дополнительный вывод в лог
+        # logging.info(f"Scheduling notification: {code} - {notification_message} - {time_obj}")
         
-        await scheduler_manager.add_notification_job(code, notification_message, time_obj)
-        await message.answer(
-            f"✅ Уведомление успешно добавлено!\n\n"
-            f"📝 Код: {code}\n"
-            f"⏰ Время: {message.text}\n"
-            f"📜 Текст: {notification_message}\n\n"
-            f"Уведомление будет отправляться ежедневно в указанное время.",
-            reply_markup=get_admin_keyboard_notif()
-        )
-        await state.clear()
+        # await scheduler_manager.add_notification_job(code, notification_message, time_obj, entities)
+        # await message.answer(
+        #     f"✅ Уведомление успешно добавлено!\n\n"
+        #     f"📝 Код: {code}\n"
+        #     f"⏰ Время: {message.text}\n"
+        #     f"📜 Текст: {notification_message}\n\n"
+        #     f"Уведомление будет отправляться ежедневно в указанное время.",
+        #     reply_markup=get_admin_keyboard_notif()
+        # )
+        # Спрашиваем, куда отправлять уведомление
+        buttons = [
+            [KeyboardButton(text="🗣 В канал")],
+            [KeyboardButton(text="💬 В ЛС пользователям")]
+        ]
+        keyboard = ReplyKeyboardMarkup(keyboard=buttons, resize_keyboard=True)
+        await message.answer("Выберите, куда будет отправляться уведомление:", reply_markup=keyboard)
+        await state.set_state(FSMNotification.waiting_for_target)
         
     except ValueError:
         await message.answer(
@@ -1137,6 +1148,50 @@ async def process_notification_time(message: Message, state: FSMContext):
         logging.error(f"Error in process_notification_time: {e}")
         await message.answer("Произошла ошибка. Попробуйте позже.")
         await state.clear()
+
+
+@admin_router.message(StateFilter(FSMNotification.waiting_for_target))
+async def process_notification_target(message: Message, state: FSMContext):
+    data = await state.get_data()
+    notification_message = data['message']
+    entities = data.get('entities', None)
+    time_str = data['time']
+
+    if message.text == "💬 В ЛС пользователям":
+        target = "private"
+    elif message.text == "🗣 В канал":
+        target = "channel"
+        await state.update_data(target=target)
+    else:
+        await message.answer("⚠ Неверный выбор. Выберите вариант из предложенных.")
+        return
+
+    code = await generate_unique_code()
+    await add_notification(code, notification_message, time_str, entities, target)
+    await scheduler_manager.add_notification_job(code, notification_message, time_str, entities, target)
+
+    await message.answer(f"✅ Уведомление добавлено! Оно будет отправляться в {target}.",reply_markup=get_admin_keyboard_notif())
+    await state.clear()
+
+
+# @admin_router.message(StateFilter(FSMNotification.waiting_for_channel))
+# async def process_notification_channel(message: Message, state: FSMContext):
+#     data = await state.get_data()
+#     notification_message = data['message']
+#     entities = data.get('entities', None)
+#     time_str = data['time']
+#     target = data['target']
+#     channel_id = message.text.strip()
+
+#     code = await generate_unique_code()
+#     await add_notification(code, notification_message, time_str, entities, target, channel_id)
+#     await scheduler_manager.add_notification_job(code, notification_message, time_str, entities, target, channel_id)
+
+#     await message.answer(f"✅ Уведомление добавлено! Оно будет отправляться в канал {channel_id}.")
+#     await state.clear()
+
+
+
 
 @admin_router.message(F.text == "Список уведомлений")
 async def view_notifications(message: Message):
