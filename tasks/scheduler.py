@@ -12,8 +12,8 @@ from routers.channel_router import delete_previous_messages
 from tasks.task_handlers import TaskManager
 import logging
 from aiogram.types import MessageEntity
-
-
+from user_bot import user_bot
+from telethon.tl.types import MessageEntityCustomEmoji
 
 class SchedulerManager:
     def __init__(self):
@@ -213,18 +213,24 @@ class SchedulerManager:
                 logging.error(f"Invalid message type for notification {notification_id}: {type(message)}")
                 return
 
-            # Инициализируем entities_obj как None
-            entities_obj = None
+            telethon_entities = None
+            aiogram_entities = None
             
             if entities:
                 try:
-                    # Если entities уже является списком MessageEntity объектов
                     if isinstance(entities[0], MessageEntity):
-                        entities_obj = entities
-                    # Если entities - это JSON строка
+                        aiogram_entities = entities
+                        # Преобразуем entities для Telethon (только для CustomEmoji)
+                        telethon_entities = [
+                            MessageEntityCustomEmoji(
+                                offset=entity.offset,
+                                length=entity.length,
+                                document_id=int(entity.custom_emoji_id)
+                            ) for entity in entities if entity.type == 'custom_emoji'
+                        ]
                     elif isinstance(entities, str):
                         entities_dicts = json.loads(entities)
-                        entities_obj = [MessageEntity(
+                        aiogram_entities = [MessageEntity(
                             type=entity['type'],
                             offset=entity['offset'],
                             length=entity['length'],
@@ -233,13 +239,16 @@ class SchedulerManager:
                             language=entity.get('language'),
                             custom_emoji_id=entity.get('custom_emoji_id')
                         ) for entity in entities_dicts]
-                except json.JSONDecodeError as e:
-                    logging.error(f"Error decoding entities JSON for notification {notification_id}: {e}")
+                        # Преобразуем entities для Telethon (только для CustomEmoji)
+                        telethon_entities = [
+                            MessageEntityCustomEmoji(
+                                offset=entity['offset'],
+                                length=entity['length'],
+                                document_id=int(entity['custom_emoji_id'])
+                            ) for entity in entities_dicts if entity['type'] == 'custom_emoji'
+                        ]
                 except Exception as e:
                     logging.error(f"Error processing entities for notification {notification_id}: {e}")
-                    logging.error(f"Entities type: {type(entities)}")
-                    if isinstance(entities, list):
-                        logging.error(f"First entity type: {type(entities[0])}")
 
             if target == "private":
                 for user_id in user_ids:
@@ -247,7 +256,7 @@ class SchedulerManager:
                         await self.task_manager.bot.send_message(
                             chat_id=user_id, 
                             text=message, 
-                            entities=entities_obj,
+                            entities=aiogram_entities,
                             parse_mode='HTML'
                         )
                         logging.info(f"Notification sent to user {user_id}: {notification_id} - {message}")
@@ -256,15 +265,28 @@ class SchedulerManager:
             
             elif target == "channel":
                 try:
-                    await self.task_manager.bot.send_message(
-                        chat_id=CHANNEL_ID,
-                        text=message,
-                        entities=entities_obj,
-                        parse_mode='HTML'
+                    # Пытаемся отправить сообщение через UserBot
+                    await user_bot.send_channel_message(
+                        channel_id=CHANNEL_ID,
+                        message=message,
+                        entities=telethon_entities
                     )
-                    logging.info(f"Notification sent to channel: {notification_id} - {message}")
+                    logging.info(f"Notification sent to channel via UserBot: {notification_id} - {message}")
                 except Exception as e:
-                    logging.error(f"Error sending notification {notification_id} to channel: {e}")
+                    logging.error(f"Error sending notification {notification_id} to channel via UserBot: {e}")
+                    logging.info("Attempting to send message via regular bot...")
+                    
+                    try:
+                        # Если не удалось отправить через UserBot, пробуем отправить обычным ботом
+                        await self.task_manager.bot.send_message(
+                            chat_id=CHANNEL_ID,
+                            text=message,
+                            entities=aiogram_entities,
+                            parse_mode='HTML'
+                        )
+                        logging.info(f"Notification sent to channel via regular bot: {notification_id} - {message}")
+                    except Exception as e:
+                        logging.error(f"Error sending notification {notification_id} to channel via regular bot: {e}")
 
         except Exception as e:
             logging.error(f"Error sending notification {notification_id}: {e}")

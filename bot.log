@@ -7055,3 +7055,2352 @@ connector: <aiohttp.connector.TCPConnector object at 0x10533ee70>
 2025-02-16 04:42:59,371 - INFO - Scheduler started successfully
 2025-02-16 04:42:59,667 - INFO - Start polling
 2025-02-16 04:42:59,721 - INFO - Run polling for bot @WW_EDU_bot id=7599529676 - 'WW-бот'
+2025-02-16 19:42:24,614 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-02-16 19:42:24,616 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-02-16 19:42:24,617 - INFO - Added job "Schedule_checker" to job store "default"
+2025-02-16 19:42:24,617 - INFO - Added job "Notification_checker" to job store "default"
+2025-02-16 19:42:24,617 - INFO - Scheduler started
+2025-02-16 19:42:24,617 - INFO - Scheduler started successfully
+2025-02-16 19:42:24,970 - INFO - Start polling
+2025-02-16 19:42:25,035 - INFO - Run polling for bot @WW_EDU_bot id=7599529676 - 'WW-бот'
+2025-02-16 19:42:45,721 - INFO - Request processed in mode 1
+2025-02-16 19:42:45,961 - INFO - Update id=574621187 is handled. Duration 239 ms by bot id=7599529676
+2025-02-16 19:42:58,890 - INFO - Request processed in mode 1
+2025-02-16 19:42:58,991 - INFO - Update id=574621188 is handled. Duration 101 ms by bot id=7599529676
+2025-02-16 19:43:24,615 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:44:24 MSK)" (scheduled at 2025-02-16 19:43:24.614450+03:00)
+2025-02-16 19:43:24,615 - INFO - Notification task started
+2025-02-16 19:43:24,615 - INFO - Checking battle schedule...
+2025-02-16 19:43:24,616 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:44:24 MSK)" (scheduled at 2025-02-16 19:43:24.616411+03:00)
+2025-02-16 19:43:24,617 - INFO - Next battle time set to: 2025-02-17 01:39:00+03:00
+2025-02-16 19:43:24,617 - INFO - Current time: 2025-02-16 19:43:24.615918+03:00
+2025-02-16 19:43:24,617 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:43:24,617 - INFO - Time until battle: 5h 55m
+2025-02-16 19:43:24,617 - INFO - Wait seconds: 17735.384082
+2025-02-16 19:43:24,617 - INFO - Sleeping for 10 seconds
+2025-02-16 19:43:24,618 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 19:43:24,619 - INFO - Added job "Battle_task" to job store "default"
+2025-02-16 19:43:24,620 - INFO - New battle scheduled for: 2025-02-17 01:39:00+03:00
+2025-02-16 19:43:24,620 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:44:24 MSK)" executed successfully
+2025-02-16 19:43:24,623 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:44:24 MSK)" executed successfully
+2025-02-16 19:43:34,622 - INFO - Current time: 2025-02-16 19:43:34.619214+03:00
+2025-02-16 19:43:34,622 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:43:34,623 - INFO - Time until battle: 5h 55m
+2025-02-16 19:43:34,623 - INFO - Wait seconds: 17725.380786
+2025-02-16 19:43:34,623 - INFO - Sleeping for 10 seconds
+2025-02-16 19:43:44,627 - INFO - Current time: 2025-02-16 19:43:44.624611+03:00
+2025-02-16 19:43:44,628 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:43:44,628 - INFO - Time until battle: 5h 55m
+2025-02-16 19:43:44,628 - INFO - Wait seconds: 17715.375389
+2025-02-16 19:43:44,628 - INFO - Sleeping for 10 seconds
+2025-02-16 19:43:54,631 - INFO - Current time: 2025-02-16 19:43:54.629759+03:00
+2025-02-16 19:43:54,631 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:43:54,632 - INFO - Time until battle: 5h 55m
+2025-02-16 19:43:54,632 - INFO - Wait seconds: 17705.370241
+2025-02-16 19:43:54,632 - INFO - Sleeping for 10 seconds
+2025-02-16 19:44:04,636 - INFO - Current time: 2025-02-16 19:44:04.633437+03:00
+2025-02-16 19:44:04,636 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:44:04,636 - INFO - Time until battle: 5h 54m
+2025-02-16 19:44:04,637 - INFO - Wait seconds: 17695.366563
+2025-02-16 19:44:04,637 - INFO - Sleeping for 10 seconds
+2025-02-16 19:44:14,641 - INFO - Current time: 2025-02-16 19:44:14.638377+03:00
+2025-02-16 19:44:14,641 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:44:14,641 - INFO - Time until battle: 5h 54m
+2025-02-16 19:44:14,641 - INFO - Wait seconds: 17685.361623
+2025-02-16 19:44:14,641 - INFO - Sleeping for 10 seconds
+2025-02-16 19:44:17,670 - INFO - Request processed in mode 1
+2025-02-16 19:44:17,748 - INFO - Update id=574621189 is handled. Duration 79 ms by bot id=7599529676
+2025-02-16 19:44:27,132 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-02-16 19:44:27,132 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-02-16 19:44:27,132 - INFO - Added job "Schedule_checker" to job store "default"
+2025-02-16 19:44:27,133 - INFO - Added job "Notification_checker" to job store "default"
+2025-02-16 19:44:27,133 - INFO - Scheduler started
+2025-02-16 19:44:27,133 - INFO - Scheduler started successfully
+2025-02-16 19:44:28,390 - INFO - Start polling
+2025-02-16 19:44:28,734 - INFO - Run polling for bot @WW_EDU_bot id=7599529676 - 'WW-бот'
+2025-02-16 19:44:30,531 - INFO - Request processed in mode 1
+2025-02-16 19:44:30,729 - INFO - Update id=574621190 is handled. Duration 198 ms by bot id=7599529676
+2025-02-16 19:44:32,472 - INFO - Request processed in mode 1
+2025-02-16 19:44:32,559 - INFO - Update id=574621191 is handled. Duration 86 ms by bot id=7599529676
+2025-02-16 19:44:34,399 - INFO - Request processed in mode 1
+2025-02-16 19:44:34,478 - INFO - Update id=574621192 is handled. Duration 79 ms by bot id=7599529676
+2025-02-16 19:44:38,620 - INFO - Request processed in mode 1
+2025-02-16 19:44:38,789 - INFO - Update id=574621193 is handled. Duration 169 ms by bot id=7599529676
+2025-02-16 19:44:49,515 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-02-16 19:44:49,515 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-02-16 19:44:49,516 - INFO - Added job "Schedule_checker" to job store "default"
+2025-02-16 19:44:49,516 - INFO - Added job "Notification_checker" to job store "default"
+2025-02-16 19:44:49,516 - INFO - Scheduler started
+2025-02-16 19:44:49,516 - INFO - Scheduler started successfully
+2025-02-16 19:44:50,370 - INFO - Start polling
+2025-02-16 19:44:50,472 - INFO - Run polling for bot @WW_EDU_bot id=7599529676 - 'WW-бот'
+2025-02-16 19:44:59,351 - INFO - Request processed in mode 1
+2025-02-16 19:44:59,683 - INFO - Update id=574621194 is handled. Duration 332 ms by bot id=7599529676
+2025-02-16 19:45:01,719 - INFO - Request processed in mode 1
+2025-02-16 19:45:01,849 - INFO - Update id=574621195 is handled. Duration 129 ms by bot id=7599529676
+2025-02-16 19:45:04,040 - INFO - Request processed in mode 1
+2025-02-16 19:45:04,189 - INFO - Update id=574621196 is handled. Duration 148 ms by bot id=7599529676
+2025-02-16 19:45:09,131 - INFO - Request processed in mode 1
+2025-02-16 19:45:09,208 - INFO - Update id=574621197 is handled. Duration 78 ms by bot id=7599529676
+2025-02-16 19:45:12,460 - INFO - Request processed in mode 1
+2025-02-16 19:45:12,689 - INFO - Update id=574621198 is handled. Duration 229 ms by bot id=7599529676
+2025-02-16 19:45:13,720 - INFO - Request processed in mode 1
+2025-02-16 19:45:13,919 - INFO - Update id=574621199 is handled. Duration 199 ms by bot id=7599529676
+2025-02-16 19:45:49,517 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:46:49 MSK)" (scheduled at 2025-02-16 19:45:49.515417+03:00)
+2025-02-16 19:45:49,519 - INFO - Notification task started
+2025-02-16 19:45:49,519 - INFO - Checking battle schedule...
+2025-02-16 19:45:49,519 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:46:49 MSK)" (scheduled at 2025-02-16 19:45:49.515656+03:00)
+2025-02-16 19:45:49,524 - INFO - Next battle time set to: 2025-02-17 01:39:00+03:00
+2025-02-16 19:45:49,524 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 19:45:49,526 - INFO - Added job "Battle_task" to job store "default"
+2025-02-16 19:45:49,526 - INFO - New battle scheduled for: 2025-02-17 01:39:00+03:00
+2025-02-16 19:45:49,526 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:46:49 MSK)" executed successfully
+2025-02-16 19:45:49,529 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:46:49 MSK)" executed successfully
+2025-02-16 19:45:49,529 - INFO - Current time: 2025-02-16 19:45:49.520177+03:00
+2025-02-16 19:45:49,529 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:45:49,530 - INFO - Time until battle: 5h 53m
+2025-02-16 19:45:49,530 - INFO - Wait seconds: 17590.479823
+2025-02-16 19:45:49,530 - INFO - Sleeping for 10 seconds
+2025-02-16 19:45:59,534 - INFO - Current time: 2025-02-16 19:45:59.531434+03:00
+2025-02-16 19:45:59,534 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:45:59,534 - INFO - Time until battle: 5h 53m
+2025-02-16 19:45:59,534 - INFO - Wait seconds: 17580.468566
+2025-02-16 19:45:59,534 - INFO - Sleeping for 10 seconds
+2025-02-16 19:46:09,538 - INFO - Current time: 2025-02-16 19:46:09.536067+03:00
+2025-02-16 19:46:09,538 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:46:09,538 - INFO - Time until battle: 5h 52m
+2025-02-16 19:46:09,538 - INFO - Wait seconds: 17570.463933
+2025-02-16 19:46:09,538 - INFO - Sleeping for 10 seconds
+2025-02-16 19:46:19,543 - INFO - Current time: 2025-02-16 19:46:19.540186+03:00
+2025-02-16 19:46:19,544 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:46:19,544 - INFO - Time until battle: 5h 52m
+2025-02-16 19:46:19,544 - INFO - Wait seconds: 17560.459814
+2025-02-16 19:46:19,544 - INFO - Sleeping for 10 seconds
+2025-02-16 19:46:29,547 - INFO - Current time: 2025-02-16 19:46:29.545957+03:00
+2025-02-16 19:46:29,547 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:46:29,547 - INFO - Time until battle: 5h 52m
+2025-02-16 19:46:29,547 - INFO - Wait seconds: 17550.454043
+2025-02-16 19:46:29,548 - INFO - Sleeping for 10 seconds
+2025-02-16 19:46:39,550 - INFO - Current time: 2025-02-16 19:46:39.549193+03:00
+2025-02-16 19:46:39,551 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:46:39,551 - INFO - Time until battle: 5h 52m
+2025-02-16 19:46:39,551 - INFO - Wait seconds: 17540.450807
+2025-02-16 19:46:39,551 - INFO - Sleeping for 10 seconds
+2025-02-16 19:46:49,517 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:47:49 MSK)" (scheduled at 2025-02-16 19:46:49.515417+03:00)
+2025-02-16 19:46:49,518 - INFO - Notification task is already running
+2025-02-16 19:46:49,518 - INFO - Checking battle schedule...
+2025-02-16 19:46:49,519 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:47:49 MSK)" (scheduled at 2025-02-16 19:46:49.515656+03:00)
+2025-02-16 19:46:49,522 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 19:46:49,523 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:47:49 MSK)" executed successfully
+2025-02-16 19:46:49,523 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:47:49 MSK)" executed successfully
+2025-02-16 19:46:49,554 - INFO - Current time: 2025-02-16 19:46:49.552790+03:00
+2025-02-16 19:46:49,554 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:46:49,554 - INFO - Time until battle: 5h 52m
+2025-02-16 19:46:49,554 - INFO - Wait seconds: 17530.44721
+2025-02-16 19:46:49,554 - INFO - Sleeping for 10 seconds
+2025-02-16 19:46:59,558 - INFO - Current time: 2025-02-16 19:46:59.555774+03:00
+2025-02-16 19:46:59,558 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:46:59,558 - INFO - Time until battle: 5h 52m
+2025-02-16 19:46:59,558 - INFO - Wait seconds: 17520.444226
+2025-02-16 19:46:59,559 - INFO - Sleeping for 10 seconds
+2025-02-16 19:47:09,563 - INFO - Current time: 2025-02-16 19:47:09.560108+03:00
+2025-02-16 19:47:09,563 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:47:09,563 - INFO - Time until battle: 5h 51m
+2025-02-16 19:47:09,563 - INFO - Wait seconds: 17510.439892
+2025-02-16 19:47:09,563 - INFO - Sleeping for 10 seconds
+2025-02-16 19:47:19,567 - INFO - Current time: 2025-02-16 19:47:19.564808+03:00
+2025-02-16 19:47:19,567 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:47:19,567 - INFO - Time until battle: 5h 51m
+2025-02-16 19:47:19,567 - INFO - Wait seconds: 17500.435192
+2025-02-16 19:47:19,567 - INFO - Sleeping for 10 seconds
+2025-02-16 19:47:29,572 - INFO - Current time: 2025-02-16 19:47:29.568363+03:00
+2025-02-16 19:47:29,573 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:47:29,573 - INFO - Time until battle: 5h 51m
+2025-02-16 19:47:29,573 - INFO - Wait seconds: 17490.431637
+2025-02-16 19:47:29,573 - INFO - Sleeping for 10 seconds
+2025-02-16 19:47:39,577 - INFO - Current time: 2025-02-16 19:47:39.574952+03:00
+2025-02-16 19:47:39,577 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:47:39,577 - INFO - Time until battle: 5h 51m
+2025-02-16 19:47:39,577 - INFO - Wait seconds: 17480.425048
+2025-02-16 19:47:39,577 - INFO - Sleeping for 10 seconds
+2025-02-16 19:47:49,517 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:48:49 MSK)" (scheduled at 2025-02-16 19:47:49.515417+03:00)
+2025-02-16 19:47:49,518 - INFO - Notification task is already running
+2025-02-16 19:47:49,518 - INFO - Checking battle schedule...
+2025-02-16 19:47:49,519 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:48:49 MSK)" (scheduled at 2025-02-16 19:47:49.515656+03:00)
+2025-02-16 19:47:49,523 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:48:49 MSK)" executed successfully
+2025-02-16 19:47:49,523 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 19:47:49,523 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:48:49 MSK)" executed successfully
+2025-02-16 19:47:49,579 - INFO - Current time: 2025-02-16 19:47:49.578123+03:00
+2025-02-16 19:47:49,579 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:47:49,579 - INFO - Time until battle: 5h 51m
+2025-02-16 19:47:49,579 - INFO - Wait seconds: 17470.421877
+2025-02-16 19:47:49,579 - INFO - Sleeping for 10 seconds
+2025-02-16 19:47:55,038 - INFO - Request processed in mode 1
+2025-02-16 19:47:55,137 - INFO - Update id=574621200 is handled. Duration 99 ms by bot id=7599529676
+2025-02-16 19:47:59,583 - INFO - Current time: 2025-02-16 19:47:59.581187+03:00
+2025-02-16 19:47:59,584 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:47:59,584 - INFO - Time until battle: 5h 51m
+2025-02-16 19:47:59,584 - INFO - Wait seconds: 17460.418813
+2025-02-16 19:47:59,584 - INFO - Sleeping for 10 seconds
+2025-02-16 19:48:09,588 - INFO - Current time: 2025-02-16 19:48:09.585648+03:00
+2025-02-16 19:48:09,588 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:48:09,588 - INFO - Time until battle: 5h 50m
+2025-02-16 19:48:09,589 - INFO - Wait seconds: 17450.414352
+2025-02-16 19:48:09,589 - INFO - Sleeping for 10 seconds
+2025-02-16 19:48:19,593 - INFO - Current time: 2025-02-16 19:48:19.590483+03:00
+2025-02-16 19:48:19,594 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:48:19,594 - INFO - Time until battle: 5h 50m
+2025-02-16 19:48:19,594 - INFO - Wait seconds: 17440.409517
+2025-02-16 19:48:19,594 - INFO - Sleeping for 10 seconds
+2025-02-16 19:48:21,938 - INFO - Request processed in mode 1
+2025-02-16 19:48:22,077 - INFO - Update id=574621201 is handled. Duration 139 ms by bot id=7599529676
+2025-02-16 19:48:27,718 - INFO - Request processed in mode 1
+2025-02-16 19:48:27,847 - INFO - Update id=574621202 is handled. Duration 128 ms by bot id=7599529676
+2025-02-16 19:48:29,598 - INFO - Current time: 2025-02-16 19:48:29.595843+03:00
+2025-02-16 19:48:29,598 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:48:29,598 - INFO - Time until battle: 5h 50m
+2025-02-16 19:48:29,598 - INFO - Wait seconds: 17430.404157
+2025-02-16 19:48:29,598 - INFO - Sleeping for 10 seconds
+2025-02-16 19:48:37,379 - INFO - Request processed in mode 1
+2025-02-16 19:48:37,395 - INFO - Adding notification job: Z at 19:50
+2025-02-16 19:48:37,399 - INFO - Added job "SchedulerManager.send_notification" to job store "default"
+2025-02-16 19:48:37,498 - INFO - Update id=574621203 is handled. Duration 119 ms by bot id=7599529676
+2025-02-16 19:48:39,602 - INFO - Current time: 2025-02-16 19:48:39.600089+03:00
+2025-02-16 19:48:39,603 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:48:39,603 - INFO - Time until battle: 5h 50m
+2025-02-16 19:48:39,603 - INFO - Wait seconds: 17420.399911
+2025-02-16 19:48:39,603 - INFO - Sleeping for 10 seconds
+2025-02-16 19:48:49,516 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:49:49 MSK)" (scheduled at 2025-02-16 19:48:49.515417+03:00)
+2025-02-16 19:48:49,517 - INFO - Notification task is already running
+2025-02-16 19:48:49,517 - INFO - Checking battle schedule...
+2025-02-16 19:48:49,517 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:49:49 MSK)" (scheduled at 2025-02-16 19:48:49.515656+03:00)
+2025-02-16 19:48:49,519 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 19:48:49,520 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:49:49 MSK)" executed successfully
+2025-02-16 19:48:49,520 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:49:49 MSK)" executed successfully
+2025-02-16 19:48:49,606 - INFO - Current time: 2025-02-16 19:48:49.604495+03:00
+2025-02-16 19:48:49,606 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:48:49,607 - INFO - Time until battle: 5h 50m
+2025-02-16 19:48:49,607 - INFO - Wait seconds: 17410.395505
+2025-02-16 19:48:49,607 - INFO - Sleeping for 10 seconds
+2025-02-16 19:48:59,612 - INFO - Current time: 2025-02-16 19:48:59.608565+03:00
+2025-02-16 19:48:59,612 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:48:59,612 - INFO - Time until battle: 5h 50m
+2025-02-16 19:48:59,612 - INFO - Wait seconds: 17400.391435
+2025-02-16 19:48:59,612 - INFO - Sleeping for 10 seconds
+2025-02-16 19:49:09,617 - INFO - Current time: 2025-02-16 19:49:09.613268+03:00
+2025-02-16 19:49:09,618 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:49:09,618 - INFO - Time until battle: 5h 49m
+2025-02-16 19:49:09,619 - INFO - Wait seconds: 17390.386732
+2025-02-16 19:49:09,619 - INFO - Sleeping for 10 seconds
+2025-02-16 19:49:19,622 - INFO - Current time: 2025-02-16 19:49:19.619594+03:00
+2025-02-16 19:49:19,622 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:49:19,622 - INFO - Time until battle: 5h 49m
+2025-02-16 19:49:19,622 - INFO - Wait seconds: 17380.380406
+2025-02-16 19:49:19,622 - INFO - Sleeping for 10 seconds
+2025-02-16 19:49:29,627 - INFO - Current time: 2025-02-16 19:49:29.624200+03:00
+2025-02-16 19:49:29,627 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:49:29,627 - INFO - Time until battle: 5h 49m
+2025-02-16 19:49:29,627 - INFO - Wait seconds: 17370.3758
+2025-02-16 19:49:29,627 - INFO - Sleeping for 10 seconds
+2025-02-16 19:49:39,630 - INFO - Current time: 2025-02-16 19:49:39.629065+03:00
+2025-02-16 19:49:39,630 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:49:39,630 - INFO - Time until battle: 5h 49m
+2025-02-16 19:49:39,630 - INFO - Wait seconds: 17360.370935
+2025-02-16 19:49:39,630 - INFO - Sleeping for 10 seconds
+2025-02-16 19:49:49,515 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:50:49 MSK)" (scheduled at 2025-02-16 19:49:49.515417+03:00)
+2025-02-16 19:49:49,515 - INFO - Notification task is already running
+2025-02-16 19:49:49,515 - INFO - Checking battle schedule...
+2025-02-16 19:49:49,516 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:50:49 MSK)" (scheduled at 2025-02-16 19:49:49.515656+03:00)
+2025-02-16 19:49:49,517 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 19:49:49,517 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:50:49 MSK)" executed successfully
+2025-02-16 19:49:49,517 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:50:49 MSK)" executed successfully
+2025-02-16 19:49:49,633 - INFO - Current time: 2025-02-16 19:49:49.631788+03:00
+2025-02-16 19:49:49,633 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:49:49,633 - INFO - Time until battle: 5h 49m
+2025-02-16 19:49:49,633 - INFO - Wait seconds: 17350.368212
+2025-02-16 19:49:49,633 - INFO - Sleeping for 10 seconds
+2025-02-16 19:49:59,637 - INFO - Current time: 2025-02-16 19:49:59.634829+03:00
+2025-02-16 19:49:59,637 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:49:59,638 - INFO - Time until battle: 5h 49m
+2025-02-16 19:49:59,638 - INFO - Wait seconds: 17340.365171
+2025-02-16 19:49:59,638 - INFO - Sleeping for 10 seconds
+2025-02-16 19:50:00,002 - INFO - Running job "SchedulerManager.send_notification (trigger: cron[hour='19', minute='50'], next run at: 2025-02-17 19:50:00 MSK)" (scheduled at 2025-02-16 19:50:00+03:00)
+2025-02-16 19:50:00,006 - ERROR - Failed to start UserBot: unable to open database file
+2025-02-16 19:50:00,007 - ERROR - Failed to send via user_bot, falling back to regular bot: unable to open database file
+2025-02-16 19:50:00,137 - INFO - Notification sent to channel via regular bot: Z - 🤔кпукпкпупккп
+2025-02-16 19:50:00,138 - INFO - Job "SchedulerManager.send_notification (trigger: cron[hour='19', minute='50'], next run at: 2025-02-17 19:50:00 MSK)" executed successfully
+2025-02-16 19:50:09,642 - INFO - Current time: 2025-02-16 19:50:09.639603+03:00
+2025-02-16 19:50:09,643 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:50:09,643 - INFO - Time until battle: 5h 48m
+2025-02-16 19:50:09,643 - INFO - Wait seconds: 17330.360397
+2025-02-16 19:50:09,643 - INFO - Sleeping for 10 seconds
+2025-02-16 19:50:19,647 - INFO - Current time: 2025-02-16 19:50:19.644876+03:00
+2025-02-16 19:50:19,647 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:50:19,647 - INFO - Time until battle: 5h 48m
+2025-02-16 19:50:19,647 - INFO - Wait seconds: 17320.355124
+2025-02-16 19:50:19,648 - INFO - Sleeping for 10 seconds
+2025-02-16 19:50:29,651 - INFO - Current time: 2025-02-16 19:50:29.649355+03:00
+2025-02-16 19:50:29,651 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:50:29,652 - INFO - Time until battle: 5h 48m
+2025-02-16 19:50:29,652 - INFO - Wait seconds: 17310.350645
+2025-02-16 19:50:29,652 - INFO - Sleeping for 10 seconds
+2025-02-16 19:50:39,656 - INFO - Current time: 2025-02-16 19:50:39.653562+03:00
+2025-02-16 19:50:39,656 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:50:39,656 - INFO - Time until battle: 5h 48m
+2025-02-16 19:50:39,656 - INFO - Wait seconds: 17300.346438
+2025-02-16 19:50:39,657 - INFO - Sleeping for 10 seconds
+2025-02-16 19:50:49,516 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:51:49 MSK)" (scheduled at 2025-02-16 19:50:49.515417+03:00)
+2025-02-16 19:50:49,517 - INFO - Notification task is already running
+2025-02-16 19:50:49,517 - INFO - Checking battle schedule...
+2025-02-16 19:50:49,517 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:51:49 MSK)" (scheduled at 2025-02-16 19:50:49.515656+03:00)
+2025-02-16 19:50:49,518 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 19:50:49,518 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:51:49 MSK)" executed successfully
+2025-02-16 19:50:49,519 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:51:49 MSK)" executed successfully
+2025-02-16 19:50:49,659 - INFO - Current time: 2025-02-16 19:50:49.658137+03:00
+2025-02-16 19:50:49,659 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:50:49,659 - INFO - Time until battle: 5h 48m
+2025-02-16 19:50:49,659 - INFO - Wait seconds: 17290.341863
+2025-02-16 19:50:49,660 - INFO - Sleeping for 10 seconds
+2025-02-16 19:50:59,662 - INFO - Current time: 2025-02-16 19:50:59.661270+03:00
+2025-02-16 19:50:59,663 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:50:59,664 - INFO - Time until battle: 5h 48m
+2025-02-16 19:50:59,664 - INFO - Wait seconds: 17280.33873
+2025-02-16 19:50:59,664 - INFO - Sleeping for 10 seconds
+2025-02-16 19:51:09,665 - INFO - Current time: 2025-02-16 19:51:09.664351+03:00
+2025-02-16 19:51:09,666 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:51:09,666 - INFO - Time until battle: 5h 47m
+2025-02-16 19:51:09,666 - INFO - Wait seconds: 17270.335649
+2025-02-16 19:51:09,666 - INFO - Sleeping for 10 seconds
+2025-02-16 19:51:19,668 - INFO - Current time: 2025-02-16 19:51:19.667371+03:00
+2025-02-16 19:51:19,670 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:51:19,670 - INFO - Time until battle: 5h 47m
+2025-02-16 19:51:19,670 - INFO - Wait seconds: 17260.332629
+2025-02-16 19:51:19,670 - INFO - Sleeping for 10 seconds
+2025-02-16 19:51:29,674 - INFO - Current time: 2025-02-16 19:51:29.671486+03:00
+2025-02-16 19:51:29,674 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:51:29,675 - INFO - Time until battle: 5h 47m
+2025-02-16 19:51:29,675 - INFO - Wait seconds: 17250.328514
+2025-02-16 19:51:29,675 - INFO - Sleeping for 10 seconds
+2025-02-16 19:51:39,680 - INFO - Current time: 2025-02-16 19:51:39.676729+03:00
+2025-02-16 19:51:39,680 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:51:39,680 - INFO - Time until battle: 5h 47m
+2025-02-16 19:51:39,680 - INFO - Wait seconds: 17240.323271
+2025-02-16 19:51:39,680 - INFO - Sleeping for 10 seconds
+2025-02-16 19:51:49,516 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:52:49 MSK)" (scheduled at 2025-02-16 19:51:49.515417+03:00)
+2025-02-16 19:51:49,516 - INFO - Notification task is already running
+2025-02-16 19:51:49,517 - INFO - Checking battle schedule...
+2025-02-16 19:51:49,517 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:52:49 MSK)" (scheduled at 2025-02-16 19:51:49.515656+03:00)
+2025-02-16 19:51:49,520 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:52:49 MSK)" executed successfully
+2025-02-16 19:51:49,520 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 19:51:49,520 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:52:49 MSK)" executed successfully
+2025-02-16 19:51:49,684 - INFO - Current time: 2025-02-16 19:51:49.682148+03:00
+2025-02-16 19:51:49,684 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:51:49,684 - INFO - Time until battle: 5h 47m
+2025-02-16 19:51:49,685 - INFO - Wait seconds: 17230.317852
+2025-02-16 19:51:49,685 - INFO - Sleeping for 10 seconds
+2025-02-16 19:51:59,689 - INFO - Current time: 2025-02-16 19:51:59.686492+03:00
+2025-02-16 19:51:59,691 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:51:59,691 - INFO - Time until battle: 5h 47m
+2025-02-16 19:51:59,691 - INFO - Wait seconds: 17220.313508
+2025-02-16 19:51:59,691 - INFO - Sleeping for 10 seconds
+2025-02-16 19:52:09,696 - INFO - Current time: 2025-02-16 19:52:09.693293+03:00
+2025-02-16 19:52:09,697 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:52:09,697 - INFO - Time until battle: 5h 46m
+2025-02-16 19:52:09,697 - INFO - Wait seconds: 17210.306707
+2025-02-16 19:52:09,697 - INFO - Sleeping for 10 seconds
+2025-02-16 19:52:18,850 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-02-16 19:52:18,850 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-02-16 19:52:18,850 - INFO - Added job "Schedule_checker" to job store "default"
+2025-02-16 19:52:18,850 - INFO - Added job "Notification_checker" to job store "default"
+2025-02-16 19:52:18,850 - INFO - Scheduler started
+2025-02-16 19:52:18,850 - INFO - Scheduler started successfully
+2025-02-16 19:52:19,276 - INFO - Start polling
+2025-02-16 19:52:19,331 - INFO - Run polling for bot @WW_EDU_bot id=7599529676 - 'WW-бот'
+2025-02-16 19:52:33,560 - INFO - Request processed in mode 1
+2025-02-16 19:52:33,793 - INFO - Update id=574621204 is handled. Duration 236 ms by bot id=7599529676
+2025-02-16 19:52:55,255 - INFO - Request processed in mode 1
+2025-02-16 19:52:55,344 - INFO - Update id=574621205 is handled. Duration 89 ms by bot id=7599529676
+2025-02-16 19:53:08,307 - INFO - Request processed in mode 1
+2025-02-16 19:53:08,450 - INFO - Update id=574621206 is handled. Duration 142 ms by bot id=7599529676
+2025-02-16 19:53:10,908 - INFO - Request processed in mode 1
+2025-02-16 19:53:10,922 - INFO - Adding notification job: A at 19:54
+2025-02-16 19:53:10,927 - INFO - Added job "SchedulerManager.send_notification" to job store "default"
+2025-02-16 19:53:11,007 - INFO - Update id=574621207 is handled. Duration 98 ms by bot id=7599529676
+2025-02-16 19:53:18,852 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:54:18 MSK)" (scheduled at 2025-02-16 19:53:18.849941+03:00)
+2025-02-16 19:53:18,853 - INFO - Notification task started
+2025-02-16 19:53:18,853 - INFO - Checking battle schedule...
+2025-02-16 19:53:18,854 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:54:18 MSK)" (scheduled at 2025-02-16 19:53:18.850165+03:00)
+2025-02-16 19:53:18,858 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:54:18 MSK)" executed successfully
+2025-02-16 19:53:18,858 - INFO - Next battle time set to: 2025-02-17 01:39:00+03:00
+2025-02-16 19:53:18,859 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 19:53:18,861 - INFO - Added job "Battle_task" to job store "default"
+2025-02-16 19:53:18,861 - INFO - New battle scheduled for: 2025-02-17 01:39:00+03:00
+2025-02-16 19:53:18,861 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:54:18 MSK)" executed successfully
+2025-02-16 19:53:18,862 - INFO - Current time: 2025-02-16 19:53:18.854998+03:00
+2025-02-16 19:53:18,862 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:53:18,862 - INFO - Time until battle: 5h 45m
+2025-02-16 19:53:18,862 - INFO - Wait seconds: 17141.145002
+2025-02-16 19:53:18,862 - INFO - Sleeping for 10 seconds
+2025-02-16 19:53:28,867 - INFO - Current time: 2025-02-16 19:53:28.864458+03:00
+2025-02-16 19:53:28,868 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:53:28,868 - INFO - Time until battle: 5h 45m
+2025-02-16 19:53:28,868 - INFO - Wait seconds: 17131.135542
+2025-02-16 19:53:28,868 - INFO - Sleeping for 10 seconds
+2025-02-16 19:53:38,871 - INFO - Current time: 2025-02-16 19:53:38.870135+03:00
+2025-02-16 19:53:38,871 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:53:38,872 - INFO - Time until battle: 5h 45m
+2025-02-16 19:53:38,872 - INFO - Wait seconds: 17121.129865
+2025-02-16 19:53:38,872 - INFO - Sleeping for 10 seconds
+2025-02-16 19:53:48,874 - INFO - Current time: 2025-02-16 19:53:48.873538+03:00
+2025-02-16 19:53:48,875 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:53:48,875 - INFO - Time until battle: 5h 45m
+2025-02-16 19:53:48,875 - INFO - Wait seconds: 17111.126462
+2025-02-16 19:53:48,875 - INFO - Sleeping for 10 seconds
+2025-02-16 19:53:58,877 - INFO - Current time: 2025-02-16 19:53:58.876473+03:00
+2025-02-16 19:53:58,877 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:53:58,877 - INFO - Time until battle: 5h 45m
+2025-02-16 19:53:58,877 - INFO - Wait seconds: 17101.123527
+2025-02-16 19:53:58,877 - INFO - Sleeping for 10 seconds
+2025-02-16 19:54:00,002 - INFO - Running job "SchedulerManager.send_notification (trigger: cron[hour='19', minute='54'], next run at: 2025-02-17 19:54:00 MSK)" (scheduled at 2025-02-16 19:54:00+03:00)
+2025-02-16 19:54:00,008 - INFO - Connecting to 149.154.167.51:443/TcpFull...
+2025-02-16 19:54:01,208 - INFO - Connection to 149.154.167.51:443/TcpFull complete!
+2025-02-16 19:54:43,514 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:55:18 MSK)" (scheduled at 2025-02-16 19:54:18.849941+03:00)
+2025-02-16 19:54:43,515 - INFO - Notification task is already running
+2025-02-16 19:54:43,515 - INFO - Checking battle schedule...
+2025-02-16 19:54:43,515 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:55:18 MSK)" (scheduled at 2025-02-16 19:54:18.850165+03:00)
+2025-02-16 19:54:43,518 - INFO - Current time: 2025-02-16 19:54:43.513636+03:00
+2025-02-16 19:54:43,518 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:54:43,518 - INFO - Time until battle: 5h 44m
+2025-02-16 19:54:43,519 - INFO - Wait seconds: 17056.486364
+2025-02-16 19:54:43,519 - INFO - Sleeping for 10 seconds
+2025-02-16 19:54:43,519 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 19:54:43,519 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:55:18 MSK)" executed successfully
+2025-02-16 19:54:43,520 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:55:18 MSK)" executed successfully
+2025-02-16 19:54:43,588 - INFO - Phone migrated to 4
+2025-02-16 19:54:43,657 - INFO - Reconnecting to new data center 4
+2025-02-16 19:54:43,720 - INFO - Disconnecting from 149.154.167.51:443/TcpFull...
+2025-02-16 19:54:43,722 - INFO - Disconnection from 149.154.167.51:443/TcpFull complete!
+2025-02-16 19:54:43,722 - INFO - Connecting to 149.154.167.92:443/TcpFull...
+2025-02-16 19:54:46,140 - INFO - Connection to 149.154.167.92:443/TcpFull complete!
+2025-02-16 19:54:58,065 - INFO - Current time: 2025-02-16 19:54:58.064308+03:00
+2025-02-16 19:54:58,065 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:54:58,065 - INFO - Time until battle: 5h 44m
+2025-02-16 19:54:58,065 - INFO - Wait seconds: 17041.935692
+2025-02-16 19:54:58,065 - INFO - Sleeping for 10 seconds
+2025-02-16 19:55:10,772 - INFO - Current time: 2025-02-16 19:55:10.769740+03:00
+2025-02-16 19:55:10,772 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:55:10,772 - INFO - Time until battle: 5h 43m
+2025-02-16 19:55:10,772 - INFO - Wait seconds: 17029.23026
+2025-02-16 19:55:10,772 - INFO - Sleeping for 10 seconds
+2025-02-16 19:55:11,867 - INFO - UserBot initialized for +971582490941
+2025-02-16 19:55:12,184 - ERROR - Failed to send message: a TLObject was expected but found something else
+2025-02-16 19:55:12,184 - ERROR - Failed to send via user_bot, falling back to regular bot: a TLObject was expected but found something else
+2025-02-16 19:55:12,417 - INFO - Notification sent to channel via regular bot: A - 🤔кddddddd
+2025-02-16 19:55:12,418 - INFO - Job "SchedulerManager.send_notification (trigger: cron[hour='19', minute='54'], next run at: 2025-02-17 19:54:00 MSK)" executed successfully
+2025-02-16 19:55:18,851 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:56:18 MSK)" (scheduled at 2025-02-16 19:55:18.849941+03:00)
+2025-02-16 19:55:18,852 - INFO - Notification task is already running
+2025-02-16 19:55:18,852 - INFO - Checking battle schedule...
+2025-02-16 19:55:18,852 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:56:18 MSK)" (scheduled at 2025-02-16 19:55:18.850165+03:00)
+2025-02-16 19:55:18,855 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 19:55:18,855 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:56:18 MSK)" executed successfully
+2025-02-16 19:55:18,856 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:56:18 MSK)" executed successfully
+2025-02-16 19:55:20,776 - INFO - Current time: 2025-02-16 19:55:20.774223+03:00
+2025-02-16 19:55:20,777 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:55:20,777 - INFO - Time until battle: 5h 43m
+2025-02-16 19:55:20,777 - INFO - Wait seconds: 17019.225777
+2025-02-16 19:55:20,777 - INFO - Sleeping for 10 seconds
+2025-02-16 19:55:30,780 - INFO - Current time: 2025-02-16 19:55:30.779072+03:00
+2025-02-16 19:55:30,780 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:55:30,780 - INFO - Time until battle: 5h 43m
+2025-02-16 19:55:30,780 - INFO - Wait seconds: 17009.220928
+2025-02-16 19:55:30,780 - INFO - Sleeping for 10 seconds
+2025-02-16 19:55:31,427 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 19:55:40,784 - INFO - Current time: 2025-02-16 19:55:40.781710+03:00
+2025-02-16 19:55:40,784 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:55:40,785 - INFO - Time until battle: 5h 43m
+2025-02-16 19:55:40,785 - INFO - Wait seconds: 16999.21829
+2025-02-16 19:55:40,785 - INFO - Sleeping for 10 seconds
+2025-02-16 19:55:45,329 - INFO - Got difference for channel 2165667426 updates
+2025-02-16 19:55:49,558 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 19:55:50,789 - INFO - Current time: 2025-02-16 19:55:50.786301+03:00
+2025-02-16 19:55:50,790 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:55:50,790 - INFO - Time until battle: 5h 43m
+2025-02-16 19:55:50,790 - INFO - Wait seconds: 16989.213699
+2025-02-16 19:55:50,790 - INFO - Sleeping for 10 seconds
+2025-02-16 19:56:00,794 - INFO - Current time: 2025-02-16 19:56:00.791642+03:00
+2025-02-16 19:56:00,794 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:56:00,795 - INFO - Time until battle: 5h 42m
+2025-02-16 19:56:00,795 - INFO - Wait seconds: 16979.208358
+2025-02-16 19:56:00,795 - INFO - Sleeping for 10 seconds
+2025-02-16 19:56:10,799 - INFO - Current time: 2025-02-16 19:56:10.796459+03:00
+2025-02-16 19:56:10,799 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:56:10,799 - INFO - Time until battle: 5h 42m
+2025-02-16 19:56:10,799 - INFO - Wait seconds: 16969.203541
+2025-02-16 19:56:10,799 - INFO - Sleeping for 10 seconds
+2025-02-16 19:56:17,778 - INFO - Got difference for channel 2013105429 updates
+2025-02-16 19:56:18,851 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:57:18 MSK)" (scheduled at 2025-02-16 19:56:18.849941+03:00)
+2025-02-16 19:56:18,851 - INFO - Notification task is already running
+2025-02-16 19:56:18,851 - INFO - Checking battle schedule...
+2025-02-16 19:56:18,851 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:57:18 MSK)" (scheduled at 2025-02-16 19:56:18.850165+03:00)
+2025-02-16 19:56:18,854 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:57:18 MSK)" executed successfully
+2025-02-16 19:56:18,854 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 19:56:18,855 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:57:18 MSK)" executed successfully
+2025-02-16 19:56:20,802 - INFO - Current time: 2025-02-16 19:56:20.800949+03:00
+2025-02-16 19:56:20,802 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:56:20,802 - INFO - Time until battle: 5h 42m
+2025-02-16 19:56:20,802 - INFO - Wait seconds: 16959.199051
+2025-02-16 19:56:20,802 - INFO - Sleeping for 10 seconds
+2025-02-16 19:56:22,708 - INFO - Got difference for channel 2471047750 updates
+2025-02-16 19:56:31,346 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-02-16 19:56:31,346 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-02-16 19:56:31,346 - INFO - Added job "Schedule_checker" to job store "default"
+2025-02-16 19:56:31,346 - INFO - Added job "Notification_checker" to job store "default"
+2025-02-16 19:56:31,346 - INFO - Scheduler started
+2025-02-16 19:56:31,346 - INFO - Scheduler started successfully
+2025-02-16 19:56:32,147 - INFO - Start polling
+2025-02-16 19:56:32,211 - INFO - Run polling for bot @WW_EDU_bot id=7599529676 - 'WW-бот'
+2025-02-16 19:56:36,639 - INFO - Request processed in mode 1
+2025-02-16 19:56:36,853 - INFO - Update id=574621208 is handled. Duration 214 ms by bot id=7599529676
+2025-02-16 19:56:49,549 - INFO - Request processed in mode 1
+2025-02-16 19:56:49,647 - INFO - Update id=574621209 is handled. Duration 98 ms by bot id=7599529676
+2025-02-16 19:56:58,438 - INFO - Request processed in mode 1
+2025-02-16 19:56:58,538 - INFO - Update id=574621210 is handled. Duration 100 ms by bot id=7599529676
+2025-02-16 19:57:02,629 - INFO - Request processed in mode 1
+2025-02-16 19:57:02,645 - INFO - Adding notification job: K at 19:57
+2025-02-16 19:57:02,648 - INFO - Added job "SchedulerManager.send_notification" to job store "default"
+2025-02-16 19:57:02,778 - INFO - Update id=574621211 is handled. Duration 148 ms by bot id=7599529676
+2025-02-16 19:57:16,199 - INFO - Request processed in mode 1
+2025-02-16 19:57:16,448 - INFO - Update id=574621212 is handled. Duration 249 ms by bot id=7599529676
+2025-02-16 19:57:23,229 - INFO - Request processed in mode 1
+2025-02-16 19:57:23,307 - INFO - Update id=574621213 is handled. Duration 78 ms by bot id=7599529676
+2025-02-16 19:57:30,618 - INFO - Request processed in mode 1
+2025-02-16 19:57:30,718 - INFO - Update id=574621214 is handled. Duration 99 ms by bot id=7599529676
+2025-02-16 19:57:31,347 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:58:31 MSK)" (scheduled at 2025-02-16 19:57:31.345923+03:00)
+2025-02-16 19:57:31,347 - INFO - Notification task started
+2025-02-16 19:57:31,348 - INFO - Checking battle schedule...
+2025-02-16 19:57:31,348 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:58:31 MSK)" (scheduled at 2025-02-16 19:57:31.346166+03:00)
+2025-02-16 19:57:31,352 - INFO - Next battle time set to: 2025-02-17 01:39:00+03:00
+2025-02-16 19:57:31,352 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 19:57:31,354 - INFO - Added job "Battle_task" to job store "default"
+2025-02-16 19:57:31,354 - INFO - New battle scheduled for: 2025-02-17 01:39:00+03:00
+2025-02-16 19:57:31,354 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:58:31 MSK)" executed successfully
+2025-02-16 19:57:31,354 - INFO - Current time: 2025-02-16 19:57:31.349189+03:00
+2025-02-16 19:57:31,354 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:57:31,354 - INFO - Time until battle: 5h 41m
+2025-02-16 19:57:31,355 - INFO - Wait seconds: 16888.650811
+2025-02-16 19:57:31,355 - INFO - Sleeping for 10 seconds
+2025-02-16 19:57:31,355 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:58:31 MSK)" executed successfully
+2025-02-16 19:57:31,938 - INFO - Request processed in mode 1
+2025-02-16 19:57:32,108 - INFO - Update id=574621215 is handled. Duration 169 ms by bot id=7599529676
+2025-02-16 19:57:41,359 - INFO - Current time: 2025-02-16 19:57:41.356362+03:00
+2025-02-16 19:57:41,359 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:57:41,359 - INFO - Time until battle: 5h 41m
+2025-02-16 19:57:41,359 - INFO - Wait seconds: 16878.643638
+2025-02-16 19:57:41,359 - INFO - Sleeping for 10 seconds
+2025-02-16 19:57:51,363 - INFO - Current time: 2025-02-16 19:57:51.360874+03:00
+2025-02-16 19:57:51,363 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:57:51,363 - INFO - Time until battle: 5h 41m
+2025-02-16 19:57:51,363 - INFO - Wait seconds: 16868.639126
+2025-02-16 19:57:51,363 - INFO - Sleeping for 10 seconds
+2025-02-16 19:58:01,368 - INFO - Current time: 2025-02-16 19:58:01.365245+03:00
+2025-02-16 19:58:01,368 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:58:01,368 - INFO - Time until battle: 5h 40m
+2025-02-16 19:58:01,368 - INFO - Wait seconds: 16858.634755
+2025-02-16 19:58:01,369 - INFO - Sleeping for 10 seconds
+2025-02-16 19:58:10,368 - INFO - Request processed in mode 1
+2025-02-16 19:58:10,467 - INFO - Update id=574621216 is handled. Duration 99 ms by bot id=7599529676
+2025-02-16 19:58:11,373 - INFO - Current time: 2025-02-16 19:58:11.370317+03:00
+2025-02-16 19:58:11,374 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:58:11,374 - INFO - Time until battle: 5h 40m
+2025-02-16 19:58:11,374 - INFO - Wait seconds: 16848.629683
+2025-02-16 19:58:11,374 - INFO - Sleeping for 10 seconds
+2025-02-16 19:58:18,488 - INFO - Request processed in mode 1
+2025-02-16 19:58:18,567 - INFO - Update id=574621217 is handled. Duration 78 ms by bot id=7599529676
+2025-02-16 19:58:19,638 - INFO - Request processed in mode 1
+2025-02-16 19:58:19,652 - INFO - Adding notification job: P at 19:59
+2025-02-16 19:58:19,652 - INFO - Added job "SchedulerManager.send_notification" to job store "default"
+2025-02-16 19:58:19,767 - INFO - Update id=574621218 is handled. Duration 129 ms by bot id=7599529676
+2025-02-16 19:58:21,379 - INFO - Current time: 2025-02-16 19:58:21.375785+03:00
+2025-02-16 19:58:21,379 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:58:21,379 - INFO - Time until battle: 5h 40m
+2025-02-16 19:58:21,379 - INFO - Wait seconds: 16838.624215
+2025-02-16 19:58:21,379 - INFO - Sleeping for 10 seconds
+2025-02-16 19:58:31,347 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:59:31 MSK)" (scheduled at 2025-02-16 19:58:31.345923+03:00)
+2025-02-16 19:58:31,348 - INFO - Notification task is already running
+2025-02-16 19:58:31,348 - INFO - Checking battle schedule...
+2025-02-16 19:58:31,349 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:59:31 MSK)" (scheduled at 2025-02-16 19:58:31.346166+03:00)
+2025-02-16 19:58:31,352 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 19:58:31,352 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:59:31 MSK)" executed successfully
+2025-02-16 19:58:31,353 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 19:59:31 MSK)" executed successfully
+2025-02-16 19:58:31,382 - INFO - Current time: 2025-02-16 19:58:31.380840+03:00
+2025-02-16 19:58:31,382 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:58:31,382 - INFO - Time until battle: 5h 40m
+2025-02-16 19:58:31,382 - INFO - Wait seconds: 16828.61916
+2025-02-16 19:58:31,382 - INFO - Sleeping for 10 seconds
+2025-02-16 19:58:41,386 - INFO - Current time: 2025-02-16 19:58:41.383657+03:00
+2025-02-16 19:58:41,386 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:58:41,386 - INFO - Time until battle: 5h 40m
+2025-02-16 19:58:41,387 - INFO - Wait seconds: 16818.616343
+2025-02-16 19:58:41,387 - INFO - Sleeping for 10 seconds
+2025-02-16 19:58:51,391 - INFO - Current time: 2025-02-16 19:58:51.388474+03:00
+2025-02-16 19:58:51,391 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:58:51,392 - INFO - Time until battle: 5h 40m
+2025-02-16 19:58:51,392 - INFO - Wait seconds: 16808.611526
+2025-02-16 19:58:51,392 - INFO - Sleeping for 10 seconds
+2025-02-16 19:59:00,001 - INFO - Running job "SchedulerManager.send_notification (trigger: cron[hour='19', minute='59'], next run at: 2025-02-17 19:59:00 MSK)" (scheduled at 2025-02-16 19:59:00+03:00)
+2025-02-16 19:59:00,008 - INFO - Connecting to 149.154.167.92:443/TcpFull...
+2025-02-16 19:59:00,066 - INFO - Connection to 149.154.167.92:443/TcpFull complete!
+2025-02-16 19:59:00,377 - INFO - UserBot initialized for +971582490941
+2025-02-16 19:59:00,378 - ERROR - Failed to send message: a TLObject was expected but found something else
+2025-02-16 19:59:00,378 - ERROR - Failed to send via user_bot, falling back to regular bot: a TLObject was expected but found something else
+2025-02-16 19:59:00,507 - INFO - Notification sent to channel via regular bot: P - 🤔кddddddd
+2025-02-16 19:59:00,507 - INFO - Job "SchedulerManager.send_notification (trigger: cron[hour='19', minute='59'], next run at: 2025-02-17 19:59:00 MSK)" executed successfully
+2025-02-16 19:59:01,396 - INFO - Current time: 2025-02-16 19:59:01.393224+03:00
+2025-02-16 19:59:01,396 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:59:01,396 - INFO - Time until battle: 5h 39m
+2025-02-16 19:59:01,396 - INFO - Wait seconds: 16798.606776
+2025-02-16 19:59:01,396 - INFO - Sleeping for 10 seconds
+2025-02-16 19:59:11,400 - INFO - Current time: 2025-02-16 19:59:11.397916+03:00
+2025-02-16 19:59:11,401 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:59:11,401 - INFO - Time until battle: 5h 39m
+2025-02-16 19:59:11,401 - INFO - Wait seconds: 16788.602084
+2025-02-16 19:59:11,401 - INFO - Sleeping for 10 seconds
+2025-02-16 19:59:21,404 - INFO - Current time: 2025-02-16 19:59:21.402283+03:00
+2025-02-16 19:59:21,404 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:59:21,404 - INFO - Time until battle: 5h 39m
+2025-02-16 19:59:21,405 - INFO - Wait seconds: 16778.597717
+2025-02-16 19:59:21,405 - INFO - Sleeping for 10 seconds
+2025-02-16 19:59:31,347 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:00:31 MSK)" (scheduled at 2025-02-16 19:59:31.345923+03:00)
+2025-02-16 19:59:31,348 - INFO - Notification task is already running
+2025-02-16 19:59:31,348 - INFO - Checking battle schedule...
+2025-02-16 19:59:31,348 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:00:31 MSK)" (scheduled at 2025-02-16 19:59:31.346166+03:00)
+2025-02-16 19:59:31,352 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:00:31 MSK)" executed successfully
+2025-02-16 19:59:31,352 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 19:59:31,352 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:00:31 MSK)" executed successfully
+2025-02-16 19:59:31,408 - INFO - Current time: 2025-02-16 19:59:31.406690+03:00
+2025-02-16 19:59:31,408 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:59:31,408 - INFO - Time until battle: 5h 39m
+2025-02-16 19:59:31,408 - INFO - Wait seconds: 16768.59331
+2025-02-16 19:59:31,408 - INFO - Sleeping for 10 seconds
+2025-02-16 19:59:41,412 - INFO - Current time: 2025-02-16 19:59:41.410035+03:00
+2025-02-16 19:59:41,412 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:59:41,412 - INFO - Time until battle: 5h 39m
+2025-02-16 19:59:41,412 - INFO - Wait seconds: 16758.589965
+2025-02-16 19:59:41,412 - INFO - Sleeping for 10 seconds
+2025-02-16 19:59:51,416 - INFO - Current time: 2025-02-16 19:59:51.414185+03:00
+2025-02-16 19:59:51,416 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 19:59:51,416 - INFO - Time until battle: 5h 39m
+2025-02-16 19:59:51,416 - INFO - Wait seconds: 16748.585815
+2025-02-16 19:59:51,417 - INFO - Sleeping for 10 seconds
+2025-02-16 20:00:01,420 - INFO - Current time: 2025-02-16 20:00:01.417365+03:00
+2025-02-16 20:00:01,420 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:00:01,420 - INFO - Time until battle: 5h 38m
+2025-02-16 20:00:01,420 - INFO - Wait seconds: 16738.582635
+2025-02-16 20:00:01,420 - INFO - Sleeping for 10 seconds
+2025-02-16 20:00:01,598 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:00:11,425 - INFO - Current time: 2025-02-16 20:00:11.422186+03:00
+2025-02-16 20:00:11,426 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:00:11,426 - INFO - Time until battle: 5h 38m
+2025-02-16 20:00:11,426 - INFO - Wait seconds: 16728.577814
+2025-02-16 20:00:11,426 - INFO - Sleeping for 10 seconds
+2025-02-16 20:00:21,430 - INFO - Current time: 2025-02-16 20:00:21.427931+03:00
+2025-02-16 20:00:21,431 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:00:21,431 - INFO - Time until battle: 5h 38m
+2025-02-16 20:00:21,431 - INFO - Wait seconds: 16718.572069
+2025-02-16 20:00:21,432 - INFO - Sleeping for 10 seconds
+2025-02-16 20:00:31,347 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:01:31 MSK)" (scheduled at 2025-02-16 20:00:31.345923+03:00)
+2025-02-16 20:00:31,347 - INFO - Notification task is already running
+2025-02-16 20:00:31,348 - INFO - Checking battle schedule...
+2025-02-16 20:00:31,348 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:01:31 MSK)" (scheduled at 2025-02-16 20:00:31.346166+03:00)
+2025-02-16 20:00:31,351 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 20:00:31,351 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:01:31 MSK)" executed successfully
+2025-02-16 20:00:31,352 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:01:31 MSK)" executed successfully
+2025-02-16 20:00:31,434 - INFO - Current time: 2025-02-16 20:00:31.433214+03:00
+2025-02-16 20:00:31,435 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:00:31,435 - INFO - Time until battle: 5h 38m
+2025-02-16 20:00:31,435 - INFO - Wait seconds: 16708.566786
+2025-02-16 20:00:31,435 - INFO - Sleeping for 10 seconds
+2025-02-16 20:00:31,689 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:00:37,586 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:00:41,439 - INFO - Current time: 2025-02-16 20:00:41.436651+03:00
+2025-02-16 20:00:41,439 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:00:41,439 - INFO - Time until battle: 5h 38m
+2025-02-16 20:00:41,440 - INFO - Wait seconds: 16698.563349
+2025-02-16 20:00:41,440 - INFO - Sleeping for 10 seconds
+2025-02-16 20:00:51,441 - INFO - Current time: 2025-02-16 20:00:51.440325+03:00
+2025-02-16 20:00:51,442 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:00:51,442 - INFO - Time until battle: 5h 38m
+2025-02-16 20:00:51,442 - INFO - Wait seconds: 16688.559675
+2025-02-16 20:00:51,442 - INFO - Sleeping for 10 seconds
+2025-02-16 20:00:52,329 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:01:01,447 - INFO - Current time: 2025-02-16 20:01:01.444035+03:00
+2025-02-16 20:01:01,447 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:01:01,447 - INFO - Time until battle: 5h 37m
+2025-02-16 20:01:01,447 - INFO - Wait seconds: 16678.555965
+2025-02-16 20:01:01,447 - INFO - Sleeping for 10 seconds
+2025-02-16 20:01:07,098 - INFO - Got difference for channel 2013105429 updates
+2025-02-16 20:01:11,452 - INFO - Current time: 2025-02-16 20:01:11.449140+03:00
+2025-02-16 20:01:11,452 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:01:11,452 - INFO - Time until battle: 5h 37m
+2025-02-16 20:01:11,453 - INFO - Wait seconds: 16668.55086
+2025-02-16 20:01:11,453 - INFO - Sleeping for 10 seconds
+2025-02-16 20:01:16,817 - INFO - Got difference for channel 2013105429 updates
+2025-02-16 20:01:21,457 - INFO - Current time: 2025-02-16 20:01:21.454447+03:00
+2025-02-16 20:01:21,457 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:01:21,458 - INFO - Time until battle: 5h 37m
+2025-02-16 20:01:21,458 - INFO - Wait seconds: 16658.545553
+2025-02-16 20:01:21,458 - INFO - Sleeping for 10 seconds
+2025-02-16 20:01:26,188 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:01:31,347 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:02:31 MSK)" (scheduled at 2025-02-16 20:01:31.345923+03:00)
+2025-02-16 20:01:31,348 - INFO - Notification task is already running
+2025-02-16 20:01:31,348 - INFO - Checking battle schedule...
+2025-02-16 20:01:31,349 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:02:31 MSK)" (scheduled at 2025-02-16 20:01:31.346166+03:00)
+2025-02-16 20:01:31,352 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:02:31 MSK)" executed successfully
+2025-02-16 20:01:31,353 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 20:01:31,353 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:02:31 MSK)" executed successfully
+2025-02-16 20:01:31,461 - INFO - Current time: 2025-02-16 20:01:31.458724+03:00
+2025-02-16 20:01:31,461 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:01:31,461 - INFO - Time until battle: 5h 37m
+2025-02-16 20:01:31,461 - INFO - Wait seconds: 16648.541276
+2025-02-16 20:01:31,461 - INFO - Sleeping for 10 seconds
+2025-02-16 20:01:41,466 - INFO - Current time: 2025-02-16 20:01:41.463230+03:00
+2025-02-16 20:01:41,466 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:01:41,466 - INFO - Time until battle: 5h 37m
+2025-02-16 20:01:41,467 - INFO - Wait seconds: 16638.53677
+2025-02-16 20:01:41,467 - INFO - Sleeping for 10 seconds
+2025-02-16 20:01:51,469 - INFO - Current time: 2025-02-16 20:01:51.468453+03:00
+2025-02-16 20:01:51,470 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:01:51,470 - INFO - Time until battle: 5h 37m
+2025-02-16 20:01:51,470 - INFO - Wait seconds: 16628.531547
+2025-02-16 20:01:51,470 - INFO - Sleeping for 10 seconds
+2025-02-16 20:02:01,472 - INFO - Current time: 2025-02-16 20:02:01.471549+03:00
+2025-02-16 20:02:01,472 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:02:01,472 - INFO - Time until battle: 5h 36m
+2025-02-16 20:02:01,472 - INFO - Wait seconds: 16618.528451
+2025-02-16 20:02:01,472 - INFO - Sleeping for 10 seconds
+2025-02-16 20:02:11,476 - INFO - Current time: 2025-02-16 20:02:11.473886+03:00
+2025-02-16 20:02:11,477 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:02:11,477 - INFO - Time until battle: 5h 36m
+2025-02-16 20:02:11,477 - INFO - Wait seconds: 16608.526114
+2025-02-16 20:02:11,477 - INFO - Sleeping for 10 seconds
+2025-02-16 20:02:21,481 - INFO - Current time: 2025-02-16 20:02:21.479068+03:00
+2025-02-16 20:02:21,481 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:02:21,482 - INFO - Time until battle: 5h 36m
+2025-02-16 20:02:21,482 - INFO - Wait seconds: 16598.520932
+2025-02-16 20:02:21,482 - INFO - Sleeping for 10 seconds
+2025-02-16 20:02:21,749 - INFO - Got difference for channel 2165667426 updates
+2025-02-16 20:02:24,576 - INFO - Got difference for channel 2013105429 updates
+2025-02-16 20:02:31,347 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:03:31 MSK)" (scheduled at 2025-02-16 20:02:31.345923+03:00)
+2025-02-16 20:02:31,348 - INFO - Notification task is already running
+2025-02-16 20:02:31,348 - INFO - Checking battle schedule...
+2025-02-16 20:02:31,348 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:03:31 MSK)" (scheduled at 2025-02-16 20:02:31.346166+03:00)
+2025-02-16 20:02:31,351 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 20:02:31,352 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:03:31 MSK)" executed successfully
+2025-02-16 20:02:31,352 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:03:31 MSK)" executed successfully
+2025-02-16 20:02:31,485 - INFO - Current time: 2025-02-16 20:02:31.483544+03:00
+2025-02-16 20:02:31,486 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:02:31,486 - INFO - Time until battle: 5h 36m
+2025-02-16 20:02:31,486 - INFO - Wait seconds: 16588.516456
+2025-02-16 20:02:31,486 - INFO - Sleeping for 10 seconds
+2025-02-16 20:02:34,838 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:02:41,490 - INFO - Current time: 2025-02-16 20:02:41.487955+03:00
+2025-02-16 20:02:41,491 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:02:41,491 - INFO - Time until battle: 5h 36m
+2025-02-16 20:02:41,491 - INFO - Wait seconds: 16578.512045
+2025-02-16 20:02:41,491 - INFO - Sleeping for 10 seconds
+2025-02-16 20:02:42,229 - INFO - Got difference for channel 2165667426 updates
+2025-02-16 20:02:51,495 - INFO - Current time: 2025-02-16 20:02:51.492941+03:00
+2025-02-16 20:02:51,495 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:02:51,495 - INFO - Time until battle: 5h 36m
+2025-02-16 20:02:51,495 - INFO - Wait seconds: 16568.507059
+2025-02-16 20:02:51,495 - INFO - Sleeping for 10 seconds
+2025-02-16 20:03:01,499 - INFO - Current time: 2025-02-16 20:03:01.497049+03:00
+2025-02-16 20:03:01,500 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:03:01,500 - INFO - Time until battle: 5h 35m
+2025-02-16 20:03:01,500 - INFO - Wait seconds: 16558.502951
+2025-02-16 20:03:01,500 - INFO - Sleeping for 10 seconds
+2025-02-16 20:03:11,504 - INFO - Current time: 2025-02-16 20:03:11.501573+03:00
+2025-02-16 20:03:11,504 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:03:11,504 - INFO - Time until battle: 5h 35m
+2025-02-16 20:03:11,504 - INFO - Wait seconds: 16548.498427
+2025-02-16 20:03:11,504 - INFO - Sleeping for 10 seconds
+2025-02-16 20:03:21,508 - INFO - Current time: 2025-02-16 20:03:21.506198+03:00
+2025-02-16 20:03:21,509 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:03:21,509 - INFO - Time until battle: 5h 35m
+2025-02-16 20:03:21,509 - INFO - Wait seconds: 16538.493802
+2025-02-16 20:03:21,509 - INFO - Sleeping for 10 seconds
+2025-02-16 20:03:30,169 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:03:31,347 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:04:31 MSK)" (scheduled at 2025-02-16 20:03:31.345923+03:00)
+2025-02-16 20:03:31,347 - INFO - Notification task is already running
+2025-02-16 20:03:31,347 - INFO - Checking battle schedule...
+2025-02-16 20:03:31,348 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:04:31 MSK)" (scheduled at 2025-02-16 20:03:31.346166+03:00)
+2025-02-16 20:03:31,350 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 20:03:31,351 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:04:31 MSK)" executed successfully
+2025-02-16 20:03:31,351 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:04:31 MSK)" executed successfully
+2025-02-16 20:03:31,511 - INFO - Current time: 2025-02-16 20:03:31.510662+03:00
+2025-02-16 20:03:31,512 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:03:31,512 - INFO - Time until battle: 5h 35m
+2025-02-16 20:03:31,512 - INFO - Wait seconds: 16528.489338
+2025-02-16 20:03:31,512 - INFO - Sleeping for 10 seconds
+2025-02-16 20:03:35,409 - INFO - Got difference for channel 1748479244 updates
+2025-02-16 20:03:39,863 - INFO - Got difference for channel 2013105429 updates
+2025-02-16 20:03:39,969 - INFO - Got difference for channel 2165667426 updates
+2025-02-16 20:03:41,515 - INFO - Current time: 2025-02-16 20:03:41.513660+03:00
+2025-02-16 20:03:41,515 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:03:41,515 - INFO - Time until battle: 5h 35m
+2025-02-16 20:03:41,515 - INFO - Wait seconds: 16518.48634
+2025-02-16 20:03:41,515 - INFO - Sleeping for 10 seconds
+2025-02-16 20:03:47,958 - INFO - Got difference for channel 2231687574 updates
+2025-02-16 20:03:51,520 - INFO - Current time: 2025-02-16 20:03:51.517144+03:00
+2025-02-16 20:03:51,520 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:03:51,520 - INFO - Time until battle: 5h 35m
+2025-02-16 20:03:51,520 - INFO - Wait seconds: 16508.482856
+2025-02-16 20:03:51,520 - INFO - Sleeping for 10 seconds
+2025-02-16 20:04:01,525 - INFO - Current time: 2025-02-16 20:04:01.521929+03:00
+2025-02-16 20:04:01,525 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:04:01,525 - INFO - Time until battle: 5h 34m
+2025-02-16 20:04:01,526 - INFO - Wait seconds: 16498.478071
+2025-02-16 20:04:01,526 - INFO - Sleeping for 10 seconds
+2025-02-16 20:04:04,740 - INFO - Got difference for channel 2165667426 updates
+2025-02-16 20:04:11,530 - INFO - Current time: 2025-02-16 20:04:11.527676+03:00
+2025-02-16 20:04:11,531 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:04:11,531 - INFO - Time until battle: 5h 34m
+2025-02-16 20:04:11,531 - INFO - Wait seconds: 16488.472324
+2025-02-16 20:04:11,531 - INFO - Sleeping for 10 seconds
+2025-02-16 20:04:19,227 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:04:21,535 - INFO - Current time: 2025-02-16 20:04:21.532491+03:00
+2025-02-16 20:04:21,536 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:04:21,536 - INFO - Time until battle: 5h 34m
+2025-02-16 20:04:21,536 - INFO - Wait seconds: 16478.467509
+2025-02-16 20:04:21,536 - INFO - Sleeping for 10 seconds
+2025-02-16 20:08:43,946 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-02-16 20:08:43,946 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-02-16 20:08:43,946 - INFO - Added job "Schedule_checker" to job store "default"
+2025-02-16 20:08:43,947 - INFO - Added job "Notification_checker" to job store "default"
+2025-02-16 20:08:43,947 - INFO - Scheduler started
+2025-02-16 20:08:43,947 - INFO - Scheduler started successfully
+2025-02-16 20:08:44,856 - INFO - Start polling
+2025-02-16 20:08:44,924 - INFO - Run polling for bot @WW_EDU_bot id=7599529676 - 'WW-бот'
+2025-02-16 20:08:49,290 - INFO - Request processed in mode 1
+2025-02-16 20:08:49,534 - INFO - Update id=574621219 is handled. Duration 244 ms by bot id=7599529676
+2025-02-16 20:08:54,986 - INFO - Request processed in mode 1
+2025-02-16 20:08:55,075 - INFO - Update id=574621220 is handled. Duration 89 ms by bot id=7599529676
+2025-02-16 20:09:03,407 - INFO - Request processed in mode 1
+2025-02-16 20:09:03,516 - INFO - Update id=574621221 is handled. Duration 109 ms by bot id=7599529676
+2025-02-16 20:09:07,996 - INFO - Request processed in mode 1
+2025-02-16 20:09:08,009 - INFO - Adding notification job: 2 at 20:10
+2025-02-16 20:09:08,014 - INFO - Added job "SchedulerManager.send_notification" to job store "default"
+2025-02-16 20:09:08,666 - INFO - Update id=574621222 is handled. Duration 670 ms by bot id=7599529676
+2025-02-16 20:09:43,947 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:10:43 MSK)" (scheduled at 2025-02-16 20:09:43.946216+03:00)
+2025-02-16 20:09:43,948 - INFO - Notification task started
+2025-02-16 20:09:43,948 - INFO - Checking battle schedule...
+2025-02-16 20:09:43,948 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:10:43 MSK)" (scheduled at 2025-02-16 20:09:43.946566+03:00)
+2025-02-16 20:09:43,952 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:10:43 MSK)" executed successfully
+2025-02-16 20:09:43,953 - INFO - Next battle time set to: 2025-02-17 01:39:00+03:00
+2025-02-16 20:09:43,953 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 20:09:43,955 - INFO - Added job "Battle_task" to job store "default"
+2025-02-16 20:09:43,955 - INFO - New battle scheduled for: 2025-02-17 01:39:00+03:00
+2025-02-16 20:09:43,955 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:10:43 MSK)" executed successfully
+2025-02-16 20:09:43,955 - INFO - Current time: 2025-02-16 20:09:43.949524+03:00
+2025-02-16 20:09:43,955 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:09:43,956 - INFO - Time until battle: 5h 29m
+2025-02-16 20:09:43,956 - INFO - Wait seconds: 16156.050476
+2025-02-16 20:09:43,956 - INFO - Sleeping for 10 seconds
+2025-02-16 20:09:53,961 - INFO - Current time: 2025-02-16 20:09:53.957903+03:00
+2025-02-16 20:09:53,961 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:09:53,962 - INFO - Time until battle: 5h 29m
+2025-02-16 20:09:53,962 - INFO - Wait seconds: 16146.042097
+2025-02-16 20:09:53,962 - INFO - Sleeping for 10 seconds
+2025-02-16 20:10:00,000 - INFO - Running job "SchedulerManager.send_notification (trigger: cron[hour='20', minute='10'], next run at: 2025-02-17 20:10:00 MSK)" (scheduled at 2025-02-16 20:10:00+03:00)
+2025-02-16 20:10:00,003 - INFO - Connecting to 149.154.167.92:443/TcpFull...
+2025-02-16 20:10:00,064 - INFO - Connection to 149.154.167.92:443/TcpFull complete!
+2025-02-16 20:10:00,406 - INFO - UserBot initialized for +971582490941
+2025-02-16 20:10:00,496 - ERROR - Failed to send message: 'ChannelFull' object has no attribute 'access_hash'
+2025-02-16 20:10:00,497 - ERROR - Failed to send via user_bot, falling back to regular bot: 'ChannelFull' object has no attribute 'access_hash'
+2025-02-16 20:10:00,625 - INFO - Notification sent to channel via regular bot: 2 - 🤔кddddddd
+2025-02-16 20:10:00,626 - INFO - Job "SchedulerManager.send_notification (trigger: cron[hour='20', minute='10'], next run at: 2025-02-17 20:10:00 MSK)" executed successfully
+2025-02-16 20:10:03,966 - INFO - Current time: 2025-02-16 20:10:03.963684+03:00
+2025-02-16 20:10:03,966 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:10:03,967 - INFO - Time until battle: 5h 28m
+2025-02-16 20:10:03,967 - INFO - Wait seconds: 16136.036316
+2025-02-16 20:10:03,967 - INFO - Sleeping for 10 seconds
+2025-02-16 20:10:13,971 - INFO - Current time: 2025-02-16 20:10:13.968477+03:00
+2025-02-16 20:10:13,971 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:10:13,972 - INFO - Time until battle: 5h 28m
+2025-02-16 20:10:13,972 - INFO - Wait seconds: 16126.031523
+2025-02-16 20:10:13,972 - INFO - Sleeping for 10 seconds
+2025-02-16 20:10:23,977 - INFO - Current time: 2025-02-16 20:10:23.974147+03:00
+2025-02-16 20:10:23,978 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:10:23,978 - INFO - Time until battle: 5h 28m
+2025-02-16 20:10:23,978 - INFO - Wait seconds: 16116.025853
+2025-02-16 20:10:23,978 - INFO - Sleeping for 10 seconds
+2025-02-16 20:10:33,981 - INFO - Current time: 2025-02-16 20:10:33.979455+03:00
+2025-02-16 20:10:33,982 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:10:33,982 - INFO - Time until battle: 5h 28m
+2025-02-16 20:10:33,982 - INFO - Wait seconds: 16106.020545
+2025-02-16 20:10:33,982 - INFO - Sleeping for 10 seconds
+2025-02-16 20:10:43,946 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:11:43 MSK)" (scheduled at 2025-02-16 20:10:43.946216+03:00)
+2025-02-16 20:10:43,947 - INFO - Notification task is already running
+2025-02-16 20:10:43,947 - INFO - Checking battle schedule...
+2025-02-16 20:10:43,948 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:11:43 MSK)" (scheduled at 2025-02-16 20:10:43.946566+03:00)
+2025-02-16 20:10:43,950 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 20:10:43,950 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:11:43 MSK)" executed successfully
+2025-02-16 20:10:43,950 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:11:43 MSK)" executed successfully
+2025-02-16 20:10:43,984 - INFO - Current time: 2025-02-16 20:10:43.982956+03:00
+2025-02-16 20:10:43,984 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:10:43,984 - INFO - Time until battle: 5h 28m
+2025-02-16 20:10:43,984 - INFO - Wait seconds: 16096.017044
+2025-02-16 20:10:43,984 - INFO - Sleeping for 10 seconds
+2025-02-16 20:10:53,987 - INFO - Current time: 2025-02-16 20:10:53.984873+03:00
+2025-02-16 20:10:53,987 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:10:53,987 - INFO - Time until battle: 5h 28m
+2025-02-16 20:10:53,987 - INFO - Wait seconds: 16086.015127
+2025-02-16 20:10:53,988 - INFO - Sleeping for 10 seconds
+2025-02-16 20:11:03,991 - INFO - Current time: 2025-02-16 20:11:03.989111+03:00
+2025-02-16 20:11:03,991 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:11:03,991 - INFO - Time until battle: 5h 27m
+2025-02-16 20:11:03,992 - INFO - Wait seconds: 16076.010889
+2025-02-16 20:11:03,992 - INFO - Sleeping for 10 seconds
+2025-02-16 20:11:13,993 - INFO - Current time: 2025-02-16 20:11:13.993176+03:00
+2025-02-16 20:11:13,993 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:11:13,993 - INFO - Time until battle: 5h 27m
+2025-02-16 20:11:13,993 - INFO - Wait seconds: 16066.006824
+2025-02-16 20:11:13,994 - INFO - Sleeping for 10 seconds
+2025-02-16 20:11:23,996 - INFO - Current time: 2025-02-16 20:11:23.995059+03:00
+2025-02-16 20:11:23,996 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:11:23,997 - INFO - Time until battle: 5h 27m
+2025-02-16 20:11:23,997 - INFO - Wait seconds: 16056.004941
+2025-02-16 20:11:23,997 - INFO - Sleeping for 10 seconds
+2025-02-16 20:11:34,000 - INFO - Current time: 2025-02-16 20:11:33.998396+03:00
+2025-02-16 20:11:34,000 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:11:34,001 - INFO - Time until battle: 5h 27m
+2025-02-16 20:11:34,001 - INFO - Wait seconds: 16046.001604
+2025-02-16 20:11:34,001 - INFO - Sleeping for 10 seconds
+2025-02-16 20:11:43,947 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:12:43 MSK)" (scheduled at 2025-02-16 20:11:43.946216+03:00)
+2025-02-16 20:11:43,947 - INFO - Notification task is already running
+2025-02-16 20:11:43,948 - INFO - Checking battle schedule...
+2025-02-16 20:11:43,948 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:12:43 MSK)" (scheduled at 2025-02-16 20:11:43.946566+03:00)
+2025-02-16 20:11:43,950 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 20:11:43,951 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:12:43 MSK)" executed successfully
+2025-02-16 20:11:43,952 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:12:43 MSK)" executed successfully
+2025-02-16 20:11:44,002 - INFO - Current time: 2025-02-16 20:11:44.001775+03:00
+2025-02-16 20:11:44,003 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:11:44,003 - INFO - Time until battle: 5h 27m
+2025-02-16 20:11:44,003 - INFO - Wait seconds: 16035.998225
+2025-02-16 20:11:44,003 - INFO - Sleeping for 10 seconds
+2025-02-16 20:11:46,184 - INFO - Got difference for account updates
+2025-02-16 20:11:53,625 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:11:54,007 - INFO - Current time: 2025-02-16 20:11:54.004485+03:00
+2025-02-16 20:11:54,007 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:11:54,007 - INFO - Time until battle: 5h 27m
+2025-02-16 20:11:54,007 - INFO - Wait seconds: 16025.995515
+2025-02-16 20:11:54,008 - INFO - Sleeping for 10 seconds
+2025-02-16 20:12:04,011 - INFO - Current time: 2025-02-16 20:12:04.009278+03:00
+2025-02-16 20:12:04,011 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:12:04,011 - INFO - Time until battle: 5h 26m
+2025-02-16 20:12:04,011 - INFO - Wait seconds: 16015.990722
+2025-02-16 20:12:04,011 - INFO - Sleeping for 10 seconds
+2025-02-16 20:12:04,825 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:12:14,016 - INFO - Current time: 2025-02-16 20:12:14.013133+03:00
+2025-02-16 20:12:14,017 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:12:14,017 - INFO - Time until battle: 5h 26m
+2025-02-16 20:12:14,017 - INFO - Wait seconds: 16005.986867
+2025-02-16 20:12:14,017 - INFO - Sleeping for 10 seconds
+2025-02-16 20:12:24,022 - INFO - Current time: 2025-02-16 20:12:24.018814+03:00
+2025-02-16 20:12:24,022 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:12:24,022 - INFO - Time until battle: 5h 26m
+2025-02-16 20:12:24,022 - INFO - Wait seconds: 15995.981186
+2025-02-16 20:12:24,023 - INFO - Sleeping for 10 seconds
+2025-02-16 20:12:33,653 - INFO - Got difference for channel 2013105429 updates
+2025-02-16 20:12:34,027 - INFO - Current time: 2025-02-16 20:12:34.024365+03:00
+2025-02-16 20:12:34,027 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:12:34,027 - INFO - Time until battle: 5h 26m
+2025-02-16 20:12:34,027 - INFO - Wait seconds: 15985.975635
+2025-02-16 20:12:34,027 - INFO - Sleeping for 10 seconds
+2025-02-16 20:12:43,947 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:13:43 MSK)" (scheduled at 2025-02-16 20:12:43.946216+03:00)
+2025-02-16 20:12:43,947 - INFO - Notification task is already running
+2025-02-16 20:12:43,947 - INFO - Checking battle schedule...
+2025-02-16 20:12:43,947 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:13:43 MSK)" (scheduled at 2025-02-16 20:12:43.946566+03:00)
+2025-02-16 20:12:43,949 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 20:12:43,950 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:13:43 MSK)" executed successfully
+2025-02-16 20:12:43,950 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:13:43 MSK)" executed successfully
+2025-02-16 20:12:44,030 - INFO - Current time: 2025-02-16 20:12:44.028960+03:00
+2025-02-16 20:12:44,030 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:12:44,030 - INFO - Time until battle: 5h 26m
+2025-02-16 20:12:44,030 - INFO - Wait seconds: 15975.97104
+2025-02-16 20:12:44,030 - INFO - Sleeping for 10 seconds
+2025-02-16 20:12:45,233 - INFO - Got difference for channel 2013105429 updates
+2025-02-16 20:12:50,564 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:12:54,040 - INFO - Current time: 2025-02-16 20:12:54.031948+03:00
+2025-02-16 20:12:54,040 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:12:54,040 - INFO - Time until battle: 5h 26m
+2025-02-16 20:12:54,040 - INFO - Wait seconds: 15965.968052
+2025-02-16 20:12:54,040 - INFO - Sleeping for 10 seconds
+2025-02-16 20:12:55,732 - INFO - Got difference for channel 2100400784 updates
+2025-02-16 20:13:00,042 - INFO - Got difference for channel 2100400784 updates
+2025-02-16 20:13:03,353 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:13:04,043 - INFO - Current time: 2025-02-16 20:13:04.042095+03:00
+2025-02-16 20:13:04,043 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:13:04,043 - INFO - Time until battle: 5h 25m
+2025-02-16 20:13:04,043 - INFO - Wait seconds: 15955.957905
+2025-02-16 20:13:04,043 - INFO - Sleeping for 10 seconds
+2025-02-16 20:13:04,125 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:14:07,946 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-02-16 20:14:07,946 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-02-16 20:14:07,947 - INFO - Added job "Schedule_checker" to job store "default"
+2025-02-16 20:14:07,947 - INFO - Added job "Notification_checker" to job store "default"
+2025-02-16 20:14:07,947 - INFO - Scheduler started
+2025-02-16 20:14:07,947 - INFO - Scheduler started successfully
+2025-02-16 20:14:08,365 - INFO - Start polling
+2025-02-16 20:14:08,419 - INFO - Run polling for bot @WW_EDU_bot id=7599529676 - 'WW-бот'
+2025-02-16 20:14:34,087 - INFO - Request processed in mode 1
+2025-02-16 20:14:34,332 - INFO - Update id=574621223 is handled. Duration 246 ms by bot id=7599529676
+2025-02-16 20:14:43,854 - INFO - Request processed in mode 1
+2025-02-16 20:14:43,932 - INFO - Update id=574621224 is handled. Duration 78 ms by bot id=7599529676
+2025-02-16 20:14:51,253 - INFO - Request processed in mode 1
+2025-02-16 20:14:51,392 - INFO - Update id=574621225 is handled. Duration 139 ms by bot id=7599529676
+2025-02-16 20:14:54,025 - INFO - Request processed in mode 1
+2025-02-16 20:14:54,044 - INFO - Adding notification job: 0 at 20:15
+2025-02-16 20:14:54,047 - INFO - Added job "SchedulerManager.send_notification" to job store "default"
+2025-02-16 20:14:54,193 - INFO - Update id=574621226 is handled. Duration 168 ms by bot id=7599529676
+2025-02-16 20:15:00,003 - INFO - Running job "SchedulerManager.send_notification (trigger: cron[hour='20', minute='15'], next run at: 2025-02-17 20:15:00 MSK)" (scheduled at 2025-02-16 20:15:00+03:00)
+2025-02-16 20:15:00,010 - INFO - Connecting to 149.154.167.92:443/TcpFull...
+2025-02-16 20:15:00,072 - INFO - Connection to 149.154.167.92:443/TcpFull complete!
+2025-02-16 20:15:00,493 - INFO - UserBot initialized for +971582490941
+2025-02-16 20:15:00,494 - ERROR - Failed to send message: a TLObject was expected but found something else
+2025-02-16 20:15:00,494 - ERROR - Failed to send via user_bot, falling back to regular bot: a TLObject was expected but found something else
+2025-02-16 20:15:00,672 - INFO - Notification sent to channel via regular bot: 0 - 🤔кddddddd
+2025-02-16 20:15:00,673 - INFO - Job "SchedulerManager.send_notification (trigger: cron[hour='20', minute='15'], next run at: 2025-02-17 20:15:00 MSK)" executed successfully
+2025-02-16 20:15:07,948 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:16:07 MSK)" (scheduled at 2025-02-16 20:15:07.946418+03:00)
+2025-02-16 20:15:07,949 - INFO - Notification task started
+2025-02-16 20:15:07,949 - INFO - Checking battle schedule...
+2025-02-16 20:15:07,949 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:16:07 MSK)" (scheduled at 2025-02-16 20:15:07.946781+03:00)
+2025-02-16 20:15:07,953 - INFO - Next battle time set to: 2025-02-17 01:39:00+03:00
+2025-02-16 20:15:07,953 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 20:15:07,955 - INFO - Added job "Battle_task" to job store "default"
+2025-02-16 20:15:07,955 - INFO - New battle scheduled for: 2025-02-17 01:39:00+03:00
+2025-02-16 20:15:07,955 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:16:07 MSK)" executed successfully
+2025-02-16 20:15:07,956 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:16:07 MSK)" executed successfully
+2025-02-16 20:15:07,957 - INFO - Current time: 2025-02-16 20:15:07.950369+03:00
+2025-02-16 20:15:07,957 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:15:07,957 - INFO - Time until battle: 5h 23m
+2025-02-16 20:15:07,957 - INFO - Wait seconds: 15832.049631
+2025-02-16 20:15:07,957 - INFO - Sleeping for 10 seconds
+2025-02-16 20:15:17,959 - INFO - Current time: 2025-02-16 20:15:17.958530+03:00
+2025-02-16 20:15:17,959 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:15:17,960 - INFO - Time until battle: 5h 23m
+2025-02-16 20:15:17,960 - INFO - Wait seconds: 15822.04147
+2025-02-16 20:15:17,960 - INFO - Sleeping for 10 seconds
+2025-02-16 20:15:21,213 - INFO - Got difference for channel 1748479244 updates
+2025-02-16 20:15:27,964 - INFO - Current time: 2025-02-16 20:15:27.961373+03:00
+2025-02-16 20:15:27,965 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:15:27,965 - INFO - Time until battle: 5h 23m
+2025-02-16 20:15:27,966 - INFO - Wait seconds: 15812.038627
+2025-02-16 20:15:27,966 - INFO - Sleeping for 10 seconds
+2025-02-16 20:15:37,970 - INFO - Current time: 2025-02-16 20:15:37.967303+03:00
+2025-02-16 20:15:37,971 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:15:37,971 - INFO - Time until battle: 5h 23m
+2025-02-16 20:15:37,971 - INFO - Wait seconds: 15802.032697
+2025-02-16 20:15:37,971 - INFO - Sleeping for 10 seconds
+2025-02-16 20:19:04,746 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-02-16 20:19:04,746 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-02-16 20:19:04,746 - INFO - Added job "Schedule_checker" to job store "default"
+2025-02-16 20:19:04,746 - INFO - Added job "Notification_checker" to job store "default"
+2025-02-16 20:19:04,747 - INFO - Scheduler started
+2025-02-16 20:19:04,747 - INFO - Scheduler started successfully
+2025-02-16 20:19:05,111 - INFO - Start polling
+2025-02-16 20:19:05,164 - INFO - Run polling for bot @WW_EDU_bot id=7599529676 - 'WW-бот'
+2025-02-16 20:19:09,435 - INFO - Request processed in mode 1
+2025-02-16 20:19:09,752 - INFO - Update id=574621227 is handled. Duration 317 ms by bot id=7599529676
+2025-02-16 20:19:17,154 - INFO - Request processed in mode 1
+2025-02-16 20:19:17,232 - INFO - Update id=574621228 is handled. Duration 77 ms by bot id=7599529676
+2025-02-16 20:19:26,393 - INFO - Request processed in mode 1
+2025-02-16 20:19:26,482 - INFO - Update id=574621229 is handled. Duration 89 ms by bot id=7599529676
+2025-02-16 20:19:27,783 - INFO - Request processed in mode 1
+2025-02-16 20:19:27,806 - INFO - Adding notification job: T at 20:20
+2025-02-16 20:19:27,809 - INFO - Added job "SchedulerManager.send_notification" to job store "default"
+2025-02-16 20:19:27,893 - INFO - Update id=574621230 is handled. Duration 109 ms by bot id=7599529676
+2025-02-16 20:20:00,002 - INFO - Running job "SchedulerManager.send_notification (trigger: cron[hour='20', minute='20'], next run at: 2025-02-17 20:20:00 MSK)" (scheduled at 2025-02-16 20:20:00+03:00)
+2025-02-16 20:20:00,006 - ERROR - Failed to send via user_bot, falling back to regular bot: UserBot.send_channel_message() takes from 2 to 3 positional arguments but 4 were given
+2025-02-16 20:20:00,222 - INFO - Notification sent to channel via regular bot: T - 🤔кddddddd
+2025-02-16 20:20:00,222 - INFO - Job "SchedulerManager.send_notification (trigger: cron[hour='20', minute='20'], next run at: 2025-02-17 20:20:00 MSK)" executed successfully
+2025-02-16 20:20:04,746 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:21:04 MSK)" (scheduled at 2025-02-16 20:20:04.746015+03:00)
+2025-02-16 20:20:04,747 - INFO - Notification task started
+2025-02-16 20:20:04,747 - INFO - Checking battle schedule...
+2025-02-16 20:20:04,749 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:21:04 MSK)" (scheduled at 2025-02-16 20:20:04.746507+03:00)
+2025-02-16 20:20:04,752 - INFO - Next battle time set to: 2025-02-17 01:39:00+03:00
+2025-02-16 20:20:04,752 - INFO - Current time: 2025-02-16 20:20:04.748570+03:00
+2025-02-16 20:20:04,752 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:20:04,752 - INFO - Time until battle: 5h 18m
+2025-02-16 20:20:04,752 - INFO - Wait seconds: 15535.25143
+2025-02-16 20:20:04,752 - INFO - Sleeping for 10 seconds
+2025-02-16 20:20:04,753 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 20:20:04,755 - INFO - Added job "Battle_task" to job store "default"
+2025-02-16 20:20:04,755 - INFO - New battle scheduled for: 2025-02-17 01:39:00+03:00
+2025-02-16 20:20:04,755 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:21:04 MSK)" executed successfully
+2025-02-16 20:20:04,757 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:21:04 MSK)" executed successfully
+2025-02-16 20:20:14,755 - INFO - Current time: 2025-02-16 20:20:14.754068+03:00
+2025-02-16 20:20:14,755 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:20:14,756 - INFO - Time until battle: 5h 18m
+2025-02-16 20:20:14,756 - INFO - Wait seconds: 15525.245932
+2025-02-16 20:20:14,756 - INFO - Sleeping for 10 seconds
+2025-02-16 20:20:24,758 - INFO - Current time: 2025-02-16 20:20:24.756692+03:00
+2025-02-16 20:20:24,758 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:20:24,758 - INFO - Time until battle: 5h 18m
+2025-02-16 20:20:24,758 - INFO - Wait seconds: 15515.243308
+2025-02-16 20:20:24,758 - INFO - Sleeping for 10 seconds
+2025-02-16 20:20:34,760 - INFO - Current time: 2025-02-16 20:20:34.759497+03:00
+2025-02-16 20:20:34,761 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:20:34,762 - INFO - Time until battle: 5h 18m
+2025-02-16 20:20:34,762 - INFO - Wait seconds: 15505.240503
+2025-02-16 20:20:34,762 - INFO - Sleeping for 10 seconds
+2025-02-16 20:20:44,766 - INFO - Current time: 2025-02-16 20:20:44.763385+03:00
+2025-02-16 20:20:44,767 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:20:44,767 - INFO - Time until battle: 5h 18m
+2025-02-16 20:20:44,768 - INFO - Wait seconds: 15495.236615
+2025-02-16 20:20:44,768 - INFO - Sleeping for 10 seconds
+2025-02-16 20:20:54,772 - INFO - Current time: 2025-02-16 20:20:54.769043+03:00
+2025-02-16 20:20:54,773 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:20:54,773 - INFO - Time until battle: 5h 18m
+2025-02-16 20:20:54,773 - INFO - Wait seconds: 15485.230957
+2025-02-16 20:20:54,773 - INFO - Sleeping for 10 seconds
+2025-02-16 20:21:04,746 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:22:04 MSK)" (scheduled at 2025-02-16 20:21:04.746015+03:00)
+2025-02-16 20:21:04,747 - INFO - Notification task is already running
+2025-02-16 20:21:04,747 - INFO - Checking battle schedule...
+2025-02-16 20:21:04,748 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:22:04 MSK)" (scheduled at 2025-02-16 20:21:04.746507+03:00)
+2025-02-16 20:21:04,749 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 20:21:04,750 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:22:04 MSK)" executed successfully
+2025-02-16 20:21:04,750 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:22:04 MSK)" executed successfully
+2025-02-16 20:21:04,775 - INFO - Current time: 2025-02-16 20:21:04.774685+03:00
+2025-02-16 20:21:04,775 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:21:04,776 - INFO - Time until battle: 5h 17m
+2025-02-16 20:21:04,776 - INFO - Wait seconds: 15475.225315
+2025-02-16 20:21:04,776 - INFO - Sleeping for 10 seconds
+2025-02-16 20:21:14,780 - INFO - Current time: 2025-02-16 20:21:14.777310+03:00
+2025-02-16 20:21:14,781 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:21:14,781 - INFO - Time until battle: 5h 17m
+2025-02-16 20:21:14,781 - INFO - Wait seconds: 15465.22269
+2025-02-16 20:21:14,781 - INFO - Sleeping for 10 seconds
+2025-02-16 20:21:24,783 - INFO - Current time: 2025-02-16 20:21:24.782943+03:00
+2025-02-16 20:21:24,785 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:21:24,785 - INFO - Time until battle: 5h 17m
+2025-02-16 20:21:24,785 - INFO - Wait seconds: 15455.217057
+2025-02-16 20:21:24,785 - INFO - Sleeping for 10 seconds
+2025-02-16 20:21:34,789 - INFO - Current time: 2025-02-16 20:21:34.786636+03:00
+2025-02-16 20:21:34,790 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:21:34,790 - INFO - Time until battle: 5h 17m
+2025-02-16 20:21:34,790 - INFO - Wait seconds: 15445.213364
+2025-02-16 20:21:34,790 - INFO - Sleeping for 10 seconds
+2025-02-16 20:21:44,793 - INFO - Current time: 2025-02-16 20:21:44.791019+03:00
+2025-02-16 20:21:44,794 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:21:44,794 - INFO - Time until battle: 5h 17m
+2025-02-16 20:21:44,794 - INFO - Wait seconds: 15435.208981
+2025-02-16 20:21:44,794 - INFO - Sleeping for 10 seconds
+2025-02-16 20:21:54,799 - INFO - Current time: 2025-02-16 20:21:54.796216+03:00
+2025-02-16 20:21:54,799 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:21:54,799 - INFO - Time until battle: 5h 17m
+2025-02-16 20:21:54,799 - INFO - Wait seconds: 15425.203784
+2025-02-16 20:21:54,800 - INFO - Sleeping for 10 seconds
+2025-02-16 20:22:04,747 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:23:04 MSK)" (scheduled at 2025-02-16 20:22:04.746015+03:00)
+2025-02-16 20:22:04,748 - INFO - Notification task is already running
+2025-02-16 20:22:04,748 - INFO - Checking battle schedule...
+2025-02-16 20:22:04,749 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:23:04 MSK)" (scheduled at 2025-02-16 20:22:04.746507+03:00)
+2025-02-16 20:22:04,751 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 20:22:04,751 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:23:04 MSK)" executed successfully
+2025-02-16 20:22:04,752 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:23:04 MSK)" executed successfully
+2025-02-16 20:22:04,802 - INFO - Current time: 2025-02-16 20:22:04.801202+03:00
+2025-02-16 20:22:04,802 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:22:04,802 - INFO - Time until battle: 5h 16m
+2025-02-16 20:22:04,802 - INFO - Wait seconds: 15415.198798
+2025-02-16 20:22:04,802 - INFO - Sleeping for 10 seconds
+2025-02-16 20:22:14,805 - INFO - Current time: 2025-02-16 20:22:14.803564+03:00
+2025-02-16 20:22:14,807 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:22:14,807 - INFO - Time until battle: 5h 16m
+2025-02-16 20:22:14,807 - INFO - Wait seconds: 15405.196436
+2025-02-16 20:22:14,807 - INFO - Sleeping for 10 seconds
+2025-02-16 20:22:24,811 - INFO - Current time: 2025-02-16 20:22:24.808270+03:00
+2025-02-16 20:22:24,811 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:22:24,811 - INFO - Time until battle: 5h 16m
+2025-02-16 20:22:24,811 - INFO - Wait seconds: 15395.19173
+2025-02-16 20:22:24,811 - INFO - Sleeping for 10 seconds
+2025-02-16 20:22:34,815 - INFO - Current time: 2025-02-16 20:22:34.812975+03:00
+2025-02-16 20:22:34,816 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:22:34,816 - INFO - Time until battle: 5h 16m
+2025-02-16 20:22:34,816 - INFO - Wait seconds: 15385.187025
+2025-02-16 20:22:34,816 - INFO - Sleeping for 10 seconds
+2025-02-16 20:22:44,820 - INFO - Current time: 2025-02-16 20:22:44.817908+03:00
+2025-02-16 20:22:44,820 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:22:44,820 - INFO - Time until battle: 5h 16m
+2025-02-16 20:22:44,820 - INFO - Wait seconds: 15375.182092
+2025-02-16 20:22:44,820 - INFO - Sleeping for 10 seconds
+2025-02-16 20:22:54,824 - INFO - Current time: 2025-02-16 20:22:54.822174+03:00
+2025-02-16 20:22:54,825 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:22:54,825 - INFO - Time until battle: 5h 16m
+2025-02-16 20:22:54,825 - INFO - Wait seconds: 15365.177826
+2025-02-16 20:22:54,825 - INFO - Sleeping for 10 seconds
+2025-02-16 20:23:04,747 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:24:04 MSK)" (scheduled at 2025-02-16 20:23:04.746015+03:00)
+2025-02-16 20:23:04,748 - INFO - Notification task is already running
+2025-02-16 20:23:04,748 - INFO - Checking battle schedule...
+2025-02-16 20:23:04,748 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:24:04 MSK)" (scheduled at 2025-02-16 20:23:04.746507+03:00)
+2025-02-16 20:23:04,749 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 20:23:04,749 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:24:04 MSK)" executed successfully
+2025-02-16 20:23:04,750 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:24:04 MSK)" executed successfully
+2025-02-16 20:23:04,827 - INFO - Current time: 2025-02-16 20:23:04.826509+03:00
+2025-02-16 20:23:04,827 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:23:04,827 - INFO - Time until battle: 5h 15m
+2025-02-16 20:23:04,827 - INFO - Wait seconds: 15355.173491
+2025-02-16 20:23:04,827 - INFO - Sleeping for 10 seconds
+2025-02-16 20:23:14,830 - INFO - Current time: 2025-02-16 20:23:14.829012+03:00
+2025-02-16 20:23:14,831 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:23:14,831 - INFO - Time until battle: 5h 15m
+2025-02-16 20:23:14,831 - INFO - Wait seconds: 15345.170988
+2025-02-16 20:23:14,831 - INFO - Sleeping for 10 seconds
+2025-02-16 20:23:24,833 - INFO - Current time: 2025-02-16 20:23:24.832915+03:00
+2025-02-16 20:23:24,833 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:23:24,833 - INFO - Time until battle: 5h 15m
+2025-02-16 20:23:24,834 - INFO - Wait seconds: 15335.167085
+2025-02-16 20:23:24,834 - INFO - Sleeping for 10 seconds
+2025-02-16 20:23:34,838 - INFO - Current time: 2025-02-16 20:23:34.835263+03:00
+2025-02-16 20:23:34,839 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:23:34,839 - INFO - Time until battle: 5h 15m
+2025-02-16 20:23:34,839 - INFO - Wait seconds: 15325.164737
+2025-02-16 20:23:34,839 - INFO - Sleeping for 10 seconds
+2025-02-16 20:23:44,842 - INFO - Current time: 2025-02-16 20:23:44.840654+03:00
+2025-02-16 20:23:44,844 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:23:44,844 - INFO - Time until battle: 5h 15m
+2025-02-16 20:23:44,844 - INFO - Wait seconds: 15315.159346
+2025-02-16 20:23:44,844 - INFO - Sleeping for 10 seconds
+2025-02-16 20:23:54,848 - INFO - Current time: 2025-02-16 20:23:54.845761+03:00
+2025-02-16 20:23:54,849 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:23:54,849 - INFO - Time until battle: 5h 15m
+2025-02-16 20:23:54,849 - INFO - Wait seconds: 15305.154239
+2025-02-16 20:23:54,849 - INFO - Sleeping for 10 seconds
+2025-02-16 20:24:04,747 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:25:04 MSK)" (scheduled at 2025-02-16 20:24:04.746015+03:00)
+2025-02-16 20:24:04,748 - INFO - Notification task is already running
+2025-02-16 20:24:04,748 - INFO - Checking battle schedule...
+2025-02-16 20:24:04,748 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:25:04 MSK)" (scheduled at 2025-02-16 20:24:04.746507+03:00)
+2025-02-16 20:24:04,752 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:25:04 MSK)" executed successfully
+2025-02-16 20:24:04,752 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 20:24:04,752 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:25:04 MSK)" executed successfully
+2025-02-16 20:24:04,852 - INFO - Current time: 2025-02-16 20:24:04.850952+03:00
+2025-02-16 20:24:04,852 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:24:04,852 - INFO - Time until battle: 5h 14m
+2025-02-16 20:24:04,852 - INFO - Wait seconds: 15295.149048
+2025-02-16 20:24:04,852 - INFO - Sleeping for 10 seconds
+2025-02-16 20:24:10,341 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-02-16 20:24:10,341 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-02-16 20:24:10,342 - INFO - Added job "Schedule_checker" to job store "default"
+2025-02-16 20:24:10,342 - INFO - Added job "Notification_checker" to job store "default"
+2025-02-16 20:24:10,342 - INFO - Scheduler started
+2025-02-16 20:24:10,342 - INFO - Scheduler started successfully
+2025-02-16 20:24:11,171 - INFO - Start polling
+2025-02-16 20:24:11,231 - INFO - Run polling for bot @WW_EDU_bot id=7599529676 - 'WW-бот'
+2025-02-16 20:24:12,883 - INFO - Request processed in mode 1
+2025-02-16 20:24:13,418 - INFO - Update id=574621231 is handled. Duration 535 ms by bot id=7599529676
+2025-02-16 20:24:18,632 - INFO - Request processed in mode 1
+2025-02-16 20:24:18,700 - INFO - Update id=574621232 is handled. Duration 68 ms by bot id=7599529676
+2025-02-16 20:24:27,642 - INFO - Request processed in mode 1
+2025-02-16 20:24:27,730 - INFO - Update id=574621233 is handled. Duration 88 ms by bot id=7599529676
+2025-02-16 20:24:28,822 - INFO - Request processed in mode 1
+2025-02-16 20:24:28,836 - INFO - Adding notification job: 5 at 20:25
+2025-02-16 20:24:28,840 - INFO - Added job "SchedulerManager.send_notification" to job store "default"
+2025-02-16 20:24:28,911 - INFO - Update id=574621234 is handled. Duration 89 ms by bot id=7599529676
+2025-02-16 20:25:00,002 - INFO - Running job "SchedulerManager.send_notification (trigger: cron[hour='20', minute='25'], next run at: 2025-02-17 20:25:00 MSK)" (scheduled at 2025-02-16 20:25:00+03:00)
+2025-02-16 20:25:00,008 - INFO - Connecting to 149.154.167.92:443/TcpFull...
+2025-02-16 20:25:00,070 - INFO - Connection to 149.154.167.92:443/TcpFull complete!
+2025-02-16 20:25:00,411 - INFO - UserBot initialized for +971582490941
+2025-02-16 20:25:00,413 - ERROR - Failed to send message: a TLObject was expected but found something else
+2025-02-16 20:25:00,413 - ERROR - Failed to send via user_bot, falling back to regular bot: a TLObject was expected but found something else
+2025-02-16 20:25:00,801 - INFO - Notification sent to channel via regular bot: 5 - 🤔кddddddd
+2025-02-16 20:25:00,801 - INFO - Job "SchedulerManager.send_notification (trigger: cron[hour='20', minute='25'], next run at: 2025-02-17 20:25:00 MSK)" executed successfully
+2025-02-16 20:25:10,343 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:26:10 MSK)" (scheduled at 2025-02-16 20:25:10.341234+03:00)
+2025-02-16 20:25:10,343 - INFO - Notification task started
+2025-02-16 20:25:10,343 - INFO - Checking battle schedule...
+2025-02-16 20:25:10,344 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:26:10 MSK)" (scheduled at 2025-02-16 20:25:10.341484+03:00)
+2025-02-16 20:25:10,347 - INFO - Next battle time set to: 2025-02-17 01:39:00+03:00
+2025-02-16 20:25:10,347 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 20:25:10,349 - INFO - Added job "Battle_task" to job store "default"
+2025-02-16 20:25:10,349 - INFO - New battle scheduled for: 2025-02-17 01:39:00+03:00
+2025-02-16 20:25:10,349 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:26:10 MSK)" executed successfully
+2025-02-16 20:25:10,350 - INFO - Current time: 2025-02-16 20:25:10.344872+03:00
+2025-02-16 20:25:10,350 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:25:10,350 - INFO - Time until battle: 5h 13m
+2025-02-16 20:25:10,350 - INFO - Wait seconds: 15229.655128
+2025-02-16 20:25:10,350 - INFO - Sleeping for 10 seconds
+2025-02-16 20:25:10,351 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:26:10 MSK)" executed successfully
+2025-02-16 20:25:20,353 - INFO - Current time: 2025-02-16 20:25:20.352025+03:00
+2025-02-16 20:25:20,353 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:25:20,353 - INFO - Time until battle: 5h 13m
+2025-02-16 20:25:20,353 - INFO - Wait seconds: 15219.647975
+2025-02-16 20:25:20,353 - INFO - Sleeping for 10 seconds
+2025-02-16 20:25:30,356 - INFO - Current time: 2025-02-16 20:25:30.354984+03:00
+2025-02-16 20:25:30,356 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:25:30,356 - INFO - Time until battle: 5h 13m
+2025-02-16 20:25:30,356 - INFO - Wait seconds: 15209.645016
+2025-02-16 20:25:30,356 - INFO - Sleeping for 10 seconds
+2025-02-16 20:25:37,261 - INFO - Got difference for channel 2276827792 updates
+2025-02-16 20:25:40,361 - INFO - Current time: 2025-02-16 20:25:40.357833+03:00
+2025-02-16 20:25:40,361 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:25:40,361 - INFO - Time until battle: 5h 13m
+2025-02-16 20:25:40,361 - INFO - Wait seconds: 15199.642167
+2025-02-16 20:25:40,362 - INFO - Sleeping for 10 seconds
+2025-02-16 20:25:41,101 - INFO - Got difference for channel 2276827792 updates
+2025-02-16 20:25:46,143 - INFO - Got difference for account updates
+2025-02-16 20:25:46,420 - INFO - Got difference for channel 2199096175 updates
+2025-02-16 20:25:48,330 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:25:50,366 - INFO - Current time: 2025-02-16 20:25:50.363374+03:00
+2025-02-16 20:25:50,367 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:25:50,367 - INFO - Time until battle: 5h 13m
+2025-02-16 20:25:50,367 - INFO - Wait seconds: 15189.636626
+2025-02-16 20:25:50,367 - INFO - Sleeping for 10 seconds
+2025-02-16 20:25:50,841 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:25:52,844 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:25:56,193 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:25:56,373 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:26:00,370 - INFO - Current time: 2025-02-16 20:26:00.368465+03:00
+2025-02-16 20:26:00,370 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:26:00,370 - INFO - Time until battle: 5h 12m
+2025-02-16 20:26:00,370 - INFO - Wait seconds: 15179.631535
+2025-02-16 20:26:00,370 - INFO - Sleeping for 10 seconds
+2025-02-16 20:26:10,342 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:27:10 MSK)" (scheduled at 2025-02-16 20:26:10.341234+03:00)
+2025-02-16 20:26:10,343 - INFO - Notification task is already running
+2025-02-16 20:26:10,344 - INFO - Checking battle schedule...
+2025-02-16 20:26:10,344 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:27:10 MSK)" (scheduled at 2025-02-16 20:26:10.341484+03:00)
+2025-02-16 20:26:10,347 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 20:26:10,347 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:27:10 MSK)" executed successfully
+2025-02-16 20:26:10,348 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:27:10 MSK)" executed successfully
+2025-02-16 20:26:10,372 - INFO - Current time: 2025-02-16 20:26:10.371649+03:00
+2025-02-16 20:26:10,373 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:26:10,373 - INFO - Time until battle: 5h 12m
+2025-02-16 20:26:10,373 - INFO - Wait seconds: 15169.628351
+2025-02-16 20:26:10,373 - INFO - Sleeping for 10 seconds
+2025-02-16 20:26:20,376 - INFO - Current time: 2025-02-16 20:26:20.374081+03:00
+2025-02-16 20:26:20,377 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:26:20,377 - INFO - Time until battle: 5h 12m
+2025-02-16 20:26:20,378 - INFO - Wait seconds: 15159.625919
+2025-02-16 20:26:20,378 - INFO - Sleeping for 10 seconds
+2025-02-16 20:26:29,443 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:26:30,375 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:26:30,381 - INFO - Current time: 2025-02-16 20:26:30.378414+03:00
+2025-02-16 20:26:30,381 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:26:30,381 - INFO - Time until battle: 5h 12m
+2025-02-16 20:26:30,381 - INFO - Wait seconds: 15149.621586
+2025-02-16 20:26:30,381 - INFO - Sleeping for 10 seconds
+2025-02-16 20:26:30,972 - INFO - Got difference for channel 2013105429 updates
+2025-02-16 20:26:40,386 - INFO - Current time: 2025-02-16 20:26:40.382965+03:00
+2025-02-16 20:26:40,387 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:26:40,387 - INFO - Time until battle: 5h 12m
+2025-02-16 20:26:40,387 - INFO - Wait seconds: 15139.617035
+2025-02-16 20:26:40,387 - INFO - Sleeping for 10 seconds
+2025-02-16 20:26:50,391 - INFO - Current time: 2025-02-16 20:26:50.388816+03:00
+2025-02-16 20:26:50,392 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:26:50,392 - INFO - Time until battle: 5h 12m
+2025-02-16 20:26:50,392 - INFO - Wait seconds: 15129.611184
+2025-02-16 20:26:50,392 - INFO - Sleeping for 10 seconds
+2025-02-16 20:26:54,636 - INFO - Got difference for channel 2165667426 updates
+2025-02-16 20:26:56,581 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:26:58,842 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:27:00,396 - INFO - Current time: 2025-02-16 20:27:00.393698+03:00
+2025-02-16 20:27:00,396 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:27:00,396 - INFO - Time until battle: 5h 11m
+2025-02-16 20:27:00,396 - INFO - Wait seconds: 15119.606302
+2025-02-16 20:27:00,396 - INFO - Sleeping for 10 seconds
+2025-02-16 20:27:05,182 - INFO - Got difference for channel 2208773573 updates
+2025-02-16 20:27:10,342 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:28:10 MSK)" (scheduled at 2025-02-16 20:27:10.341234+03:00)
+2025-02-16 20:27:10,342 - INFO - Notification task is already running
+2025-02-16 20:27:10,342 - INFO - Checking battle schedule...
+2025-02-16 20:27:10,343 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:28:10 MSK)" (scheduled at 2025-02-16 20:27:10.341484+03:00)
+2025-02-16 20:27:10,346 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:28:10 MSK)" executed successfully
+2025-02-16 20:27:10,347 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 20:27:10,347 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:28:10 MSK)" executed successfully
+2025-02-16 20:27:10,399 - INFO - Current time: 2025-02-16 20:27:10.397932+03:00
+2025-02-16 20:27:10,399 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:27:10,399 - INFO - Time until battle: 5h 11m
+2025-02-16 20:27:10,399 - INFO - Wait seconds: 15109.602068
+2025-02-16 20:27:10,399 - INFO - Sleeping for 10 seconds
+2025-02-16 20:27:16,282 - INFO - Got difference for account updates
+2025-02-16 20:27:20,402 - INFO - Current time: 2025-02-16 20:27:20.400953+03:00
+2025-02-16 20:27:20,402 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:27:20,402 - INFO - Time until battle: 5h 11m
+2025-02-16 20:27:20,402 - INFO - Wait seconds: 15099.599047
+2025-02-16 20:27:20,402 - INFO - Sleeping for 10 seconds
+2025-02-16 20:27:30,102 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:27:30,403 - INFO - Current time: 2025-02-16 20:27:30.403082+03:00
+2025-02-16 20:27:30,403 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:27:30,403 - INFO - Time until battle: 5h 11m
+2025-02-16 20:27:30,404 - INFO - Wait seconds: 15089.596918
+2025-02-16 20:27:30,404 - INFO - Sleeping for 10 seconds
+2025-02-16 20:27:31,240 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:27:33,440 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:27:40,406 - INFO - Current time: 2025-02-16 20:27:40.405184+03:00
+2025-02-16 20:27:40,407 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:27:40,407 - INFO - Time until battle: 5h 11m
+2025-02-16 20:27:40,407 - INFO - Wait seconds: 15079.594816
+2025-02-16 20:27:40,407 - INFO - Sleeping for 10 seconds
+2025-02-16 20:27:49,091 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:27:50,409 - INFO - Current time: 2025-02-16 20:27:50.408540+03:00
+2025-02-16 20:27:50,409 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:27:50,409 - INFO - Time until battle: 5h 11m
+2025-02-16 20:27:50,409 - INFO - Wait seconds: 15069.59146
+2025-02-16 20:27:50,409 - INFO - Sleeping for 10 seconds
+2025-02-16 20:28:00,413 - INFO - Current time: 2025-02-16 20:28:00.411027+03:00
+2025-02-16 20:28:00,413 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:28:00,413 - INFO - Time until battle: 5h 10m
+2025-02-16 20:28:00,413 - INFO - Wait seconds: 15059.588973
+2025-02-16 20:28:00,413 - INFO - Sleeping for 10 seconds
+2025-02-16 20:28:10,342 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:29:10 MSK)" (scheduled at 2025-02-16 20:28:10.341234+03:00)
+2025-02-16 20:28:10,342 - INFO - Notification task is already running
+2025-02-16 20:28:10,342 - INFO - Checking battle schedule...
+2025-02-16 20:28:10,342 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:29:10 MSK)" (scheduled at 2025-02-16 20:28:10.341484+03:00)
+2025-02-16 20:28:10,344 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 20:28:10,345 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:29:10 MSK)" executed successfully
+2025-02-16 20:28:10,345 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:29:10 MSK)" executed successfully
+2025-02-16 20:28:10,415 - INFO - Current time: 2025-02-16 20:28:10.414639+03:00
+2025-02-16 20:28:10,415 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:28:10,415 - INFO - Time until battle: 5h 10m
+2025-02-16 20:28:10,415 - INFO - Wait seconds: 15049.585361
+2025-02-16 20:28:10,415 - INFO - Sleeping for 10 seconds
+2025-02-16 20:28:15,851 - INFO - Got difference for channel 2013105429 updates
+2025-02-16 20:28:16,121 - INFO - Got difference for account updates
+2025-02-16 20:28:20,419 - INFO - Current time: 2025-02-16 20:28:20.416468+03:00
+2025-02-16 20:28:20,419 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:28:20,419 - INFO - Time until battle: 5h 10m
+2025-02-16 20:28:20,419 - INFO - Wait seconds: 15039.583532
+2025-02-16 20:28:20,420 - INFO - Sleeping for 10 seconds
+2025-02-16 20:28:30,422 - INFO - Current time: 2025-02-16 20:28:30.421098+03:00
+2025-02-16 20:28:30,422 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:28:30,422 - INFO - Time until battle: 5h 10m
+2025-02-16 20:28:30,422 - INFO - Wait seconds: 15029.578902
+2025-02-16 20:28:30,422 - INFO - Sleeping for 10 seconds
+2025-02-16 20:28:37,360 - INFO - Got difference for channel 2013105429 updates
+2025-02-16 20:28:40,426 - INFO - Current time: 2025-02-16 20:28:40.423807+03:00
+2025-02-16 20:28:40,426 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:28:40,426 - INFO - Time until battle: 5h 10m
+2025-02-16 20:28:40,426 - INFO - Wait seconds: 15019.576193
+2025-02-16 20:28:40,426 - INFO - Sleeping for 10 seconds
+2025-02-16 20:28:50,431 - INFO - Current time: 2025-02-16 20:28:50.428165+03:00
+2025-02-16 20:28:50,433 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:28:50,433 - INFO - Time until battle: 5h 10m
+2025-02-16 20:28:50,433 - INFO - Wait seconds: 15009.571835
+2025-02-16 20:28:50,433 - INFO - Sleeping for 10 seconds
+2025-02-16 20:29:00,437 - INFO - Current time: 2025-02-16 20:29:00.434636+03:00
+2025-02-16 20:29:00,438 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:29:00,438 - INFO - Time until battle: 5h 9m
+2025-02-16 20:29:00,438 - INFO - Wait seconds: 14999.565364
+2025-02-16 20:29:00,438 - INFO - Sleeping for 10 seconds
+2025-02-16 20:29:10,342 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:30:10 MSK)" (scheduled at 2025-02-16 20:29:10.341234+03:00)
+2025-02-16 20:29:10,342 - INFO - Notification task is already running
+2025-02-16 20:29:10,342 - INFO - Checking battle schedule...
+2025-02-16 20:29:10,342 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:30:10 MSK)" (scheduled at 2025-02-16 20:29:10.341484+03:00)
+2025-02-16 20:29:10,345 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:30:10 MSK)" executed successfully
+2025-02-16 20:29:10,345 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 20:29:10,345 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:30:10 MSK)" executed successfully
+2025-02-16 20:29:10,441 - INFO - Current time: 2025-02-16 20:29:10.439606+03:00
+2025-02-16 20:29:10,441 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:29:10,442 - INFO - Time until battle: 5h 9m
+2025-02-16 20:29:10,442 - INFO - Wait seconds: 14989.560394
+2025-02-16 20:29:10,442 - INFO - Sleeping for 10 seconds
+2025-02-16 20:29:16,262 - INFO - Got difference for account updates
+2025-02-16 20:29:20,446 - INFO - Current time: 2025-02-16 20:29:20.443534+03:00
+2025-02-16 20:29:20,446 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:29:20,446 - INFO - Time until battle: 5h 9m
+2025-02-16 20:29:20,446 - INFO - Wait seconds: 14979.556466
+2025-02-16 20:29:20,446 - INFO - Sleeping for 10 seconds
+2025-02-16 20:29:27,820 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:29:30,449 - INFO - Current time: 2025-02-16 20:29:30.447679+03:00
+2025-02-16 20:29:30,449 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:29:30,449 - INFO - Time until battle: 5h 9m
+2025-02-16 20:29:30,450 - INFO - Wait seconds: 14969.552321
+2025-02-16 20:29:30,450 - INFO - Sleeping for 10 seconds
+2025-02-16 20:29:40,453 - INFO - Current time: 2025-02-16 20:29:40.451439+03:00
+2025-02-16 20:29:40,453 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:29:40,453 - INFO - Time until battle: 5h 9m
+2025-02-16 20:29:40,453 - INFO - Wait seconds: 14959.548561
+2025-02-16 20:29:40,453 - INFO - Sleeping for 10 seconds
+2025-02-16 20:29:50,459 - INFO - Current time: 2025-02-16 20:29:50.454863+03:00
+2025-02-16 20:29:50,459 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:29:50,459 - INFO - Time until battle: 5h 9m
+2025-02-16 20:29:50,459 - INFO - Wait seconds: 14949.545137
+2025-02-16 20:29:50,459 - INFO - Sleeping for 10 seconds
+2025-02-16 20:30:00,517 - INFO - Current time: 2025-02-16 20:30:00.514203+03:00
+2025-02-16 20:30:00,519 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:30:00,519 - INFO - Time until battle: 5h 8m
+2025-02-16 20:30:00,519 - INFO - Wait seconds: 14939.485797
+2025-02-16 20:30:00,519 - INFO - Sleeping for 10 seconds
+2025-02-16 20:30:10,396 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:31:10 MSK)" (scheduled at 2025-02-16 20:30:10.341234+03:00)
+2025-02-16 20:30:10,396 - INFO - Notification task is already running
+2025-02-16 20:30:10,397 - INFO - Checking battle schedule...
+2025-02-16 20:30:10,397 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:31:10 MSK)" (scheduled at 2025-02-16 20:30:10.341484+03:00)
+2025-02-16 20:30:10,400 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:31:10 MSK)" executed successfully
+2025-02-16 20:30:10,400 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 20:30:10,400 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:31:10 MSK)" executed successfully
+2025-02-16 20:30:10,522 - INFO - Current time: 2025-02-16 20:30:10.520791+03:00
+2025-02-16 20:30:10,522 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:30:10,522 - INFO - Time until battle: 5h 8m
+2025-02-16 20:30:10,522 - INFO - Wait seconds: 14929.479209
+2025-02-16 20:30:10,522 - INFO - Sleeping for 10 seconds
+2025-02-16 20:30:12,146 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:30:20,526 - INFO - Current time: 2025-02-16 20:30:20.524225+03:00
+2025-02-16 20:30:20,527 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:30:20,527 - INFO - Time until battle: 5h 8m
+2025-02-16 20:30:20,527 - INFO - Wait seconds: 14919.475775
+2025-02-16 20:30:20,527 - INFO - Sleeping for 10 seconds
+2025-02-16 20:30:30,532 - INFO - Current time: 2025-02-16 20:30:30.528852+03:00
+2025-02-16 20:30:30,532 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:30:30,532 - INFO - Time until battle: 5h 8m
+2025-02-16 20:30:30,532 - INFO - Wait seconds: 14909.471148
+2025-02-16 20:30:30,532 - INFO - Sleeping for 10 seconds
+2025-02-16 20:30:40,537 - INFO - Current time: 2025-02-16 20:30:40.533922+03:00
+2025-02-16 20:30:40,537 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:30:40,537 - INFO - Time until battle: 5h 8m
+2025-02-16 20:30:40,537 - INFO - Wait seconds: 14899.466078
+2025-02-16 20:30:40,537 - INFO - Sleeping for 10 seconds
+2025-02-16 20:30:50,541 - INFO - Current time: 2025-02-16 20:30:50.539380+03:00
+2025-02-16 20:30:50,542 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:30:50,542 - INFO - Time until battle: 5h 8m
+2025-02-16 20:30:50,542 - INFO - Wait seconds: 14889.46062
+2025-02-16 20:30:50,542 - INFO - Sleeping for 10 seconds
+2025-02-16 20:31:00,544 - INFO - Current time: 2025-02-16 20:31:00.543839+03:00
+2025-02-16 20:31:00,545 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:31:00,545 - INFO - Time until battle: 5h 7m
+2025-02-16 20:31:00,545 - INFO - Wait seconds: 14879.456161
+2025-02-16 20:31:00,545 - INFO - Sleeping for 10 seconds
+2025-02-16 20:31:01,817 - INFO - Got difference for channel 2013105429 updates
+2025-02-16 20:33:52,773 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-02-16 20:33:52,773 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-02-16 20:33:52,774 - INFO - Added job "Schedule_checker" to job store "default"
+2025-02-16 20:33:52,774 - INFO - Added job "Notification_checker" to job store "default"
+2025-02-16 20:33:52,774 - INFO - Scheduler started
+2025-02-16 20:33:52,774 - INFO - Scheduler started successfully
+2025-02-16 20:33:53,525 - INFO - Start polling
+2025-02-16 20:33:53,590 - INFO - Run polling for bot @WW_EDU_bot id=7599529676 - 'WW-бот'
+2025-02-16 20:34:14,370 - INFO - Request processed in mode 1
+2025-02-16 20:34:14,704 - INFO - Update id=574621235 is handled. Duration 334 ms by bot id=7599529676
+2025-02-16 20:34:20,108 - INFO - Request processed in mode 1
+2025-02-16 20:34:20,186 - INFO - Update id=574621236 is handled. Duration 78 ms by bot id=7599529676
+2025-02-16 20:34:26,820 - INFO - Request processed in mode 1
+2025-02-16 20:34:26,996 - INFO - Update id=574621237 is handled. Duration 178 ms by bot id=7599529676
+2025-02-16 20:34:30,138 - INFO - Request processed in mode 1
+2025-02-16 20:34:30,161 - INFO - Adding notification job: R at 20:35
+2025-02-16 20:34:30,165 - INFO - Added job "SchedulerManager.send_notification" to job store "default"
+2025-02-16 20:34:30,348 - INFO - Update id=574621238 is handled. Duration 209 ms by bot id=7599529676
+2025-02-16 20:34:52,774 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:35:52 MSK)" (scheduled at 2025-02-16 20:34:52.772963+03:00)
+2025-02-16 20:34:52,775 - INFO - Notification task started
+2025-02-16 20:34:52,776 - INFO - Checking battle schedule...
+2025-02-16 20:34:52,776 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:35:52 MSK)" (scheduled at 2025-02-16 20:34:52.773518+03:00)
+2025-02-16 20:34:52,779 - INFO - Next battle time set to: 2025-02-17 01:39:00+03:00
+2025-02-16 20:34:52,780 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 20:34:52,781 - INFO - Added job "Battle_task" to job store "default"
+2025-02-16 20:34:52,781 - INFO - New battle scheduled for: 2025-02-17 01:39:00+03:00
+2025-02-16 20:34:52,781 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:35:52 MSK)" executed successfully
+2025-02-16 20:34:52,782 - INFO - Current time: 2025-02-16 20:34:52.777119+03:00
+2025-02-16 20:34:52,782 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:34:52,782 - INFO - Time until battle: 5h 4m
+2025-02-16 20:34:52,782 - INFO - Wait seconds: 14647.222881
+2025-02-16 20:34:52,782 - INFO - Sleeping for 10 seconds
+2025-02-16 20:34:52,783 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:35:52 MSK)" executed successfully
+2025-02-16 20:35:00,002 - INFO - Running job "SchedulerManager.send_notification (trigger: cron[hour='20', minute='35'], next run at: 2025-02-17 20:35:00 MSK)" (scheduled at 2025-02-16 20:35:00+03:00)
+2025-02-16 20:35:00,009 - INFO - Connecting to 149.154.167.92:443/TcpFull...
+2025-02-16 20:35:00,076 - INFO - Connection to 149.154.167.92:443/TcpFull complete!
+2025-02-16 20:35:00,426 - INFO - UserBot initialized for +971582490941
+2025-02-16 20:35:00,428 - ERROR - Failed to send message: a TLObject was expected but found something else
+2025-02-16 20:35:00,428 - ERROR - Failed to send via user_bot, falling back to regular bot: a TLObject was expected but found something else
+2025-02-16 20:35:00,919 - INFO - Notification sent to channel via regular bot: R - 🤔кddddddd
+2025-02-16 20:35:00,920 - INFO - Job "SchedulerManager.send_notification (trigger: cron[hour='20', minute='35'], next run at: 2025-02-17 20:35:00 MSK)" executed successfully
+2025-02-16 20:35:02,785 - INFO - Current time: 2025-02-16 20:35:02.783959+03:00
+2025-02-16 20:35:02,786 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:35:02,786 - INFO - Time until battle: 5h 3m
+2025-02-16 20:35:02,786 - INFO - Wait seconds: 14637.216041
+2025-02-16 20:35:02,787 - INFO - Sleeping for 10 seconds
+2025-02-16 20:35:12,791 - INFO - Current time: 2025-02-16 20:35:12.788439+03:00
+2025-02-16 20:35:12,791 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:35:12,791 - INFO - Time until battle: 5h 3m
+2025-02-16 20:35:12,791 - INFO - Wait seconds: 14627.211561
+2025-02-16 20:35:12,791 - INFO - Sleeping for 10 seconds
+2025-02-16 20:35:22,793 - INFO - Current time: 2025-02-16 20:35:22.792876+03:00
+2025-02-16 20:35:22,793 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:35:22,793 - INFO - Time until battle: 5h 3m
+2025-02-16 20:35:22,793 - INFO - Wait seconds: 14617.207124
+2025-02-16 20:35:22,794 - INFO - Sleeping for 10 seconds
+2025-02-16 20:35:32,796 - INFO - Current time: 2025-02-16 20:35:32.795223+03:00
+2025-02-16 20:35:32,796 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:35:32,796 - INFO - Time until battle: 5h 3m
+2025-02-16 20:35:32,796 - INFO - Wait seconds: 14607.204777
+2025-02-16 20:35:32,796 - INFO - Sleeping for 10 seconds
+2025-02-16 20:35:42,800 - INFO - Current time: 2025-02-16 20:35:42.797781+03:00
+2025-02-16 20:35:42,801 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:35:42,801 - INFO - Time until battle: 5h 3m
+2025-02-16 20:35:42,801 - INFO - Wait seconds: 14597.202219
+2025-02-16 20:35:42,801 - INFO - Sleeping for 10 seconds
+2025-02-16 20:35:46,330 - INFO - Got difference for channel 1748479244 updates
+2025-02-16 20:35:46,817 - INFO - Got difference for channel 2146737637 updates
+2025-02-16 20:35:52,774 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:36:52 MSK)" (scheduled at 2025-02-16 20:35:52.772963+03:00)
+2025-02-16 20:35:52,775 - INFO - Notification task is already running
+2025-02-16 20:35:52,775 - INFO - Checking battle schedule...
+2025-02-16 20:35:52,776 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:36:52 MSK)" (scheduled at 2025-02-16 20:35:52.773518+03:00)
+2025-02-16 20:35:52,780 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:36:52 MSK)" executed successfully
+2025-02-16 20:35:52,780 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 20:35:52,781 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:36:52 MSK)" executed successfully
+2025-02-16 20:35:52,804 - INFO - Current time: 2025-02-16 20:35:52.803207+03:00
+2025-02-16 20:35:52,804 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:35:52,804 - INFO - Time until battle: 5h 3m
+2025-02-16 20:35:52,804 - INFO - Wait seconds: 14587.196793
+2025-02-16 20:35:52,804 - INFO - Sleeping for 10 seconds
+2025-02-16 20:36:02,809 - INFO - Current time: 2025-02-16 20:36:02.806003+03:00
+2025-02-16 20:36:02,810 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:36:02,811 - INFO - Time until battle: 5h 2m
+2025-02-16 20:36:02,811 - INFO - Wait seconds: 14577.193997
+2025-02-16 20:36:02,811 - INFO - Sleeping for 10 seconds
+2025-02-16 20:36:12,813 - INFO - Current time: 2025-02-16 20:36:12.812075+03:00
+2025-02-16 20:36:12,813 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:36:12,813 - INFO - Time until battle: 5h 2m
+2025-02-16 20:36:12,813 - INFO - Wait seconds: 14567.187925
+2025-02-16 20:36:12,813 - INFO - Sleeping for 10 seconds
+2025-02-16 20:36:22,579 - INFO - Got difference for channel 1748479244 updates
+2025-02-16 20:36:22,817 - INFO - Current time: 2025-02-16 20:36:22.815222+03:00
+2025-02-16 20:36:22,817 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:36:22,817 - INFO - Time until battle: 5h 2m
+2025-02-16 20:36:22,817 - INFO - Wait seconds: 14557.184778
+2025-02-16 20:36:22,817 - INFO - Sleeping for 10 seconds
+2025-02-16 20:36:23,537 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:36:32,821 - INFO - Current time: 2025-02-16 20:36:32.819274+03:00
+2025-02-16 20:36:32,821 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:36:32,821 - INFO - Time until battle: 5h 2m
+2025-02-16 20:36:32,821 - INFO - Wait seconds: 14547.180726
+2025-02-16 20:36:32,821 - INFO - Sleeping for 10 seconds
+2025-02-16 20:36:38,068 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:36:42,824 - INFO - Current time: 2025-02-16 20:36:42.823163+03:00
+2025-02-16 20:36:42,824 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:36:42,824 - INFO - Time until battle: 5h 2m
+2025-02-16 20:36:42,824 - INFO - Wait seconds: 14537.176837
+2025-02-16 20:36:42,824 - INFO - Sleeping for 10 seconds
+2025-02-16 20:36:52,774 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:37:52 MSK)" (scheduled at 2025-02-16 20:36:52.772963+03:00)
+2025-02-16 20:36:52,774 - INFO - Notification task is already running
+2025-02-16 20:36:52,775 - INFO - Checking battle schedule...
+2025-02-16 20:36:52,775 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:37:52 MSK)" (scheduled at 2025-02-16 20:36:52.773518+03:00)
+2025-02-16 20:36:52,776 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 20:36:52,776 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:37:52 MSK)" executed successfully
+2025-02-16 20:36:52,776 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:37:52 MSK)" executed successfully
+2025-02-16 20:36:52,827 - INFO - Current time: 2025-02-16 20:36:52.826111+03:00
+2025-02-16 20:36:52,827 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:36:52,827 - INFO - Time until battle: 5h 2m
+2025-02-16 20:36:52,827 - INFO - Wait seconds: 14527.173889
+2025-02-16 20:36:52,827 - INFO - Sleeping for 10 seconds
+2025-02-16 20:37:02,830 - INFO - Current time: 2025-02-16 20:37:02.827798+03:00
+2025-02-16 20:37:02,831 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:37:02,831 - INFO - Time until battle: 5h 1m
+2025-02-16 20:37:02,831 - INFO - Wait seconds: 14517.172202
+2025-02-16 20:37:02,832 - INFO - Sleeping for 10 seconds
+2025-02-16 20:37:12,834 - INFO - Current time: 2025-02-16 20:37:12.833359+03:00
+2025-02-16 20:37:12,835 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:37:12,835 - INFO - Time until battle: 5h 1m
+2025-02-16 20:37:12,835 - INFO - Wait seconds: 14507.166641
+2025-02-16 20:37:12,836 - INFO - Sleeping for 10 seconds
+2025-02-16 20:37:13,829 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:37:22,839 - INFO - Current time: 2025-02-16 20:37:22.836813+03:00
+2025-02-16 20:37:22,841 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:37:22,841 - INFO - Time until battle: 5h 1m
+2025-02-16 20:37:22,841 - INFO - Wait seconds: 14497.163187
+2025-02-16 20:37:22,841 - INFO - Sleeping for 10 seconds
+2025-02-16 20:37:32,843 - INFO - Current time: 2025-02-16 20:37:32.842156+03:00
+2025-02-16 20:37:32,843 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:37:32,843 - INFO - Time until battle: 5h 1m
+2025-02-16 20:37:32,843 - INFO - Wait seconds: 14487.157844
+2025-02-16 20:37:32,843 - INFO - Sleeping for 10 seconds
+2025-02-16 20:37:42,481 - INFO - Got difference for channel 2146737637 updates
+2025-02-16 20:37:42,759 - INFO - Got difference for channel 1748479244 updates
+2025-02-16 20:37:42,847 - INFO - Current time: 2025-02-16 20:37:42.845144+03:00
+2025-02-16 20:37:42,847 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:37:42,847 - INFO - Time until battle: 5h 1m
+2025-02-16 20:37:42,847 - INFO - Wait seconds: 14477.154856
+2025-02-16 20:37:42,847 - INFO - Sleeping for 10 seconds
+2025-02-16 20:37:47,420 - INFO - Got difference for channel 1748479244 updates
+2025-02-16 20:37:51,079 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:37:52,775 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:38:52 MSK)" (scheduled at 2025-02-16 20:37:52.772963+03:00)
+2025-02-16 20:37:52,775 - INFO - Notification task is already running
+2025-02-16 20:37:52,775 - INFO - Checking battle schedule...
+2025-02-16 20:37:52,776 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:38:52 MSK)" (scheduled at 2025-02-16 20:37:52.773518+03:00)
+2025-02-16 20:37:52,779 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 20:37:52,779 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:38:52 MSK)" executed successfully
+2025-02-16 20:37:52,780 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:38:52 MSK)" executed successfully
+2025-02-16 20:37:52,851 - INFO - Current time: 2025-02-16 20:37:52.849017+03:00
+2025-02-16 20:37:52,851 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:37:52,851 - INFO - Time until battle: 5h 1m
+2025-02-16 20:37:52,851 - INFO - Wait seconds: 14467.150983
+2025-02-16 20:37:52,851 - INFO - Sleeping for 10 seconds
+2025-02-16 20:37:55,051 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:38:02,854 - INFO - Current time: 2025-02-16 20:38:02.852984+03:00
+2025-02-16 20:38:02,854 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:38:02,854 - INFO - Time until battle: 5h 0m
+2025-02-16 20:38:02,854 - INFO - Wait seconds: 14457.147016
+2025-02-16 20:38:02,854 - INFO - Sleeping for 10 seconds
+2025-02-16 20:38:12,856 - INFO - Current time: 2025-02-16 20:38:12.855728+03:00
+2025-02-16 20:38:12,856 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:38:12,856 - INFO - Time until battle: 5h 0m
+2025-02-16 20:38:12,856 - INFO - Wait seconds: 14447.144272
+2025-02-16 20:38:12,856 - INFO - Sleeping for 10 seconds
+2025-02-16 20:38:16,220 - INFO - Got difference for account updates
+2025-02-16 20:38:19,499 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:38:22,849 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:38:22,858 - INFO - Current time: 2025-02-16 20:38:22.857555+03:00
+2025-02-16 20:38:22,858 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:38:22,858 - INFO - Time until battle: 5h 0m
+2025-02-16 20:38:22,858 - INFO - Wait seconds: 14437.142445
+2025-02-16 20:38:22,858 - INFO - Sleeping for 10 seconds
+2025-02-16 20:38:32,864 - INFO - Current time: 2025-02-16 20:38:32.860199+03:00
+2025-02-16 20:38:32,865 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:38:32,865 - INFO - Time until battle: 5h 0m
+2025-02-16 20:38:32,865 - INFO - Wait seconds: 14427.139801
+2025-02-16 20:38:32,865 - INFO - Sleeping for 10 seconds
+2025-02-16 20:38:33,630 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:38:35,889 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:38:42,870 - INFO - Current time: 2025-02-16 20:38:42.867251+03:00
+2025-02-16 20:38:42,870 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:38:42,871 - INFO - Time until battle: 5h 0m
+2025-02-16 20:38:42,871 - INFO - Wait seconds: 14417.132749
+2025-02-16 20:38:42,871 - INFO - Sleeping for 10 seconds
+2025-02-16 20:38:52,775 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:39:52 MSK)" (scheduled at 2025-02-16 20:38:52.772963+03:00)
+2025-02-16 20:38:52,775 - INFO - Notification task is already running
+2025-02-16 20:38:52,775 - INFO - Checking battle schedule...
+2025-02-16 20:38:52,775 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:39:52 MSK)" (scheduled at 2025-02-16 20:38:52.773518+03:00)
+2025-02-16 20:38:52,777 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 20:38:52,777 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:39:52 MSK)" executed successfully
+2025-02-16 20:38:52,779 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:39:52 MSK)" executed successfully
+2025-02-16 20:38:52,873 - INFO - Current time: 2025-02-16 20:38:52.872378+03:00
+2025-02-16 20:38:52,873 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:38:52,873 - INFO - Time until battle: 5h 0m
+2025-02-16 20:38:52,873 - INFO - Wait seconds: 14407.127622
+2025-02-16 20:38:52,873 - INFO - Sleeping for 10 seconds
+2025-02-16 20:39:02,879 - INFO - Current time: 2025-02-16 20:39:02.875267+03:00
+2025-02-16 20:39:02,879 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:39:02,879 - INFO - Time until battle: 4h 59m
+2025-02-16 20:39:02,880 - INFO - Wait seconds: 14397.124733
+2025-02-16 20:39:02,880 - INFO - Sleeping for 10 seconds
+2025-02-16 20:39:12,883 - INFO - Current time: 2025-02-16 20:39:12.880711+03:00
+2025-02-16 20:39:12,883 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:39:12,883 - INFO - Time until battle: 4h 59m
+2025-02-16 20:39:12,883 - INFO - Wait seconds: 14387.119289
+2025-02-16 20:39:12,883 - INFO - Sleeping for 10 seconds
+2025-02-16 20:39:16,301 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:39:22,887 - INFO - Current time: 2025-02-16 20:39:22.884449+03:00
+2025-02-16 20:39:22,887 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:39:22,887 - INFO - Time until battle: 4h 59m
+2025-02-16 20:39:22,887 - INFO - Wait seconds: 14377.115551
+2025-02-16 20:39:22,888 - INFO - Sleeping for 10 seconds
+2025-02-16 20:39:28,780 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:39:32,893 - INFO - Current time: 2025-02-16 20:39:32.889384+03:00
+2025-02-16 20:39:32,894 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:39:32,894 - INFO - Time until battle: 4h 59m
+2025-02-16 20:39:32,894 - INFO - Wait seconds: 14367.110616
+2025-02-16 20:39:32,894 - INFO - Sleeping for 10 seconds
+2025-02-16 20:39:42,899 - INFO - Current time: 2025-02-16 20:39:42.896009+03:00
+2025-02-16 20:39:42,899 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:39:42,899 - INFO - Time until battle: 4h 59m
+2025-02-16 20:39:42,900 - INFO - Wait seconds: 14357.103991
+2025-02-16 20:39:42,900 - INFO - Sleeping for 10 seconds
+2025-02-16 20:39:52,775 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:40:52 MSK)" (scheduled at 2025-02-16 20:39:52.772963+03:00)
+2025-02-16 20:39:52,776 - INFO - Notification task is already running
+2025-02-16 20:39:52,777 - INFO - Checking battle schedule...
+2025-02-16 20:39:52,778 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:40:52 MSK)" (scheduled at 2025-02-16 20:39:52.773518+03:00)
+2025-02-16 20:39:52,780 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 20:39:52,781 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:40:52 MSK)" executed successfully
+2025-02-16 20:39:52,782 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:40:52 MSK)" executed successfully
+2025-02-16 20:39:52,903 - INFO - Current time: 2025-02-16 20:39:52.901448+03:00
+2025-02-16 20:39:52,903 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:39:52,903 - INFO - Time until battle: 4h 59m
+2025-02-16 20:39:52,903 - INFO - Wait seconds: 14347.098552
+2025-02-16 20:39:52,903 - INFO - Sleeping for 10 seconds
+2025-02-16 20:40:02,906 - INFO - Current time: 2025-02-16 20:40:02.904574+03:00
+2025-02-16 20:40:02,908 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:40:02,908 - INFO - Time until battle: 4h 58m
+2025-02-16 20:40:02,908 - INFO - Wait seconds: 14337.095426
+2025-02-16 20:40:02,908 - INFO - Sleeping for 10 seconds
+2025-02-16 20:40:12,912 - INFO - Current time: 2025-02-16 20:40:12.909241+03:00
+2025-02-16 20:40:12,913 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:40:12,913 - INFO - Time until battle: 4h 58m
+2025-02-16 20:40:12,913 - INFO - Wait seconds: 14327.090759
+2025-02-16 20:40:12,913 - INFO - Sleeping for 10 seconds
+2025-02-16 20:40:16,292 - INFO - Got difference for channel 2146737637 updates
+2025-02-16 20:40:18,621 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:40:22,917 - INFO - Current time: 2025-02-16 20:40:22.914823+03:00
+2025-02-16 20:40:22,918 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:40:22,918 - INFO - Time until battle: 4h 58m
+2025-02-16 20:40:22,918 - INFO - Wait seconds: 14317.085177
+2025-02-16 20:40:22,918 - INFO - Sleeping for 10 seconds
+2025-02-16 20:40:29,652 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:40:32,923 - INFO - Current time: 2025-02-16 20:40:32.919604+03:00
+2025-02-16 20:40:32,923 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:40:32,923 - INFO - Time until battle: 4h 58m
+2025-02-16 20:40:32,923 - INFO - Wait seconds: 14307.080396
+2025-02-16 20:40:32,923 - INFO - Sleeping for 10 seconds
+2025-02-16 20:40:42,927 - INFO - Current time: 2025-02-16 20:40:42.924831+03:00
+2025-02-16 20:40:42,928 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:40:42,928 - INFO - Time until battle: 4h 58m
+2025-02-16 20:40:42,928 - INFO - Wait seconds: 14297.075169
+2025-02-16 20:40:42,928 - INFO - Sleeping for 10 seconds
+2025-02-16 20:40:49,251 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:40:52,774 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:41:52 MSK)" (scheduled at 2025-02-16 20:40:52.772963+03:00)
+2025-02-16 20:40:52,774 - INFO - Notification task is already running
+2025-02-16 20:40:52,774 - INFO - Checking battle schedule...
+2025-02-16 20:40:52,775 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:41:52 MSK)" (scheduled at 2025-02-16 20:40:52.773518+03:00)
+2025-02-16 20:40:52,776 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 20:40:52,776 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:41:52 MSK)" executed successfully
+2025-02-16 20:40:52,776 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:41:52 MSK)" executed successfully
+2025-02-16 20:40:52,930 - INFO - Current time: 2025-02-16 20:40:52.929621+03:00
+2025-02-16 20:40:52,930 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:40:52,930 - INFO - Time until battle: 4h 58m
+2025-02-16 20:40:52,930 - INFO - Wait seconds: 14287.070379
+2025-02-16 20:40:52,930 - INFO - Sleeping for 10 seconds
+2025-02-16 20:41:02,934 - INFO - Current time: 2025-02-16 20:41:02.932197+03:00
+2025-02-16 20:41:02,934 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:41:02,935 - INFO - Time until battle: 4h 57m
+2025-02-16 20:41:02,935 - INFO - Wait seconds: 14277.067803
+2025-02-16 20:41:02,935 - INFO - Sleeping for 10 seconds
+2025-02-16 20:41:09,865 - INFO - Got difference for channel 2165667426 updates
+2025-02-16 20:41:12,937 - INFO - Current time: 2025-02-16 20:41:12.936428+03:00
+2025-02-16 20:41:12,938 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:41:12,938 - INFO - Time until battle: 4h 57m
+2025-02-16 20:41:12,938 - INFO - Wait seconds: 14267.063572
+2025-02-16 20:41:12,938 - INFO - Sleeping for 10 seconds
+2025-02-16 20:41:22,942 - INFO - Current time: 2025-02-16 20:41:22.939936+03:00
+2025-02-16 20:41:22,943 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:41:22,943 - INFO - Time until battle: 4h 57m
+2025-02-16 20:41:22,943 - INFO - Wait seconds: 14257.060064
+2025-02-16 20:41:22,943 - INFO - Sleeping for 10 seconds
+2025-02-16 20:41:32,690 - INFO - Got difference for channel 2203089916 updates
+2025-02-16 20:41:32,945 - INFO - Current time: 2025-02-16 20:41:32.944599+03:00
+2025-02-16 20:41:32,946 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:41:32,946 - INFO - Time until battle: 4h 57m
+2025-02-16 20:41:32,946 - INFO - Wait seconds: 14247.055401
+2025-02-16 20:41:32,946 - INFO - Sleeping for 10 seconds
+2025-02-16 20:41:42,949 - INFO - Current time: 2025-02-16 20:41:42.947667+03:00
+2025-02-16 20:41:42,949 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:41:42,949 - INFO - Time until battle: 4h 57m
+2025-02-16 20:41:42,949 - INFO - Wait seconds: 14237.052333
+2025-02-16 20:41:42,949 - INFO - Sleeping for 10 seconds
+2025-02-16 20:41:46,400 - INFO - Got difference for channel 2146737637 updates
+2025-02-16 20:41:46,490 - INFO - Got difference for channel 1748479244 updates
+2025-02-16 20:41:46,571 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:41:52,774 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:42:52 MSK)" (scheduled at 2025-02-16 20:41:52.772963+03:00)
+2025-02-16 20:41:52,775 - INFO - Notification task is already running
+2025-02-16 20:41:52,775 - INFO - Checking battle schedule...
+2025-02-16 20:41:52,775 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:42:52 MSK)" (scheduled at 2025-02-16 20:41:52.773518+03:00)
+2025-02-16 20:41:52,776 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 20:41:52,777 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:42:52 MSK)" executed successfully
+2025-02-16 20:41:52,777 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:42:52 MSK)" executed successfully
+2025-02-16 20:41:52,953 - INFO - Current time: 2025-02-16 20:41:52.950715+03:00
+2025-02-16 20:41:52,953 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:41:52,953 - INFO - Time until battle: 4h 57m
+2025-02-16 20:41:52,953 - INFO - Wait seconds: 14227.049285
+2025-02-16 20:41:52,953 - INFO - Sleeping for 10 seconds
+2025-02-16 20:41:53,590 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:42:02,958 - INFO - Current time: 2025-02-16 20:42:02.955167+03:00
+2025-02-16 20:42:02,958 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:42:02,959 - INFO - Time until battle: 4h 56m
+2025-02-16 20:42:02,959 - INFO - Wait seconds: 14217.044833
+2025-02-16 20:42:02,959 - INFO - Sleeping for 10 seconds
+2025-02-16 20:42:12,963 - INFO - Current time: 2025-02-16 20:42:12.960763+03:00
+2025-02-16 20:42:12,963 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:42:12,963 - INFO - Time until battle: 4h 56m
+2025-02-16 20:42:12,963 - INFO - Wait seconds: 14207.039237
+2025-02-16 20:42:12,963 - INFO - Sleeping for 10 seconds
+2025-02-16 20:42:17,493 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:42:22,967 - INFO - Current time: 2025-02-16 20:42:22.964828+03:00
+2025-02-16 20:42:22,967 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:42:22,967 - INFO - Time until battle: 4h 56m
+2025-02-16 20:42:22,967 - INFO - Wait seconds: 14197.035172
+2025-02-16 20:42:22,968 - INFO - Sleeping for 10 seconds
+2025-02-16 20:42:32,970 - INFO - Current time: 2025-02-16 20:42:32.969297+03:00
+2025-02-16 20:42:32,970 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:42:32,970 - INFO - Time until battle: 4h 56m
+2025-02-16 20:42:32,970 - INFO - Wait seconds: 14187.030703
+2025-02-16 20:42:32,970 - INFO - Sleeping for 10 seconds
+2025-02-16 20:42:42,975 - INFO - Current time: 2025-02-16 20:42:42.972018+03:00
+2025-02-16 20:42:42,975 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:42:42,975 - INFO - Time until battle: 4h 56m
+2025-02-16 20:42:42,975 - INFO - Wait seconds: 14177.027982
+2025-02-16 20:42:42,975 - INFO - Sleeping for 10 seconds
+2025-02-16 20:42:52,774 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:43:52 MSK)" (scheduled at 2025-02-16 20:42:52.772963+03:00)
+2025-02-16 20:42:52,775 - INFO - Notification task is already running
+2025-02-16 20:42:52,775 - INFO - Checking battle schedule...
+2025-02-16 20:42:52,775 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:43:52 MSK)" (scheduled at 2025-02-16 20:42:52.773518+03:00)
+2025-02-16 20:42:52,777 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:43:52 MSK)" executed successfully
+2025-02-16 20:42:52,778 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 20:42:52,778 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:43:52 MSK)" executed successfully
+2025-02-16 20:42:52,979 - INFO - Current time: 2025-02-16 20:42:52.977164+03:00
+2025-02-16 20:42:52,980 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:42:52,980 - INFO - Time until battle: 4h 56m
+2025-02-16 20:42:52,980 - INFO - Wait seconds: 14167.022836
+2025-02-16 20:42:52,980 - INFO - Sleeping for 10 seconds
+2025-02-16 20:43:02,983 - INFO - Current time: 2025-02-16 20:43:02.981930+03:00
+2025-02-16 20:43:02,983 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:43:02,984 - INFO - Time until battle: 4h 55m
+2025-02-16 20:43:02,984 - INFO - Wait seconds: 14157.01807
+2025-02-16 20:43:02,984 - INFO - Sleeping for 10 seconds
+2025-02-16 20:43:12,989 - INFO - Current time: 2025-02-16 20:43:12.985634+03:00
+2025-02-16 20:43:12,989 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:43:12,989 - INFO - Time until battle: 4h 55m
+2025-02-16 20:43:12,989 - INFO - Wait seconds: 14147.014366
+2025-02-16 20:43:12,989 - INFO - Sleeping for 10 seconds
+2025-02-16 20:43:22,994 - INFO - Current time: 2025-02-16 20:43:22.991399+03:00
+2025-02-16 20:43:22,994 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:43:22,994 - INFO - Time until battle: 4h 55m
+2025-02-16 20:43:22,994 - INFO - Wait seconds: 14137.008601
+2025-02-16 20:43:22,994 - INFO - Sleeping for 10 seconds
+2025-02-16 20:43:32,999 - INFO - Current time: 2025-02-16 20:43:32.996295+03:00
+2025-02-16 20:43:33,000 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:43:33,000 - INFO - Time until battle: 4h 55m
+2025-02-16 20:43:33,000 - INFO - Wait seconds: 14127.003705
+2025-02-16 20:43:33,000 - INFO - Sleeping for 10 seconds
+2025-02-16 20:43:41,574 - INFO - Got difference for channel 2165667426 updates
+2025-02-16 20:43:43,004 - INFO - Current time: 2025-02-16 20:43:43.001235+03:00
+2025-02-16 20:43:43,004 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:43:43,004 - INFO - Time until battle: 4h 55m
+2025-02-16 20:43:43,005 - INFO - Wait seconds: 14116.998765
+2025-02-16 20:43:43,005 - INFO - Sleeping for 10 seconds
+2025-02-16 20:43:52,385 - INFO - Got difference for channel 2165667426 updates
+2025-02-16 20:43:52,775 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:44:52 MSK)" (scheduled at 2025-02-16 20:43:52.772963+03:00)
+2025-02-16 20:43:52,776 - INFO - Notification task is already running
+2025-02-16 20:43:52,776 - INFO - Checking battle schedule...
+2025-02-16 20:43:52,776 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:44:52 MSK)" (scheduled at 2025-02-16 20:43:52.773518+03:00)
+2025-02-16 20:43:52,778 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 20:43:52,778 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:44:52 MSK)" executed successfully
+2025-02-16 20:43:52,779 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:44:52 MSK)" executed successfully
+2025-02-16 20:43:53,007 - INFO - Current time: 2025-02-16 20:43:53.006488+03:00
+2025-02-16 20:43:53,008 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:43:53,008 - INFO - Time until battle: 4h 55m
+2025-02-16 20:43:53,008 - INFO - Wait seconds: 14106.993512
+2025-02-16 20:43:53,008 - INFO - Sleeping for 10 seconds
+2025-02-16 20:44:03,012 - INFO - Current time: 2025-02-16 20:44:03.010133+03:00
+2025-02-16 20:44:03,012 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:44:03,013 - INFO - Time until battle: 4h 54m
+2025-02-16 20:44:03,013 - INFO - Wait seconds: 14096.989867
+2025-02-16 20:44:03,013 - INFO - Sleeping for 10 seconds
+2025-02-16 20:44:07,693 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:44:13,015 - INFO - Current time: 2025-02-16 20:44:13.013448+03:00
+2025-02-16 20:44:13,015 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:44:13,015 - INFO - Time until battle: 4h 54m
+2025-02-16 20:44:13,016 - INFO - Wait seconds: 14086.986552
+2025-02-16 20:44:13,016 - INFO - Sleeping for 10 seconds
+2025-02-16 20:44:15,134 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:44:23,020 - INFO - Current time: 2025-02-16 20:44:23.017605+03:00
+2025-02-16 20:44:23,020 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:44:23,021 - INFO - Time until battle: 4h 54m
+2025-02-16 20:44:23,021 - INFO - Wait seconds: 14076.982395
+2025-02-16 20:44:23,021 - INFO - Sleeping for 10 seconds
+2025-02-16 20:44:33,023 - INFO - Current time: 2025-02-16 20:44:33.022459+03:00
+2025-02-16 20:44:33,023 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:44:33,023 - INFO - Time until battle: 4h 54m
+2025-02-16 20:44:33,023 - INFO - Wait seconds: 14066.977541
+2025-02-16 20:44:33,023 - INFO - Sleeping for 10 seconds
+2025-02-16 20:44:37,034 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:44:43,028 - INFO - Current time: 2025-02-16 20:44:43.025296+03:00
+2025-02-16 20:44:43,029 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:44:43,029 - INFO - Time until battle: 4h 54m
+2025-02-16 20:44:43,029 - INFO - Wait seconds: 14056.974704
+2025-02-16 20:44:43,029 - INFO - Sleeping for 10 seconds
+2025-02-16 20:44:50,574 - INFO - Got difference for channel 2431420281 updates
+2025-02-16 20:44:52,775 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:45:52 MSK)" (scheduled at 2025-02-16 20:44:52.772963+03:00)
+2025-02-16 20:44:52,776 - INFO - Notification task is already running
+2025-02-16 20:44:52,776 - INFO - Checking battle schedule...
+2025-02-16 20:44:52,776 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:45:52 MSK)" (scheduled at 2025-02-16 20:44:52.773518+03:00)
+2025-02-16 20:44:52,779 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:45:52 MSK)" executed successfully
+2025-02-16 20:44:52,779 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 20:44:52,780 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:45:52 MSK)" executed successfully
+2025-02-16 20:44:53,033 - INFO - Current time: 2025-02-16 20:44:53.031175+03:00
+2025-02-16 20:44:53,033 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:44:53,033 - INFO - Time until battle: 4h 54m
+2025-02-16 20:44:53,033 - INFO - Wait seconds: 14046.968825
+2025-02-16 20:44:53,033 - INFO - Sleeping for 10 seconds
+2025-02-16 20:44:57,334 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:45:02,126 - INFO - Got difference for channel 2208773573 updates
+2025-02-16 20:45:03,037 - INFO - Current time: 2025-02-16 20:45:03.034902+03:00
+2025-02-16 20:45:03,037 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:45:03,037 - INFO - Time until battle: 4h 53m
+2025-02-16 20:45:03,037 - INFO - Wait seconds: 14036.965098
+2025-02-16 20:45:03,037 - INFO - Sleeping for 10 seconds
+2025-02-16 20:45:10,513 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:45:13,041 - INFO - Current time: 2025-02-16 20:45:13.038847+03:00
+2025-02-16 20:45:13,042 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:45:13,042 - INFO - Time until battle: 4h 53m
+2025-02-16 20:45:13,042 - INFO - Wait seconds: 14026.961153
+2025-02-16 20:45:13,042 - INFO - Sleeping for 10 seconds
+2025-02-16 20:45:16,145 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:45:16,524 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:45:23,046 - INFO - Current time: 2025-02-16 20:45:23.043738+03:00
+2025-02-16 20:45:23,046 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:45:23,046 - INFO - Time until battle: 4h 53m
+2025-02-16 20:45:23,046 - INFO - Wait seconds: 14016.956262
+2025-02-16 20:45:23,047 - INFO - Sleeping for 10 seconds
+2025-02-16 20:45:33,050 - INFO - Current time: 2025-02-16 20:45:33.048336+03:00
+2025-02-16 20:45:33,050 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:45:33,051 - INFO - Time until battle: 4h 53m
+2025-02-16 20:45:33,051 - INFO - Wait seconds: 14006.951664
+2025-02-16 20:45:33,051 - INFO - Sleeping for 10 seconds
+2025-02-16 20:45:43,055 - INFO - Current time: 2025-02-16 20:45:43.052720+03:00
+2025-02-16 20:45:43,055 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:45:43,055 - INFO - Time until battle: 4h 53m
+2025-02-16 20:45:43,055 - INFO - Wait seconds: 13996.94728
+2025-02-16 20:45:43,055 - INFO - Sleeping for 10 seconds
+2025-02-16 20:45:46,805 - INFO - Got difference for channel 2146737637 updates
+2025-02-16 20:45:52,774 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:46:52 MSK)" (scheduled at 2025-02-16 20:45:52.772963+03:00)
+2025-02-16 20:45:52,775 - INFO - Notification task is already running
+2025-02-16 20:45:52,775 - INFO - Checking battle schedule...
+2025-02-16 20:45:52,775 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:46:52 MSK)" (scheduled at 2025-02-16 20:45:52.773518+03:00)
+2025-02-16 20:45:52,776 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 20:45:52,777 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:46:52 MSK)" executed successfully
+2025-02-16 20:45:52,777 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:46:52 MSK)" executed successfully
+2025-02-16 20:45:53,060 - INFO - Current time: 2025-02-16 20:45:53.057392+03:00
+2025-02-16 20:45:53,060 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:45:53,060 - INFO - Time until battle: 4h 53m
+2025-02-16 20:45:53,060 - INFO - Wait seconds: 13986.942608
+2025-02-16 20:45:53,060 - INFO - Sleeping for 10 seconds
+2025-02-16 20:45:53,194 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:46:03,065 - INFO - Current time: 2025-02-16 20:46:03.062242+03:00
+2025-02-16 20:46:03,065 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:46:03,065 - INFO - Time until battle: 4h 52m
+2025-02-16 20:46:03,065 - INFO - Wait seconds: 13976.937758
+2025-02-16 20:46:03,065 - INFO - Sleeping for 10 seconds
+2025-02-16 20:46:06,845 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:46:13,068 - INFO - Current time: 2025-02-16 20:46:13.066847+03:00
+2025-02-16 20:46:13,068 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:46:13,068 - INFO - Time until battle: 4h 52m
+2025-02-16 20:46:13,068 - INFO - Wait seconds: 13966.933153
+2025-02-16 20:46:13,068 - INFO - Sleeping for 10 seconds
+2025-02-16 20:46:16,336 - INFO - Got difference for account updates
+2025-02-16 20:46:21,183 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:46:23,071 - INFO - Current time: 2025-02-16 20:46:23.069640+03:00
+2025-02-16 20:46:23,071 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:46:23,071 - INFO - Time until battle: 4h 52m
+2025-02-16 20:46:23,071 - INFO - Wait seconds: 13956.93036
+2025-02-16 20:46:23,071 - INFO - Sleeping for 10 seconds
+2025-02-16 20:46:27,902 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:46:28,613 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:46:33,074 - INFO - Current time: 2025-02-16 20:46:33.073117+03:00
+2025-02-16 20:46:33,074 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:46:33,074 - INFO - Time until battle: 4h 52m
+2025-02-16 20:46:33,074 - INFO - Wait seconds: 13946.926883
+2025-02-16 20:46:33,074 - INFO - Sleeping for 10 seconds
+2025-02-16 20:46:40,165 - INFO - Got difference for channel 2165667426 updates
+2025-02-16 20:46:43,076 - INFO - Current time: 2025-02-16 20:46:43.075503+03:00
+2025-02-16 20:46:43,076 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:46:43,076 - INFO - Time until battle: 4h 52m
+2025-02-16 20:46:43,076 - INFO - Wait seconds: 13936.924497
+2025-02-16 20:46:43,076 - INFO - Sleeping for 10 seconds
+2025-02-16 20:46:47,023 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:46:52,774 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:47:52 MSK)" (scheduled at 2025-02-16 20:46:52.772963+03:00)
+2025-02-16 20:46:52,774 - INFO - Notification task is already running
+2025-02-16 20:46:52,774 - INFO - Checking battle schedule...
+2025-02-16 20:46:52,775 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:47:52 MSK)" (scheduled at 2025-02-16 20:46:52.773518+03:00)
+2025-02-16 20:46:52,776 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 20:46:52,776 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:47:52 MSK)" executed successfully
+2025-02-16 20:46:52,776 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:47:52 MSK)" executed successfully
+2025-02-16 20:46:53,079 - INFO - Current time: 2025-02-16 20:46:53.078145+03:00
+2025-02-16 20:46:53,079 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:46:53,079 - INFO - Time until battle: 4h 52m
+2025-02-16 20:46:53,079 - INFO - Wait seconds: 13926.921855
+2025-02-16 20:46:53,079 - INFO - Sleeping for 10 seconds
+2025-02-16 20:47:03,083 - INFO - Current time: 2025-02-16 20:47:03.081176+03:00
+2025-02-16 20:47:03,083 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:47:03,084 - INFO - Time until battle: 4h 51m
+2025-02-16 20:47:03,084 - INFO - Wait seconds: 13916.918824
+2025-02-16 20:47:03,084 - INFO - Sleeping for 10 seconds
+2025-02-16 20:47:13,086 - INFO - Current time: 2025-02-16 20:47:13.085589+03:00
+2025-02-16 20:47:13,086 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:47:13,086 - INFO - Time until battle: 4h 51m
+2025-02-16 20:47:13,086 - INFO - Wait seconds: 13906.914411
+2025-02-16 20:47:13,086 - INFO - Sleeping for 10 seconds
+2025-02-16 20:47:15,004 - INFO - Got difference for channel 2146737637 updates
+2025-02-16 20:47:18,693 - WARNING - Received SIGINT signal
+2025-02-16 20:47:18,695 - INFO - Polling stopped for bot @WW_EDU_bot id=7599529676 - 'WW-бот'
+2025-02-16 20:47:18,695 - INFO - Polling stopped
+2025-02-16 20:47:22,586 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-02-16 20:47:22,586 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-02-16 20:47:22,587 - INFO - Added job "Schedule_checker" to job store "default"
+2025-02-16 20:47:22,587 - INFO - Added job "Notification_checker" to job store "default"
+2025-02-16 20:47:22,587 - INFO - Scheduler started
+2025-02-16 20:47:22,587 - INFO - Scheduler started successfully
+2025-02-16 20:47:22,993 - INFO - Start polling
+2025-02-16 20:47:23,044 - INFO - Run polling for bot @WW_EDU_bot id=7599529676 - 'WW-бот'
+2025-02-16 20:47:25,526 - INFO - Request processed in mode 1
+2025-02-16 20:47:25,931 - INFO - Update id=574621239 is handled. Duration 405 ms by bot id=7599529676
+2025-02-16 20:47:35,475 - INFO - Request processed in mode 1
+2025-02-16 20:47:35,553 - INFO - Update id=574621240 is handled. Duration 78 ms by bot id=7599529676
+2025-02-16 20:47:45,926 - INFO - Request processed in mode 1
+2025-02-16 20:47:46,023 - INFO - Update id=574621241 is handled. Duration 97 ms by bot id=7599529676
+2025-02-16 20:47:47,474 - INFO - Request processed in mode 1
+2025-02-16 20:47:47,485 - INFO - Adding notification job: 8 at 20:48
+2025-02-16 20:47:47,492 - INFO - Added job "SchedulerManager.send_notification" to job store "default"
+2025-02-16 20:47:47,564 - INFO - Update id=574621242 is handled. Duration 90 ms by bot id=7599529676
+2025-02-16 20:48:00,001 - INFO - Running job "SchedulerManager.send_notification (trigger: cron[hour='20', minute='48'], next run at: 2025-02-17 20:48:00 MSK)" (scheduled at 2025-02-16 20:48:00+03:00)
+2025-02-16 20:48:00,004 - INFO - Connecting to 149.154.167.92:443/TcpFull...
+2025-02-16 20:48:00,053 - INFO - Connection to 149.154.167.92:443/TcpFull complete!
+2025-02-16 20:48:01,425 - INFO - UserBot initialized for +971582490941
+2025-02-16 20:48:01,425 - ERROR - Failed to send message: MessageMethods.send_message() got an unexpected keyword argument 'entities'
+2025-02-16 20:48:01,426 - ERROR - Failed to send via user_bot, falling back to regular bot: MessageMethods.send_message() got an unexpected keyword argument 'entities'
+2025-02-16 20:48:01,554 - INFO - Notification sent to channel via regular bot: 8 - 🤔кddddddd
+2025-02-16 20:48:01,554 - INFO - Job "SchedulerManager.send_notification (trigger: cron[hour='20', minute='48'], next run at: 2025-02-17 20:48:00 MSK)" executed successfully
+2025-02-16 20:48:22,588 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:49:22 MSK)" (scheduled at 2025-02-16 20:48:22.586708+03:00)
+2025-02-16 20:48:22,589 - INFO - Notification task started
+2025-02-16 20:48:22,589 - INFO - Checking battle schedule...
+2025-02-16 20:48:22,589 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:49:22 MSK)" (scheduled at 2025-02-16 20:48:22.586942+03:00)
+2025-02-16 20:48:22,592 - INFO - Next battle time set to: 2025-02-17 01:39:00+03:00
+2025-02-16 20:48:22,592 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 20:48:22,594 - INFO - Added job "Battle_task" to job store "default"
+2025-02-16 20:48:22,595 - INFO - New battle scheduled for: 2025-02-17 01:39:00+03:00
+2025-02-16 20:48:22,595 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:49:22 MSK)" executed successfully
+2025-02-16 20:48:22,595 - INFO - Current time: 2025-02-16 20:48:22.590306+03:00
+2025-02-16 20:48:22,595 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:48:22,595 - INFO - Time until battle: 4h 50m
+2025-02-16 20:48:22,595 - INFO - Wait seconds: 13837.409694
+2025-02-16 20:48:22,595 - INFO - Sleeping for 10 seconds
+2025-02-16 20:48:22,596 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:49:22 MSK)" executed successfully
+2025-02-16 20:48:32,599 - INFO - Current time: 2025-02-16 20:48:32.597100+03:00
+2025-02-16 20:48:32,599 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:48:32,599 - INFO - Time until battle: 4h 50m
+2025-02-16 20:48:32,599 - INFO - Wait seconds: 13827.4029
+2025-02-16 20:48:32,599 - INFO - Sleeping for 10 seconds
+2025-02-16 20:48:42,604 - INFO - Current time: 2025-02-16 20:48:42.601008+03:00
+2025-02-16 20:48:42,605 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:48:42,606 - INFO - Time until battle: 4h 50m
+2025-02-16 20:48:42,606 - INFO - Wait seconds: 13817.398992
+2025-02-16 20:48:42,606 - INFO - Sleeping for 10 seconds
+2025-02-16 20:48:46,247 - INFO - Got difference for account updates
+2025-02-16 20:48:46,815 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:48:52,611 - INFO - Current time: 2025-02-16 20:48:52.607835+03:00
+2025-02-16 20:48:52,611 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:48:52,611 - INFO - Time until battle: 4h 50m
+2025-02-16 20:48:52,611 - INFO - Wait seconds: 13807.392165
+2025-02-16 20:48:52,611 - INFO - Sleeping for 10 seconds
+2025-02-16 20:49:02,615 - INFO - Current time: 2025-02-16 20:49:02.612688+03:00
+2025-02-16 20:49:02,615 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:49:02,616 - INFO - Time until battle: 4h 49m
+2025-02-16 20:49:02,616 - INFO - Wait seconds: 13797.387312
+2025-02-16 20:49:02,616 - INFO - Sleeping for 10 seconds
+2025-02-16 20:49:05,727 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:49:07,416 - INFO - Got difference for channel 2013105429 updates
+2025-02-16 20:49:12,620 - INFO - Current time: 2025-02-16 20:49:12.617580+03:00
+2025-02-16 20:49:12,620 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:49:12,620 - INFO - Time until battle: 4h 49m
+2025-02-16 20:49:12,620 - INFO - Wait seconds: 13787.38242
+2025-02-16 20:49:12,620 - INFO - Sleeping for 10 seconds
+2025-02-16 20:49:22,588 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:50:22 MSK)" (scheduled at 2025-02-16 20:49:22.586708+03:00)
+2025-02-16 20:49:22,588 - INFO - Notification task is already running
+2025-02-16 20:49:22,588 - INFO - Checking battle schedule...
+2025-02-16 20:49:22,588 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:50:22 MSK)" (scheduled at 2025-02-16 20:49:22.586942+03:00)
+2025-02-16 20:49:22,589 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:50:22 MSK)" executed successfully
+2025-02-16 20:49:22,590 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 20:49:22,590 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:50:22 MSK)" executed successfully
+2025-02-16 20:49:22,622 - INFO - Current time: 2025-02-16 20:49:22.621927+03:00
+2025-02-16 20:49:22,622 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:49:22,622 - INFO - Time until battle: 4h 49m
+2025-02-16 20:49:22,622 - INFO - Wait seconds: 13777.378073
+2025-02-16 20:49:22,622 - INFO - Sleeping for 10 seconds
+2025-02-16 20:51:51,616 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-02-16 20:51:51,616 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-02-16 20:51:51,617 - INFO - Added job "Schedule_checker" to job store "default"
+2025-02-16 20:51:51,617 - INFO - Added job "Notification_checker" to job store "default"
+2025-02-16 20:51:51,617 - INFO - Scheduler started
+2025-02-16 20:51:51,617 - INFO - Scheduler started successfully
+2025-02-16 20:51:52,184 - INFO - Start polling
+2025-02-16 20:51:52,246 - INFO - Run polling for bot @WW_EDU_bot id=7599529676 - 'WW-бот'
+2025-02-16 20:51:58,585 - INFO - Request processed in mode 1
+2025-02-16 20:51:58,811 - INFO - Update id=574621243 is handled. Duration 225 ms by bot id=7599529676
+2025-02-16 20:52:13,780 - INFO - Request processed in mode 1
+2025-02-16 20:52:13,872 - INFO - Update id=574621244 is handled. Duration 92 ms by bot id=7599529676
+2025-02-16 20:52:18,654 - INFO - Request processed in mode 1
+2025-02-16 20:52:18,752 - INFO - Update id=574621245 is handled. Duration 97 ms by bot id=7599529676
+2025-02-16 20:52:22,864 - INFO - Request processed in mode 1
+2025-02-16 20:52:22,881 - INFO - Adding notification job: S at 20:53
+2025-02-16 20:52:22,883 - INFO - Added job "SchedulerManager.send_notification" to job store "default"
+2025-02-16 20:52:23,122 - INFO - Update id=574621246 is handled. Duration 258 ms by bot id=7599529676
+2025-02-16 20:52:51,618 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:53:51 MSK)" (scheduled at 2025-02-16 20:52:51.616491+03:00)
+2025-02-16 20:52:51,619 - INFO - Notification task started
+2025-02-16 20:52:51,619 - INFO - Checking battle schedule...
+2025-02-16 20:52:51,619 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:53:51 MSK)" (scheduled at 2025-02-16 20:52:51.616725+03:00)
+2025-02-16 20:52:51,623 - INFO - Next battle time set to: 2025-02-17 01:39:00+03:00
+2025-02-16 20:52:51,623 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 20:52:51,625 - INFO - Added job "Battle_task" to job store "default"
+2025-02-16 20:52:51,625 - INFO - New battle scheduled for: 2025-02-17 01:39:00+03:00
+2025-02-16 20:52:51,625 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:53:51 MSK)" executed successfully
+2025-02-16 20:52:51,626 - INFO - Current time: 2025-02-16 20:52:51.620725+03:00
+2025-02-16 20:52:51,626 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:52:51,626 - INFO - Time until battle: 4h 46m
+2025-02-16 20:52:51,626 - INFO - Wait seconds: 13568.379275
+2025-02-16 20:52:51,626 - INFO - Sleeping for 10 seconds
+2025-02-16 20:52:51,628 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:53:51 MSK)" executed successfully
+2025-02-16 20:53:00,002 - INFO - Running job "SchedulerManager.send_notification (trigger: cron[hour='20', minute='53'], next run at: 2025-02-17 20:53:00 MSK)" (scheduled at 2025-02-16 20:53:00+03:00)
+2025-02-16 20:53:00,008 - INFO - Connecting to 149.154.167.92:443/TcpFull...
+2025-02-16 20:53:00,062 - INFO - Connection to 149.154.167.92:443/TcpFull complete!
+2025-02-16 20:53:00,653 - INFO - UserBot initialized for +971582490941
+2025-02-16 20:53:00,792 - ERROR - Failed to send message: a TLObject was expected but found something else
+2025-02-16 20:53:00,792 - ERROR - Failed to send via user_bot, falling back to regular bot: a TLObject was expected but found something else
+2025-02-16 20:53:00,902 - INFO - Notification sent to channel via regular bot: S - 🤔кddddddd
+2025-02-16 20:53:00,903 - INFO - Job "SchedulerManager.send_notification (trigger: cron[hour='20', minute='53'], next run at: 2025-02-17 20:53:00 MSK)" executed successfully
+2025-02-16 20:53:01,628 - INFO - Current time: 2025-02-16 20:53:01.627672+03:00
+2025-02-16 20:53:01,629 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:53:01,629 - INFO - Time until battle: 4h 45m
+2025-02-16 20:53:01,629 - INFO - Wait seconds: 13558.372328
+2025-02-16 20:53:01,629 - INFO - Sleeping for 10 seconds
+2025-02-16 20:53:11,632 - INFO - Current time: 2025-02-16 20:53:11.629912+03:00
+2025-02-16 20:53:11,633 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:53:11,633 - INFO - Time until battle: 4h 45m
+2025-02-16 20:53:11,633 - INFO - Wait seconds: 13548.370088
+2025-02-16 20:53:11,633 - INFO - Sleeping for 10 seconds
+2025-02-16 20:53:16,233 - INFO - Got difference for account updates
+2025-02-16 20:53:16,324 - INFO - Got difference for channel 2030486673 updates
+2025-02-16 20:53:21,637 - INFO - Current time: 2025-02-16 20:53:21.635221+03:00
+2025-02-16 20:53:21,637 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:53:21,637 - INFO - Time until battle: 4h 45m
+2025-02-16 20:53:21,638 - INFO - Wait seconds: 13538.364779
+2025-02-16 20:53:21,638 - INFO - Sleeping for 10 seconds
+2025-02-16 20:53:31,642 - INFO - Current time: 2025-02-16 20:53:31.639461+03:00
+2025-02-16 20:53:31,642 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:53:31,642 - INFO - Time until battle: 4h 45m
+2025-02-16 20:53:31,643 - INFO - Wait seconds: 13528.360539
+2025-02-16 20:53:31,643 - INFO - Sleeping for 10 seconds
+2025-02-16 20:53:41,644 - INFO - Current time: 2025-02-16 20:53:41.644308+03:00
+2025-02-16 20:53:41,645 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:53:41,645 - INFO - Time until battle: 4h 45m
+2025-02-16 20:53:41,645 - INFO - Wait seconds: 13518.355692
+2025-02-16 20:53:41,645 - INFO - Sleeping for 10 seconds
+2025-02-16 20:53:51,618 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:54:51 MSK)" (scheduled at 2025-02-16 20:53:51.616491+03:00)
+2025-02-16 20:53:51,618 - INFO - Notification task is already running
+2025-02-16 20:53:51,618 - INFO - Checking battle schedule...
+2025-02-16 20:53:51,618 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:54:51 MSK)" (scheduled at 2025-02-16 20:53:51.616725+03:00)
+2025-02-16 20:53:51,620 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 20:53:51,620 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:54:51 MSK)" executed successfully
+2025-02-16 20:53:51,621 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:54:51 MSK)" executed successfully
+2025-02-16 20:53:51,647 - INFO - Current time: 2025-02-16 20:53:51.646278+03:00
+2025-02-16 20:53:51,647 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:53:51,647 - INFO - Time until battle: 4h 45m
+2025-02-16 20:53:51,647 - INFO - Wait seconds: 13508.353722
+2025-02-16 20:53:51,647 - INFO - Sleeping for 10 seconds
+2025-02-16 20:53:58,793 - INFO - Got difference for channel 1926923669 updates
+2025-02-16 20:54:01,650 - INFO - Current time: 2025-02-16 20:54:01.649141+03:00
+2025-02-16 20:54:01,650 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:54:01,650 - INFO - Time until battle: 4h 44m
+2025-02-16 20:54:01,650 - INFO - Wait seconds: 13498.350859
+2025-02-16 20:54:01,650 - INFO - Sleeping for 10 seconds
+2025-02-16 20:54:03,990 - WARNING - Received SIGINT signal
+2025-02-16 20:54:03,991 - INFO - Polling stopped for bot @WW_EDU_bot id=7599529676 - 'WW-бот'
+2025-02-16 20:54:03,991 - INFO - Polling stopped
+2025-02-16 20:54:05,064 - INFO - Notification task was cancelled
+2025-02-16 20:54:08,086 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-02-16 20:54:08,087 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-02-16 20:54:08,087 - INFO - Added job "Schedule_checker" to job store "default"
+2025-02-16 20:54:08,087 - INFO - Added job "Notification_checker" to job store "default"
+2025-02-16 20:54:08,087 - INFO - Scheduler started
+2025-02-16 20:54:08,087 - INFO - Scheduler started successfully
+2025-02-16 20:54:09,032 - INFO - Start polling
+2025-02-16 20:54:09,085 - INFO - Run polling for bot @WW_EDU_bot id=7599529676 - 'WW-бот'
+2025-02-16 20:54:09,364 - INFO - Request processed in mode 1
+2025-02-16 20:54:09,579 - INFO - Update id=574621247 is handled. Duration 215 ms by bot id=7599529676
+2025-02-16 20:54:28,744 - INFO - Request processed in mode 1
+2025-02-16 20:54:28,862 - INFO - Update id=574621248 is handled. Duration 118 ms by bot id=7599529676
+2025-02-16 20:54:33,023 - INFO - Request processed in mode 1
+2025-02-16 20:54:33,382 - INFO - Update id=574621249 is handled. Duration 359 ms by bot id=7599529676
+2025-02-16 20:54:33,874 - INFO - Request processed in mode 1
+2025-02-16 20:54:33,889 - INFO - Adding notification job: V at 20:55
+2025-02-16 20:54:33,892 - INFO - Added job "SchedulerManager.send_notification" to job store "default"
+2025-02-16 20:54:33,972 - INFO - Update id=574621250 is handled. Duration 98 ms by bot id=7599529676
+2025-02-16 20:55:00,002 - INFO - Running job "SchedulerManager.send_notification (trigger: cron[hour='20', minute='55'], next run at: 2025-02-17 20:55:00 MSK)" (scheduled at 2025-02-16 20:55:00+03:00)
+2025-02-16 20:55:00,006 - INFO - Connecting to 149.154.167.92:443/TcpFull...
+2025-02-16 20:55:00,062 - INFO - Connection to 149.154.167.92:443/TcpFull complete!
+2025-02-16 20:55:00,582 - INFO - UserBot initialized for +971582490941
+2025-02-16 20:55:00,772 - INFO - Request processed in mode 1
+2025-02-16 20:55:00,773 - INFO - Update id=574621251 is not handled. Duration 0 ms by bot id=7599529676
+2025-02-16 20:55:00,853 - INFO - Message sent to channel -1002430244531
+2025-02-16 20:55:00,853 - INFO - Notification sent to channel via user_bot: V - 🤔кddddddd
+2025-02-16 20:55:00,853 - INFO - Job "SchedulerManager.send_notification (trigger: cron[hour='20', minute='55'], next run at: 2025-02-17 20:55:00 MSK)" executed successfully
+2025-02-16 20:55:08,088 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:56:08 MSK)" (scheduled at 2025-02-16 20:55:08.086904+03:00)
+2025-02-16 20:55:08,088 - INFO - Notification task started
+2025-02-16 20:55:08,088 - INFO - Checking battle schedule...
+2025-02-16 20:55:08,088 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:56:08 MSK)" (scheduled at 2025-02-16 20:55:08.087084+03:00)
+2025-02-16 20:55:08,090 - INFO - Next battle time set to: 2025-02-17 01:39:00+03:00
+2025-02-16 20:55:08,090 - INFO - Current time: 2025-02-16 20:55:08.089121+03:00
+2025-02-16 20:55:08,090 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:55:08,090 - INFO - Time until battle: 4h 43m
+2025-02-16 20:55:08,090 - INFO - Wait seconds: 13431.910879
+2025-02-16 20:55:08,090 - INFO - Sleeping for 10 seconds
+2025-02-16 20:55:08,091 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 20:55:08,092 - INFO - Added job "Battle_task" to job store "default"
+2025-02-16 20:55:08,092 - INFO - New battle scheduled for: 2025-02-17 01:39:00+03:00
+2025-02-16 20:55:08,092 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:56:08 MSK)" executed successfully
+2025-02-16 20:55:08,093 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 20:56:08 MSK)" executed successfully
+2025-02-16 20:55:18,095 - INFO - Current time: 2025-02-16 20:55:18.092349+03:00
+2025-02-16 20:55:18,096 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:55:18,096 - INFO - Time until battle: 4h 43m
+2025-02-16 20:55:18,096 - INFO - Wait seconds: 13421.907651
+2025-02-16 20:55:18,096 - INFO - Sleeping for 10 seconds
+2025-02-16 20:55:28,099 - INFO - Current time: 2025-02-16 20:55:28.097791+03:00
+2025-02-16 20:55:28,099 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:55:28,099 - INFO - Time until battle: 4h 43m
+2025-02-16 20:55:28,099 - INFO - Wait seconds: 13411.902209
+2025-02-16 20:55:28,099 - INFO - Sleeping for 10 seconds
+2025-02-16 20:55:37,543 - INFO - Got difference for channel 2165667426 updates
+2025-02-16 20:55:38,102 - INFO - Current time: 2025-02-16 20:55:38.100574+03:00
+2025-02-16 20:55:38,103 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:55:38,103 - INFO - Time until battle: 4h 43m
+2025-02-16 20:55:38,103 - INFO - Wait seconds: 13401.899426
+2025-02-16 20:55:38,103 - INFO - Sleeping for 10 seconds
+2025-02-16 20:55:43,824 - INFO - Got difference for channel 2165667426 updates
+2025-02-16 20:55:46,543 - INFO - Got difference for channel 2255881135 updates
+2025-02-16 20:55:48,107 - INFO - Current time: 2025-02-16 20:55:48.104696+03:00
+2025-02-16 20:55:48,107 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 20:55:48,107 - INFO - Time until battle: 4h 43m
+2025-02-16 20:55:48,107 - INFO - Wait seconds: 13391.895304
+2025-02-16 20:55:48,107 - INFO - Sleeping for 10 seconds
+2025-02-16 23:54:14,997 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-02-16 23:54:14,997 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-02-16 23:54:14,998 - INFO - Added job "Schedule_checker" to job store "default"
+2025-02-16 23:54:14,998 - INFO - Added job "Notification_checker" to job store "default"
+2025-02-16 23:54:14,998 - INFO - Scheduler started
+2025-02-16 23:54:14,998 - INFO - Scheduler started successfully
+2025-02-16 23:54:16,214 - INFO - Start polling
+2025-02-16 23:54:16,267 - INFO - Run polling for bot @WW_EDU_bot id=7599529676 - 'WW-бот'
+2025-02-16 23:54:36,215 - INFO - Request processed in mode 1
+2025-02-16 23:54:36,442 - INFO - Update id=574621252 is handled. Duration 227 ms by bot id=7599529676
+2025-02-16 23:54:43,246 - INFO - Request processed in mode 1
+2025-02-16 23:54:43,324 - INFO - Update id=574621253 is handled. Duration 77 ms by bot id=7599529676
+2025-02-16 23:54:52,754 - INFO - Request processed in mode 1
+2025-02-16 23:54:52,834 - INFO - Update id=574621254 is handled. Duration 79 ms by bot id=7599529676
+2025-02-16 23:54:54,165 - INFO - Request processed in mode 1
+2025-02-16 23:54:54,182 - INFO - Adding notification job: B at 23:55
+2025-02-16 23:54:54,185 - INFO - Added job "SchedulerManager.send_notification" to job store "default"
+2025-02-16 23:54:54,394 - INFO - Update id=574621255 is handled. Duration 229 ms by bot id=7599529676
+2025-02-16 23:55:00,001 - INFO - Running job "SchedulerManager.send_notification (trigger: cron[hour='23', minute='55'], next run at: 2025-02-17 23:55:00 MSK)" (scheduled at 2025-02-16 23:55:00+03:00)
+2025-02-16 23:55:00,007 - INFO - Connecting to 149.154.167.92:443/TcpFull...
+2025-02-16 23:55:00,063 - INFO - Connection to 149.154.167.92:443/TcpFull complete!
+2025-02-16 23:55:00,454 - INFO - UserBot initialized for +971582490941
+2025-02-16 23:55:00,635 - INFO - Request processed in mode 1
+2025-02-16 23:55:00,636 - INFO - Update id=574621256 is not handled. Duration 0 ms by bot id=7599529676
+2025-02-16 23:55:00,724 - INFO - Message sent to channel -1002430244531
+2025-02-16 23:55:00,724 - INFO - Notification sent to channel via UserBot: B - 🤔кddddddd
+2025-02-16 23:55:00,724 - INFO - Job "SchedulerManager.send_notification (trigger: cron[hour='23', minute='55'], next run at: 2025-02-17 23:55:00 MSK)" executed successfully
+2025-02-16 23:55:14,999 - INFO - Running job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 23:56:14 MSK)" (scheduled at 2025-02-16 23:55:14.997089+03:00)
+2025-02-16 23:55:15,000 - INFO - Notification task started
+2025-02-16 23:55:15,000 - INFO - Checking battle schedule...
+2025-02-16 23:55:15,001 - INFO - Running job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 23:56:14 MSK)" (scheduled at 2025-02-16 23:55:14.997672+03:00)
+2025-02-16 23:55:15,003 - INFO - Next battle time set to: 2025-02-17 01:39:00+03:00
+2025-02-16 23:55:15,003 - INFO - Next battle time determined: 2025-02-17 01:39:00+03:00
+2025-02-16 23:55:15,005 - INFO - Added job "Battle_task" to job store "default"
+2025-02-16 23:55:15,005 - INFO - New battle scheduled for: 2025-02-17 01:39:00+03:00
+2025-02-16 23:55:15,005 - INFO - Job "Schedule_checker (trigger: interval[0:01:00], next run at: 2025-02-16 23:56:14 MSK)" executed successfully
+2025-02-16 23:55:15,006 - INFO - Job "Notification_checker (trigger: interval[0:01:00], next run at: 2025-02-16 23:56:14 MSK)" executed successfully
+2025-02-16 23:55:15,007 - INFO - Current time: 2025-02-16 23:55:15.002274+03:00
+2025-02-16 23:55:15,007 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 23:55:15,007 - INFO - Time until battle: 1h 43m
+2025-02-16 23:55:15,007 - INFO - Wait seconds: 2624.997726
+2025-02-16 23:55:15,007 - INFO - Sleeping for 10 seconds
+2025-02-16 23:55:20,296 - INFO - Request processed in mode 1
+2025-02-16 23:55:20,298 - INFO - Update id=574621257 is not handled. Duration 1 ms by bot id=7599529676
+2025-02-16 23:55:25,012 - INFO - Current time: 2025-02-16 23:55:25.009099+03:00
+2025-02-16 23:55:25,012 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 23:55:25,012 - INFO - Time until battle: 1h 43m
+2025-02-16 23:55:25,012 - INFO - Wait seconds: 2614.990901
+2025-02-16 23:55:25,012 - INFO - Sleeping for 10 seconds
+2025-02-16 23:55:35,015 - INFO - Current time: 2025-02-16 23:55:35.013854+03:00
+2025-02-16 23:55:35,015 - INFO - Battle time: 2025-02-17 01:39:00+03:00
+2025-02-16 23:55:35,015 - INFO - Time until battle: 1h 43m
+2025-02-16 23:55:35,015 - INFO - Wait seconds: 2604.986146
+2025-02-16 23:55:35,015 - INFO - Sleeping for 10 seconds
