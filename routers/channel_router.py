@@ -521,7 +521,10 @@ async def announce_winner(bot: Bot, channel_id: int, winners):
             except Exception as admin_error:
                 logging.error(f"Failed to notify admin about winner message error: {admin_error}")
     for admin_id in admin_ids:
-        await bot.send_message(admin_id, f'Секретный код победителя: {secret_code}')
+        try:
+            await bot.send_message(admin_id, f'Секретный код победителя: {secret_code}')
+        except Exception as admin_error:
+            logging.error(f"Failed to notify admin with ID = {admin_id} about winner message error: {admin_error}")
     if len(winners)==1:
         winner = winners[0]
         media = [

@@ -72,7 +72,7 @@ class SchedulerManager:
             logging.info("Battle task was cancelled")
             await self.cleanup_battle()
         except Exception as e:
-            logging.error("Error in battle task" + {str(e)})
+            logging.error("Error in battle task " + str(e))
             await self.cleanup_battle()
             
             
