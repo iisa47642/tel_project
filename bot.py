@@ -121,10 +121,10 @@ async def main():
     await create_tables()
     await channel_router.make_some_magic()
     
-    # message_throttling = ThrottlingMiddleware(limit=1.0)  # 2 секунды для сообщений
+    message_throttling = ThrottlingMiddleware(limit=1.0)  # 2 секунды для сообщений
     callback_throttling = ThrottlingMiddleware(limit=1.0)
     
-    # dp.message.middleware(message_throttling)
+    dp.message.middleware(message_throttling)
     dp.callback_query.middleware(callback_throttling)
     dp.message.middleware(AlbumsMiddleware(2))
 

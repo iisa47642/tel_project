@@ -6,6 +6,8 @@ from aiogram import Bot
 import pytz
 from typing import Optional
 from datetime import datetime, time, timedelta
+
+import telethon
 from config.config import load_config
 from database.db import clear_users_in_batl, get_all_notifications, get_all_users
 from routers.channel_router import delete_previous_messages
@@ -13,13 +15,14 @@ from tasks.task_handlers import TaskManager
 import logging
 from aiogram.types import MessageEntity
 from user_bot import user_bot
-from telethon.tl.types import MessageEntityCustomEmoji
+from telethon.tl.types import *
 
 class SchedulerManager:
     def __init__(self):
         self.scheduler = AsyncIOScheduler()
         self.timezone = pytz.timezone('Europe/Moscow')
         self.task_manager = TaskManager()
+        self.sent_notifications = set()
 
     async def setup(self, bot: Bot):
         """Настройка планировщика и добавление задач"""
@@ -41,11 +44,27 @@ class SchedulerManager:
             self.scheduler.add_job(
                 self.check_and_schedule_notifications,
                 'interval',
-                minutes=1,
+                minutes=2,
                 seconds=0,
                 name='Notification_checker',
                 misfire_grace_time=300
             )
+            
+            self.scheduler.add_job(
+                self.check_scheduler_status,
+                'interval',
+                minutes=1,
+                name='Scheduler_status_checker'
+            )
+            
+            self.scheduler.add_job(
+                self.clear_sent_notifications,
+                'cron',
+                hour=0,
+                minute=36,
+                name="Notification destuctor")
+
+            
 
 
             
@@ -206,6 +225,8 @@ class SchedulerManager:
 
     async def send_notification(self, notification_id, user_ids, message, entities=None, target="private"):
         try:
+            logging.info(f"Attempting to send notification {notification_id}")
+        # ... rest of the function ...
             config = await self.get_config()
             CHANNEL_ID = config.tg_bot.channel_id
             
@@ -219,16 +240,33 @@ class SchedulerManager:
             if entities:
                 try:
                     if isinstance(entities[0], MessageEntity):
-                        aiogram_entities = entities
-                        # Преобразуем entities для Telethon (только для CustomEmoji)
-                        telethon_entities = [
-                            MessageEntityCustomEmoji(
-                                offset=entity.offset,
-                                length=entity.length,
-                                document_id=int(entity.custom_emoji_id)
-                            ) for entity in entities if entity.type == 'custom_emoji'
-                        ]
+                        print(11111111111)
+                        telethon_entities = []
+                        for entity in entities:
+                            if entity.type == 'custom_emoji':
+                                telethon_entities.append(MessageEntityCustomEmoji(
+                                    offset=entity.offset,
+                                    length=entity.length,
+                                    document_id=int(entity.custom_emoji_id)
+                                ))
+                            elif entity.type == 'bold':
+                                telethon_entities.append(MessageEntityBold(
+                                    offset=entity.offset,
+                                    length=entity.length
+                                ))
+                            elif entity.type == 'italic':
+                                telethon_entities.append(MessageEntityItalic(
+                                    offset=entity.offset,
+                                    length=entity.length
+                                ))
+                            elif entity.type == 'text_link':
+                                telethon_entities.append(MessageEntityTextUrl(
+                                    offset=entity.offset,
+                                    length=entity.length,
+                                    url=entity.url
+                                ))
                     elif isinstance(entities, str):
+                        print(22222222222222)
                         entities_dicts = json.loads(entities)
                         aiogram_entities = [MessageEntity(
                             type=entity['type'],
@@ -240,24 +278,43 @@ class SchedulerManager:
                             custom_emoji_id=entity.get('custom_emoji_id')
                         ) for entity in entities_dicts]
                         # Преобразуем entities для Telethon (только для CustomEmoji)
-                        telethon_entities = [
-                            MessageEntityCustomEmoji(
-                                offset=entity['offset'],
-                                length=entity['length'],
-                                document_id=int(entity['custom_emoji_id'])
-                            ) for entity in entities_dicts if entity['type'] == 'custom_emoji'
-                        ]
+                        telethon_entities = []
+                        for entity in entities_dicts:
+                            if entity['type'] == 'custom_emoji':
+                                telethon_entities.append(MessageEntityCustomEmoji(
+                                    offset=entity['offset'],
+                                    length=entity['length'],
+                                    document_id=int(entity['custom_emoji_id'])
+                                ))
+                            elif entity['type'] == 'bold':
+                                telethon_entities.append(MessageEntityBold(
+                                    offset=entity['offset'],
+                                    length=entity['length']
+                                ))
+                            elif entity['type'] == 'italic':
+                                telethon_entities.append(MessageEntityItalic(
+                                    offset=entity['offset'],
+                                    length=entity['length']
+                                ))
+                            elif entity['type'] == 'text_link':
+                                telethon_entities.append(MessageEntityTextUrl(
+                                    offset=entity['offset'],
+                                    length=entity['length'],
+                                    url=entity['url']
+                                ))
+                    print(3333333)
+                    print(entities)
                 except Exception as e:
                     logging.error(f"Error processing entities for notification {notification_id}: {e}")
-
+            else:
+                logging.info(f"Message don't have entities")
             if target == "private":
                 for user_id in user_ids:
                     try:
                         await self.task_manager.bot.send_message(
                             chat_id=user_id, 
                             text=message, 
-                            entities=aiogram_entities,
-                            parse_mode='HTML'
+                            entities=aiogram_entities
                         )
                         logging.info(f"Notification sent to user {user_id}: {notification_id} - {message}")
                     except Exception as e:
@@ -281,8 +338,7 @@ class SchedulerManager:
                         await self.task_manager.bot.send_message(
                             chat_id=CHANNEL_ID,
                             text=message,
-                            entities=aiogram_entities,
-                            parse_mode='HTML'
+                            entities=aiogram_entities
                         )
                         logging.info(f"Notification sent to channel via regular bot: {notification_id} - {message}")
                     except Exception as e:
@@ -297,26 +353,50 @@ class SchedulerManager:
     async def check_and_schedule_notifications(self):
         try:
             notifications = await get_all_notifications()
-            for notification in notifications:
-                notification_id, code, message, time_str, entities, target = notification  # Разбираем все столбцы
-                time_obj = datetime.strptime(time_str, "%H:%M").time()
-                time_obj = self.timezone.localize(datetime.combine(datetime.now().date(), time_obj))  # Преобразуем время в локальное время Москвы
-                current_time = datetime.now(self.timezone)  # Получаем текущее время в таймзоне Москвы
+            current_time = datetime.now(self.timezone)
 
-                if time_obj.time() == current_time.time():
+            for notification in notifications:
+                notification_id, code, message, time_str, entities, target = notification
+                
+                # Преобразуем строку времени в объект time
+                time_obj = datetime.strptime(time_str, "%H:%M").time()
+                
+                # Создаем datetime объект для времени уведомления в текущем дне
+                notification_time = self.timezone.localize(datetime.combine(current_time.date(), time_obj))
+                
+                # Создаем временное окно в 2 минуты после запланированного времени
+                time_window_end = notification_time + timedelta(seconds=10)
+                job_id = f'notification_{code}'
+                if job_id in self.sent_notifications:
+                    if current_time > notification_time:
+                        logging.info(f"Notification {code} already sent today")
+                    continue
+                if current_time <= time_window_end:
+                    # Если текущее время находится в пределах временного окна (включая запланированное время),
+                    # планируем отправку уведомления
+                    if current_time >= notification_time:
+                        # Если уже прошло запланированное время, отправляем немедленно
+                        run_date = current_time
+                    else:
+                        # Иначе планируем на запланированное время
+                        run_date = notification_time
+                    self.sent_notifications.add(job_id)
                     users = await get_all_users()  # Функция должна возвращать список [(user_id,), ...]
                     user_ids = [user[0] for user in users]
                     self.scheduler.add_job(
                         self.send_notification,
                         'date',
-                        run_date=current_time,
-                        args=(notification_id, user_ids, message, entities, target),  # Теперь передаем все аргументы,
-                        id=f'notification_{code}',
+                        run_date=run_date,
+                        args=(notification_id, user_ids, message, entities, target),
+                        id=job_id,
                         replace_existing=True,
                     )
                     logging.info(f"Scheduled notification: {code} - {message}")
+                else:
+                    logging.info(f"Skipped notification {code} scheduled for {notification_time} (current time: {current_time})")
         except Exception as e:
             logging.error(f"Error in check_and_schedule_notifications: {e}", exc_info=True)
+
 
 
     async def remove_notification_job(self, code: str):
@@ -326,8 +406,17 @@ class SchedulerManager:
         except Exception as e:
             logging.error(f"Error removing notification job: {code}", exc_info=True)
 
+    
+    async def check_scheduler_status(self):
+        logging.info(f"Scheduler status: running={self.scheduler.running}")
+        for job in self.scheduler.get_jobs():
+            logging.info(f"Job: {job.id}, next run time: {job.next_run_time}")
 
 
+
+    async def clear_sent_notifications(self):
+        self.sent_notifications.clear()
+        logging.info("Cleared sent notifications for the new day")
 
 
 

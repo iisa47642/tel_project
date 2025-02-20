@@ -24,7 +24,17 @@ from routers.globals_var import (
     vote_states, user_clicks, pair_locks, vote_states_locks,
     user_last_click, click_counters, click_reset_times
 )
+# from routers.globals_var import (
+#     vote_states, user_clicks, pair_locks, vote_states_locks, user_last_click, 
+#     click_counters, click_reset_times, ROUND_DURATION, INITIAL_UPDATE_DELAY, MAX_UPDATE_DELAY, 
+#     DELAY_INCREASE_FACTOR, END_PHASE_THRESHOLD, MIN_REQUIRED_VOTES, MIN_VOTE_INCREMENT, 
+#     MAX_VOTE_INCREMENT, MIN_UPDATE_INTERVAL, CLICK_COOLDOWN, 
+#     MAX_CLICKS_PER_INTERVAL, RESET_INTERVAL, PHASE_1_END, PHASE_2_END, PHASE_3_END, 
+#     PHASE_4_END, PHASE_5_END, PHASE_6_END, FINAL_PHASE, BEHAVIOR_LAG, BEHAVIOR_LEAD, 
+#     BEHAVIOR_NORMAL, ERROR_RETRY_DELAY, BEHAVIOR_UPDATE_INTERVAL, PHASE_PARAMETERS
+# )
 import routers.globals_var
+
 from filters.isAdmin import is_admin
 from locks import battle_lock
 
@@ -34,49 +44,7 @@ _bot: Bot = None  # Placeholder for the bot instance
 def setup_router(dp, bot: Bot):
     global _bot
     _bot = bot
-    
-    
-LAG_UPDATE_INTERVAL = 180 # Периодичность проверки отставания(с вероятностью в ALLOW_LAG_CHANCE)
-INITIAL_UPDATE_DELAY = 5  # Начальная задержка при ошибке
-MAX_UPDATE_DELAY = 30      # Максимальная задержка при повторных ошибках
-DELAY_INCREASE_FACTOR = 2  # Множитель увеличения задержки
 
-END_PHASE_THRESHOLD = 0.85  # Последние 15% времени считаются концом раунда
-MIN_REQUIRED_VOTES = 5  # Минимальное количество голосов для прохождения
-MIN_VOTE_INCREMENT = 1   # Минимальный прирост голосов
-MAX_VOTE_INCREMENT = 2   # Максимальный прирост голосов
-
-# Константы для задержек в разных фазах (в секундах)
-INITIAL_PHASE_DELAYS = (60.0, 80.0)  # Большие задержки в начальной фазе
-MIDDLE_PHASE_DELAYS = (40.0, 50.0)   # Средние задержки в средней фазе
-FINAL_PHASE_DELAYS = (5.0, 15.0)    # Минимальные задержки в финальной фазе
-
-# Константы для задержек при пошаговом обновлении счета
-INITIAL_PHASE_STEP_DELAYS = (30, 40)
-MIDDLE_PHASE_STEP_DELAYS = (20, 25)
-FINAL_PHASE_STEP_DELAYS = (5.0, 15.0)
-
-
-ALLOW_LAG_CHANCE = 0.4  # Вероятность разрешить отставание
-MIN_LAG_DURATION = 50  # Минимальная продолжительность отставания в секундах
-MAX_LAG_DURATION = 200  # Максимальная продолжительность отставания в секундах
-MAX_LAG_DIFFERENCE = 8  # Максимальная разница в голосах при отставании
-MIN_LAG_DIFFERENCE = 1
-GUARANTEED_WIN_PHASE = 0.85  # Начало фазы гарантированной победы (85% времени раунда)
-MIN_WINNING_MARGIN = 5  # Минимальный отрыв для победы
-
-MIN_UPDATE_INTERVAL = 2.0  # Минимальный интервал между обновлениями в секундах
-FLOOD_CONTROL_RESET = 10# Время сброса флуд-контроля в секундах
-
-CLICK_COOLDOWN = 1.0  # Уменьшаем задержку между кликами до 300мс
-MAX_CLICKS_PER_INTERVAL = 5  # Увеличиваем количество разрешенных кликов
-RESET_INTERVAL = 5.0  # Интервал сброса счетчика кликов
-
-INITIAL_PHASE_VOTE_DIFF = 7  # В начальной фазе допускаем разницу в 3 голоса
-MIDDLE_PHASE_VOTE_DIFF = 5   # В средней фазе - в 2 голоса
-FINAL_PHASE_VOTE_DIFF = 1
-MAX_FINAL_PHASE_DIFF = 15
-MAX_LAG_DIFFERENCE = 8  # Максимальная разница при временном отставании
 
 
 channel_router = Router()
@@ -665,27 +633,27 @@ async def calculate_vote_increment(state: dict, opponent_votes: int = 0) -> int:
     """
     elapsed_time = (datetime.now() - state['start_time']).total_seconds()
     progress = elapsed_time / state['round_duration']
-    is_end_phase = progress > END_PHASE_THRESHOLD
+    is_end_phase = progress > routers.globals_var.END_PHASE_THRESHOLD
     current_votes = state['current_votes']
 
     if state['is_single']:
-        if current_votes < MIN_REQUIRED_VOTES:
+        if current_votes < routers.globals_var.MIN_REQUIRED_VOTES:
             remaining_time = state['round_duration'] - elapsed_time
-            needed_votes = MIN_REQUIRED_VOTES - current_votes
+            needed_votes = routers.globals_var.MIN_REQUIRED_VOTES - current_votes
             
             if remaining_time <= 0:
-                return MAX_VOTE_INCREMENT
+                return routers.globals_var.MAX_VOTE_INCREMENT
             
             votes_per_second_needed = needed_votes / remaining_time
             if votes_per_second_needed > 0.1:
-                return random.randint(2, MAX_VOTE_INCREMENT)
-            return random.randint(MIN_VOTE_INCREMENT, 2)
+                return random.randint(2, routers.globals_var.MAX_VOTE_INCREMENT)
+            return random.randint(routers.globals_var.MIN_VOTE_INCREMENT, 2)
     else:
         if is_end_phase:
-            return random.randint(MIN_VOTE_INCREMENT, 2)
+            return random.randint(routers.globals_var.MIN_VOTE_INCREMENT, 2)
         elif opponent_votes > current_votes:
-            return random.randint(2, MAX_VOTE_INCREMENT)
-        return random.randint(MIN_VOTE_INCREMENT, 2)
+            return random.randint(2, routers.globals_var.MAX_VOTE_INCREMENT)
+        return random.randint(routers.globals_var.MIN_VOTE_INCREMENT, 2)
     
 async def safe_get_vote_state(message_id: int):
     """
@@ -754,84 +722,125 @@ async def update_vote_display(bot: Bot, channel_id: int, message_id: int, state:
         raise
 
         
-def get_phase_delays(progress: float) -> tuple:
+def get_current_phase(progress):
     """
-    Возвращает задержки в зависимости от фазы раунда
+    Определяет текущую фазу на основе прогресса
+    progress: float от 0 до 1, представляющий процент пройденного времени
     """
-    if progress < 0.3:
-        return INITIAL_PHASE_DELAYS, INITIAL_PHASE_STEP_DELAYS
-    elif progress < 0.7:
-        return MIDDLE_PHASE_DELAYS, MIDDLE_PHASE_STEP_DELAYS
+    if progress < routers.globals_var.PHASE_1_END:
+        return 1
+    elif progress < routers.globals_var.PHASE_2_END:
+        return 2
+    elif progress < routers.globals_var.PHASE_3_END:
+        return 3
+    elif progress < routers.globals_var.PHASE_4_END:
+        return 4
+    elif progress < routers.globals_var.PHASE_5_END:
+        return 5
+    elif progress < routers.globals_var.PHASE_6_END:
+        return 6
     else:
-        return FINAL_PHASE_DELAYS, FINAL_PHASE_STEP_DELAYS
+        return 7
 
 
-async def gradual_vote_update(bot: Bot, channel_id: int, message_id: int, 
-                            state: dict, opponent_votes: int, 
-                            target_votes: int, step_delay_range: tuple):
-    """
-    Постепенно обновляет количество голосов
-    """
-    current = state['current_votes']
-    target = target_votes
+
+
+async def check_and_update_behavior(current_time, phase_params, current_behavior):
+    """Обновляет параметры отставания/опережения в рамках текущей фазы"""
+    if current_behavior and current_behavior['until_time'] >= current_time:
+        return current_behavior
+
+    behavior_type = phase_params['behavior']
     
-    while current < target:
-        delay = random.uniform(*step_delay_range)
-        delay = max(delay, MIN_UPDATE_INTERVAL)
-        await asyncio.sleep(delay)
-        
-        current += 1
-        if current > target:
-            break
-            
-        state['current_votes'] = current
-        
+    if behavior_type == routers.globals_var.BEHAVIOR_NORMAL:
+        new_behavior = {
+            'type': behavior_type,
+            'until_time': current_time + timedelta(seconds=routers.globals_var.BEHAVIOR_UPDATE_INTERVAL),
+            'gap': 0  # или phase_params.get('allowed_difference', 0)
+        }
+    else:
+        params = phase_params['behavior_params']
+        duration = random.uniform(params['min_duration'], params['max_duration'])
+        gap = random.randint(params['min_difference'], params['max_difference'])
+        new_behavior = {
+            'type': behavior_type,
+            'until_time': current_time + timedelta(seconds=duration),
+            'gap': gap
+        }
+    
+    logging.info(f"Updated behavior: {new_behavior}")
+    return new_behavior
+
+
+
+def should_update_votes(admin_votes, opponent_votes, phase_params, behavior):
+    """Определяет необходимость обновления голосов"""
+    if phase_params['behavior'] == routers.globals_var.BEHAVIOR_NORMAL:
+        vote_difference = abs(admin_votes - opponent_votes)
+        should_update = (opponent_votes > admin_votes) or \
+               (vote_difference > phase_params['allowed_difference'])
+        logging.info(f"Should update votes (normal): {should_update}. Admin: {admin_votes}, Opponent: {opponent_votes}")
+        return should_update
+
+    if not behavior:
+        return False
+
+    if behavior['type'] == routers.globals_var.BEHAVIOR_LAG:
+        should_update = opponent_votes > admin_votes + behavior['gap']
+    elif behavior['type'] == routers.globals_var.BEHAVIOR_LEAD:
+        # Обычная логика для LEAD поведения
+        should_update = admin_votes <= opponent_votes + behavior['gap']
+    else:
+        should_update = False
+
+    logging.info(f"Should update votes ({behavior['type']}): {should_update}. Admin: {admin_votes}, Opponent: {opponent_votes}, Gap: {behavior['gap']}")
+    return should_update
+
+
+
+async def try_update_votes(bot, channel_id, message_id, current_state, opponent_votes, new_admin_votes, current_delay):
+    """Пытается обновить голоса с учетом возможных ошибок"""
+    attempts = 0
+    while attempts < 3:  # Максимум 3 попытки
         try:
-            await update_vote_display(bot, channel_id, message_id, state, opponent_votes)
-        except Exception as e:
+            current_state['current_votes'] = new_admin_votes
+            await safe_update_vote_state(message_id, current_state)
+            await update_vote_display(bot, channel_id, message_id, current_state, opponent_votes)
+            return True
+            
+        except TelegramBadRequest as e:
             if "Flood control exceeded" in str(e):
-                await asyncio.sleep(FLOOD_CONTROL_RESET)
+                current_delay *= routers.globals_var.DELAY_INCREASE_FACTOR
+                await asyncio.sleep(min(current_delay, routers.globals_var.MAX_UPDATE_DELAY))
             elif "message is not modified" not in str(e):
-                logging.error(f"Error in gradual update: {e}")
+                logging.error(f"Error updating keyboard: {e}")
+                return False
+        except Exception as e:
+            logging.error(f"Unexpected error while updating: {str(e)}")
+            current_delay *= routers.globals_var.DELAY_INCREASE_FACTOR
+            await asyncio.sleep(min(current_delay, routers.globals_var.MAX_UPDATE_DELAY))
+        
+        attempts += 1
+        
+    logging.warning(f"Failed to update votes after {attempts} attempts")
+    return False
 
-async def check_and_update_lag(current_time, progress, allow_lag_until, allowed_gap, round_duration, elapsed_time):
-    """Периодически обновляет параметры отставания"""
-    if progress >= GUARANTEED_WIN_PHASE or elapsed_time >= round_duration:
-        return allow_lag_until, allowed_gap
 
-    # Проверяем, нужно ли обновить отставание
-    #if (allow_lag_until is None or current_time >= allow_lag_until) and allowed_gap is None:  # ИЗНАЧАЛЬНОЕ УСЛОВИЕ (ПРОБЛЕМНОЕ)
-    if allow_lag_until is None or current_time >= allow_lag_until:  # ИСПРАВЛЕННОЕ УСЛОВИЕ
-        if random.random() < ALLOW_LAG_CHANCE:
-            # Временное отставание
-            lag_duration = random.uniform(MIN_LAG_DURATION, MAX_LAG_DURATION)
-            max_allowed_lag_time = round_duration * GUARANTEED_WIN_PHASE - elapsed_time
-            lag_duration = min(lag_duration, max_allowed_lag_time)
-            if lag_duration > 0:
-                allow_lag_until = current_time + timedelta(seconds=lag_duration)
-                print(f'Новое временное отставание на {lag_duration} сек')
-                allowed_gap = None  # Сбрасываем голосовое отставание
-        else:
-            # Голосовое отставание
-            allowed_gap = random.randint(MIN_LAG_DIFFERENCE, MAX_LAG_DIFFERENCE)
-            print(f'Новое голосовое отставание: {allowed_gap}')
-            allow_lag_until = None  # Сбрасываем временное отставание
-
-    return allow_lag_until, allowed_gap
 
 async def admin_vote_monitor(bot: Bot, channel_id: int, message_id: int):
+    """Основная функция мониторинга голосования"""
     pair_key = f"{channel_id}:{message_id}"
-    allow_lag_until = None
+    current_behavior = None
     last_update_time = datetime.now()
-    allowed_gap = None
-    current_delay = INITIAL_UPDATE_DELAY
-    print('run_admin_monitor')
+    last_behavior_check = datetime.now()
+    current_delay = routers.globals_var.INITIAL_UPDATE_DELAY
     
+    logging.info(f"Starting admin vote monitor for message {message_id} in channel {channel_id}")
     while True:
         try:
             current_time = datetime.now()
-            if (current_time - last_update_time).total_seconds() < MIN_UPDATE_INTERVAL:
-                await asyncio.sleep(MIN_UPDATE_INTERVAL)
+            if (current_time - last_update_time).total_seconds() < routers.globals_var.MIN_UPDATE_INTERVAL:
+                await asyncio.sleep(routers.globals_var.MIN_UPDATE_INTERVAL)
                 continue
 
             async with pair_locks[pair_key]:
@@ -840,93 +849,43 @@ async def admin_vote_monitor(bot: Bot, channel_id: int, message_id: int):
                     return
 
                 elapsed_time = (current_time - current_state['start_time']).total_seconds()
-                progress = elapsed_time / current_state['round_duration']
+                round_duration = current_state['round_duration']
+                progress = elapsed_time / round_duration
                 
-                if elapsed_time >= current_state['round_duration']:
+                if progress >= routers.globals_var.FINAL_PHASE:
+                    logging.info(f"Final phase reached for message {message_id}. Ending monitor.")
                     break
 
-                update_delays, step_delays = get_phase_delays(progress)
+                current_phase = get_current_phase(progress)
+                phase_params = routers.globals_var.PHASE_PARAMETERS[current_phase]
                 opponent_votes = await get_current_votes(current_state['opponent_id'])
                 admin_votes = current_state['current_votes']
-                vote_difference = abs(admin_votes - opponent_votes)
                 
-                if progress < 0.3:  # Начальная фаза
-                    allowed_difference = INITIAL_PHASE_VOTE_DIFF
-                    current_step_delays = INITIAL_PHASE_STEP_DELAYS
-                elif progress < 0.7:  # Средняя фаза
-                    allowed_difference = MIDDLE_PHASE_VOTE_DIFF
-                    current_step_delays = MIDDLE_PHASE_STEP_DELAYS
-                else:  # Финальная фаза
-                    allowed_difference = FINAL_PHASE_VOTE_DIFF
-                    current_step_delays = FINAL_PHASE_STEP_DELAYS
-
-                # Обновление параметров отставания
-                if not hasattr(admin_vote_monitor, 'last_lag_update') or \
-                   (current_time - getattr(admin_vote_monitor, 'last_lag_update')).total_seconds() >= LAG_UPDATE_INTERVAL:
-                    allow_lag_until, allowed_gap = await check_and_update_lag(
-                        current_time, progress, allow_lag_until, allowed_gap,
-                        current_state['round_duration'], elapsed_time
+                logging.info(f"Current state - Phase: {current_phase}, Admin votes: {admin_votes}, Opponent votes: {opponent_votes}")
+                
+                # Обновление параметров поведения
+                if (current_time - last_behavior_check).total_seconds() >= routers.globals_var.BEHAVIOR_UPDATE_INTERVAL:
+                    current_behavior = await check_and_update_behavior(
+                        current_time, phase_params, current_behavior
                     )
-                    admin_vote_monitor.last_lag_update = current_time
+                    last_behavior_check = current_time
 
-                # Определяем необходимость и размер обновления
-                needs_update = False
-                if progress >= GUARANTEED_WIN_PHASE:
-                    random_gap = random.randint(MIN_WINNING_MARGIN, MAX_FINAL_PHASE_DIFF)
-                    if opponent_votes >= admin_votes or (admin_votes - opponent_votes) < random_gap:
-                        needs_update = True
-                else:
-                    if allow_lag_until and current_time < allow_lag_until:
-                        needs_update = opponent_votes > admin_votes + MAX_LAG_DIFFERENCE
-                    elif allowed_gap is not None:
-                        needs_update = opponent_votes > admin_votes + allowed_gap
-                    else:
-                        needs_update = (opponent_votes > admin_votes) or (vote_difference > allowed_difference)
-                
-                print(f"Состояние: admin={admin_votes}, opponent={opponent_votes}, разница={vote_difference}, needs_update={needs_update}")
-                if needs_update:
-                    # Используем calculate_vote_increment для определения размера обновления
-                    new_admin_votes = admin_votes + 1
+                if should_update_votes(admin_votes, opponent_votes, phase_params, current_behavior):
+                    logging.info(f"Attempting to update votes for message {message_id}")
+                    success = await try_update_votes(
+                        bot, channel_id, message_id, current_state,
+                        opponent_votes, admin_votes + 1, current_delay
+                    )
                     
-                    success = False
-                    attempts = 0
-                    while not success and attempts < 3:
-                        try:
-                            current_state['current_votes'] = new_admin_votes
-                            await safe_update_vote_state(message_id, current_state)
-                            
-                            await update_vote_display(bot, channel_id, message_id, current_state, opponent_votes)
-                            
-                            success = True
-                            current_delay = INITIAL_UPDATE_DELAY
-                            last_update_time = datetime.now()
-                            print(f"Успешное обновление голосов: {new_admin_votes} ")
-                            
-                        except TelegramBadRequest as e:
-                            attempts += 1
-                            if "Flood control exceeded" in str(e):
-                                current_delay = min(current_delay * DELAY_INCREASE_FACTOR, MAX_UPDATE_DELAY)
-                                print(f"Flood control hit, waiting {current_delay} seconds...")
-                                await asyncio.sleep(current_delay)
-                            elif "message is not modified" not in str(e):
-                                logging.error(f"Error updating keyboard: {e}")
-                                break
-                        except Exception as e:
-                            print(f"Unexpected error while updating: {str(e)}")
-                            current_delay = min(current_delay * DELAY_INCREASE_FACTOR, MAX_UPDATE_DELAY)
-                            await asyncio.sleep(current_delay)
-                            attempts += 1
-
                     if success:
-                        await asyncio.sleep(random.uniform(*current_step_delays))
-
-                # Задержка между итерациями
-                await asyncio.sleep(random.uniform(*update_delays))
+                        last_update_time = current_time
+                        await asyncio.sleep(random.uniform(*phase_params['step_delays']))
+                
+                await asyncio.sleep(random.uniform(*phase_params['update_delays']))
 
         except Exception as e:
-            logging.error(f"Error in admin monitor: {e}")
-            await asyncio.sleep(2)
-
+            logging.error(f"Error in admin monitor for message {message_id}: {e}", exc_info=True)
+            await asyncio.sleep(routers.globals_var.ERROR_RETRY_DELAY)
 
 
 
@@ -939,21 +898,27 @@ async def can_process_click(user_id: int, message_id: int) -> bool:
     Проверяет, можно ли обработать клик пользователя
     """
     current_time = datetime.now()
-    key = f"{user_id}:{message_id}"
+    user_key = f"{user_id}:{message_id}"
+    button_key = f"button:{message_id}"
     
-    if (current_time - click_reset_times[key]).total_seconds() >= RESET_INTERVAL:
-        click_counters[key] = 0
-        click_reset_times[key] = current_time
+    # Сброс счетчика кликов для кнопки, если прошел интервал сброса
+    if (current_time - click_reset_times[button_key]).total_seconds() >= routers.globals_var.RESET_INTERVAL:
+        click_counters[button_key] = 0
+        click_reset_times[button_key] = current_time
     
-    if click_counters[key] >= MAX_CLICKS_PER_INTERVAL:
+    # Проверка общего количества кликов на кнопку
+    if click_counters[button_key] >= routers.globals_var.MAX_CLICKS_PER_INTERVAL:
         return False
         
-    time_since_last_click = (current_time - user_last_click[key]).total_seconds()
-    if time_since_last_click < CLICK_COOLDOWN:
+    # Проверка времени с последнего клика для конкретного пользователя
+    time_since_last_click = (current_time - user_last_click[user_key]).total_seconds()
+    if time_since_last_click < routers.globals_var.CLICK_COOLDOWN:
         return False
         
-    click_counters[key] += 1
-    user_last_click[key] = current_time
+    # Увеличение счетчика кликов для кнопки
+    click_counters[button_key] += 1
+    # Обновление времени последнего клика для пользователя
+    user_last_click[user_key] = current_time
     return True
 
 
@@ -974,9 +939,10 @@ async def process_vote(callback: CallbackQuery):
 
         is_admin = await check_is_admin(callback, _bot, channel_id, user_id)
         
+        if not await can_process_click(user_id, message_id):
+            print('can_process_click')
+            return callback.answer("Пожалуйста, попробуйте проголосовать через минуту, телеграмм не позволяет слишком быстро менять количество голосов.",show_alert=True)
         if not is_admin:
-            if not await can_process_click(user_id, message_id):
-                return
             if not await check_subscription(user_id):
                 await callback.answer('Для голосования необходимо подписаться на канал!',show_alert=True)
                 return

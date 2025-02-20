@@ -731,11 +731,26 @@ async def participiants_of_current_battle(message: Message):
                 username = await get_username_by_id(user_id)
             except Exception as e:
                 print("Не удалось получить ник пользователя. Ошибка:", e)
+                username = "Неизвестно"
             command = f'/prof{user_id}'
-            text += f'ID: {user_id}, ник: @{username}, анкета: {command}\n'
-        await message.answer(text=text)
+            user_info = f'ID: {user_id}, ник: @{username}, анкета: {command}\n'
+            
+            # Если добавление информации о новом пользователе превысит лимит
+            if len(text) + len(user_info) > 4000:
+                # Отправляем текущую часть сообщения
+                await message.answer(text=text)
+                # Начинаем новую часть сообщения
+                text = user_info
+            else:
+                # Добавляем информацию о пользователе к текущей части сообщения
+                text += user_info
+        
+        # Отправляем последнюю часть сообщения, если она не пустая
+        if text:
+            await message.answer(text=text)
     else:
         await message.answer(text='Список участников пуст')
+
 
 # Команда /prof с параметром telegram_id
 @admin_router.message(F.text.regexp(r'^/prof(\d+)$'))
