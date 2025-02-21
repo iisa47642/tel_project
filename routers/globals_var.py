@@ -103,8 +103,8 @@ async def reset_vote_states():
         vote_states_locks = defaultdict(asyncio.Lock)
         BATTLE_SETTINGS = await select_battle_settings()
         ROUND_DURATION = BATTLE_SETTINGS[0]
-        INITIAL_UPDATE_DELAY = 5
-        MAX_UPDATE_DELAY = 30
+        INITIAL_UPDATE_DELAY = 20
+        MAX_UPDATE_DELAY = 120
         DELAY_INCREASE_FACTOR = 2
         END_PHASE_THRESHOLD = 0.85
         MIN_REQUIRED_VOTES = 5
