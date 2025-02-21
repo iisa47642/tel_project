@@ -120,9 +120,12 @@ async def main():
         await bot.get_updates(offset=last_update_id + 1)
     await create_tables()
     await channel_router.make_some_magic()
-    
-    message_throttling = ThrottlingMiddleware(limit=1.0)  # 2 секунды для сообщений
-    callback_throttling = ThrottlingMiddleware(limit=1.0)
+    SUPER_ADMIN_IDS = config.tg_bot.super_admin_ids
+    ADMIN_IDS = await select_all_admins()
+    ADMIN_IDS = [i[0] for i in ADMIN_IDS]
+    ADMIN_IDS += SUPER_ADMIN_IDS
+    message_throttling = ThrottlingMiddleware(limit=1.0, admin_ids=ADMIN_IDS)  # 2 секунды для сообщений
+    callback_throttling = ThrottlingMiddleware(limit=1.0, admin_ids=ADMIN_IDS)
     
     dp.message.middleware(message_throttling)
     dp.callback_query.middleware(callback_throttling)
@@ -157,10 +160,6 @@ async def main():
             await bot.delete_my_commands(scope=BotCommandScopeDefault())
             
             # Очищаем команды для всех известных админов
-            SUPER_ADMIN_IDS = config.tg_bot.super_admin_ids
-            ADMIN_IDS = await select_all_admins()
-            ADMIN_IDS = [i[0] for i in ADMIN_IDS]
-            ADMIN_IDS += SUPER_ADMIN_IDS
             for admin_id in ADMIN_IDS:
                 try:
                     await bot.delete_my_commands(

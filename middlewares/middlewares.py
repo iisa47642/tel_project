@@ -85,10 +85,11 @@ class AlbumsMiddleware(BaseMiddleware):
         return await handler(event, data)
 
 class ThrottlingMiddleware(BaseMiddleware):
-    def __init__(self, limit: float = 1.0) -> None:
+    def __init__(self, limit: float = 1.0, admin_ids: List[int] = []) -> None:
         self.rate_limit = limit
         self.user_timeouts: Dict[int, datetime] = {}
         self.cleanup_threshold = 1000
+        self.admin_ids = admin_ids
         super().__init__()
 
     async def __call__(
@@ -97,6 +98,12 @@ class ThrottlingMiddleware(BaseMiddleware):
         event: Union[Message, CallbackQuery],
         data: Dict[str, Any]
     ) -> Any:
+        user_id = event.from_user.id
+
+        # Пропускаем проверку для админов
+        if user_id in self.admin_ids:
+            return await handler(event, data)
+
         # Очистка старых записей
         if len(self.user_timeouts) > self.cleanup_threshold:
             current_time = datetime.now()
@@ -106,7 +113,6 @@ class ThrottlingMiddleware(BaseMiddleware):
                 if (current_time - timestamp).total_seconds() < self.rate_limit
             }
 
-        user_id = event.from_user.id
         current_time = datetime.now()
 
         # Проверяем ограничение
@@ -131,6 +137,7 @@ class ThrottlingMiddleware(BaseMiddleware):
         
         # Продолжаем обработку
         return await handler(event, data)
+
 
 
 class UserCheckMiddleware(BaseMiddleware):

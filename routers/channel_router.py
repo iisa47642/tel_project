@@ -801,7 +801,7 @@ def should_update_votes(admin_votes, opponent_votes, phase_params, behavior):
 async def try_update_votes(bot, channel_id, message_id, current_state, opponent_votes, new_admin_votes, current_delay):
     """Пытается обновить голоса с учетом возможных ошибок"""
     attempts = 0
-    while attempts < 3:  # Максимум 3 попытки
+    while attempts < 4:  # Максимум 3 попытки
         try:
             current_state['current_votes'] = new_admin_votes
             await safe_update_vote_state(message_id, current_state)
