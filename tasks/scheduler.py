@@ -225,8 +225,6 @@ class SchedulerManager:
 
     async def send_notification(self, notification_id, user_ids, message, entities=None, target="private"):
         try:
-            logging.info(f"Attempting to send notification {notification_id}")
-        # ... rest of the function ...
             config = await self.get_config()
             CHANNEL_ID = config.tg_bot.channel_id
             
@@ -239,8 +237,45 @@ class SchedulerManager:
             
             if entities:
                 try:
-                    if isinstance(entities[0], MessageEntity):
-                        print(11111111111)
+                    print("Entities received:", entities)
+                    if isinstance(entities, list) and all(isinstance(e, dict) for e in entities):
+                        print("Processing list of dicts")
+                        aiogram_entities = [MessageEntity(
+                            type=entity['type'],
+                            offset=entity['offset'],
+                            length=entity['length'],
+                            url=entity.get('url'),
+                            user=entity.get('user'),
+                            language=entity.get('language'),
+                            custom_emoji_id=entity.get('custom_emoji_id')
+                        ) for entity in entities]
+                        telethon_entities = []
+                        for entity in entities:
+                            if entity['type'] == 'custom_emoji':
+                                telethon_entities.append(MessageEntityCustomEmoji(
+                                    offset=entity['offset'],
+                                    length=entity['length'],
+                                    document_id=int(entity['custom_emoji_id'])
+                                ))
+                            elif entity['type'] == 'bold':
+                                telethon_entities.append(MessageEntityBold(
+                                    offset=entity['offset'],
+                                    length=entity['length']
+                                ))
+                            elif entity['type'] == 'italic':
+                                telethon_entities.append(MessageEntityItalic(
+                                    offset=entity['offset'],
+                                    length=entity['length']
+                                ))
+                            elif entity['type'] == 'text_link':
+                                telethon_entities.append(MessageEntityTextUrl(
+                                    offset=entity['offset'],
+                                    length=entity['length'],
+                                    url=entity['url']
+                                ))
+                    elif isinstance(entities, list) and all(isinstance(e, MessageEntity) for e in entities):
+                        print("Processing list of MessageEntity")
+                        aiogram_entities = entities
                         telethon_entities = []
                         for entity in entities:
                             if entity.type == 'custom_emoji':
@@ -265,8 +300,10 @@ class SchedulerManager:
                                     length=entity.length,
                                     url=entity.url
                                 ))
+
+
                     elif isinstance(entities, str):
-                        print(22222222222222)
+                        print("Processing JSON string")
                         entities_dicts = json.loads(entities)
                         aiogram_entities = [MessageEntity(
                             type=entity['type'],
@@ -277,7 +314,7 @@ class SchedulerManager:
                             language=entity.get('language'),
                             custom_emoji_id=entity.get('custom_emoji_id')
                         ) for entity in entities_dicts]
-                        # Преобразуем entities для Telethon (только для CustomEmoji)
+                        # Преобразование для Telethon (все поддерживаемые типы)
                         telethon_entities = []
                         for entity in entities_dicts:
                             if entity['type'] == 'custom_emoji':
@@ -302,27 +339,30 @@ class SchedulerManager:
                                     length=entity['length'],
                                     url=entity['url']
                                 ))
-                    print(3333333)
+                    else:
+                        print("Unknown entities format")
                     print(entities)
                 except Exception as e:
                     logging.error(f"Error processing entities for notification {notification_id}: {e}")
-            else:
-                logging.info(f"Message don't have entities")
+                    # Можно добавить  raise, чтобы ошибка не игнорировалась, а всплывала выше
+                    # raise
+
             if target == "private":
                 for user_id in user_ids:
                     try:
                         await self.task_manager.bot.send_message(
-                            chat_id=user_id, 
-                            text=message, 
-                            entities=aiogram_entities
+                            chat_id=user_id,
+                            text=message,
+                            entities=aiogram_entities,
+                            # parse_mode='HTML'  # Раскомментируйте, если нужен HTML, но это не обязательно
                         )
                         logging.info(f"Notification sent to user {user_id}: {notification_id} - {message}")
                     except Exception as e:
                         logging.error(f"Error sending notification {notification_id} to user {user_id}: {e}")
-            
+
             elif target == "channel":
                 try:
-                    # Пытаемся отправить сообщение через UserBot
+                    # Отправка через UserBot (Telethon)
                     await user_bot.send_channel_message(
                         channel_id=CHANNEL_ID,
                         message=message,
@@ -332,13 +372,14 @@ class SchedulerManager:
                 except Exception as e:
                     logging.error(f"Error sending notification {notification_id} to channel via UserBot: {e}")
                     logging.info("Attempting to send message via regular bot...")
-                    
+
                     try:
-                        # Если не удалось отправить через UserBot, пробуем отправить обычным ботом
+                        # Отправка через обычный бот (aiogram)
                         await self.task_manager.bot.send_message(
                             chat_id=CHANNEL_ID,
                             text=message,
-                            entities=aiogram_entities
+                            entities=aiogram_entities,
+                            # parse_mode='HTML'  # Раскомментируйте, если нужен HTML, но это не обязательно
                         )
                         logging.info(f"Notification sent to channel via regular bot: {notification_id} - {message}")
                     except Exception as e:
@@ -346,6 +387,7 @@ class SchedulerManager:
 
         except Exception as e:
             logging.error(f"Error sending notification {notification_id}: {e}")
+
 
 
 
@@ -365,7 +407,7 @@ class SchedulerManager:
                 notification_time = self.timezone.localize(datetime.combine(current_time.date(), time_obj))
                 
                 # Создаем временное окно в 2 минуты после запланированного времени
-                time_window_end = notification_time + timedelta(seconds=10)
+                time_window_end = notification_time + timedelta(seconds=40)
                 job_id = f'notification_{code}'
                 if job_id in self.sent_notifications:
                     if current_time > notification_time:
