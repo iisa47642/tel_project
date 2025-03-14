@@ -15,7 +15,7 @@ from filters.isAdmin import is_admin
 from keyboards.admin_keyboards import *
 from database.db import *
 from routers.channel_router import delete_previous_messages, make_some_magic, get_channel_id
-from states.admin_states import FSMFillForm, FSMNotification
+from states.admin_states import ClearBattleStates, DateInput, FSMFillForm, FSMNotification
 from tasks import scheduler_manager
 from utils.task_manager import TaskManagerInstance
 from keyboards.user_keyboards import main_user_kb
@@ -252,53 +252,95 @@ async def statistics(message: Message):
 ####################################                    Очистка баттла                      #################################
 
 
+
 @admin_router.message(lambda message: message.text == "💣 Очистка баттла")
-async def clear_battle(message: Message):
-    channel_id = get_channel_id()
-    try:
-        if not scheduler_manager.task_manager.battle_active:
-            users_on_battle = await select_participants_no_id_null()
-            if users_on_battle:
-                for user in users_on_battle:
-                    await create_application(user['user_id'],user['photo_id'])
-                await clear_users_in_batl()        
-                await _bot.send_message(message.from_user.id,"Список участников баттла очищен")
+async def clear_battle_confirmation(message: Message, state: FSMContext):
+    # Создаем клавиатуру для подтверждения
+    keyboard = ReplyKeyboardMarkup(
+        keyboard=[
+            [
+                KeyboardButton(text="✅ Да, очистить"),
+                KeyboardButton(text="❌ Нет, отменить")
+            ]
+        ],
+        resize_keyboard=True
+    )
+    
+    await message.answer(
+        "⚠️ Вы уверены, что хотите очистить баттл?\n"
+        "Это действие нельзя будет отменить.",
+        reply_markup=keyboard
+    )
+    # Устанавливаем состояние ожидания подтверждения
+    await state.set_state(ClearBattleStates.waiting_for_confirmation)
+
+
+
+
+@admin_router.message(ClearBattleStates.waiting_for_confirmation)
+async def clear_battle(message: Message, state: FSMContext):
+    main_keyboard = get_main_admin_kb(message.from_user.id)
+    if message.text == "✅ Да, очистить":
+        # Очищаем состояние
+        await state.clear()
+        channel_id = get_channel_id()
+        try:
+            if not scheduler_manager.task_manager.battle_active:
+                users_on_battle = await select_participants_no_id_null()
+                if users_on_battle:
+                    for user in users_on_battle:
+                        await create_application(user['user_id'],user['photo_id'])
+                    await clear_users_in_batl()        
+                    await _bot.send_message(message.from_user.id,"Список участников баттла очищен", )
+                else:
+                    await _bot.send_message(message.from_user.id,"Список участников баттла уже пуст")
+                await _bot.send_message(message.from_user.id,"В данный момент нет активного баттла.", reply_markup=main_keyboard)
+                return
+            
+            
+            # Останавливаем текущий баттл
+            if scheduler_manager.remove_current_battle():
+                # Очистка произойдет автоматически в обработчике CancelledError
+                await delete_previous_messages(message.bot, channel_id)
+                
+                users_on_battle = await select_participants_no_id_null()
+                if users_on_battle:
+                    for user in users_on_battle:
+                        await create_application(user['user_id'],user['photo_id'])
+                    await clear_users_in_batl()
+                # Обновляем сообщение с подтверждением
+                await _bot.send_message(message.from_user.id, text="Баттл успешно остановлен.", reply_markup=main_keyboard)
+                
+                # Отправляем уведомление в канал
+                war_message = await _bot.send_message(
+                    channel_id,
+                    "⚠️ Баттл был остановлен администратором."
+                )
+                await save_message_ids([war_message.message_id])
+
+
             else:
-                await _bot.send_message(message.from_user.id,"Список участников баттла уже пуст")
-            await _bot.send_message(message.from_user.id,"В данный момент нет активного баттла.")
-            return
-        
-        
-        # Останавливаем текущий баттл
-        if scheduler_manager.remove_current_battle():
-            # Очистка произойдет автоматически в обработчике CancelledError
-            await delete_previous_messages(message.bot, channel_id)
+                await _bot.send_message(message.from_user.id,text="Не удалось остановить баттл.", reply_markup=main_keyboard)
             
-            users_on_battle = await select_participants_no_id_null()
-            if users_on_battle:
-                for user in users_on_battle:
-                    await create_application(user['user_id'],user['photo_id'])
-                await clear_users_in_batl()
-            # Обновляем сообщение с подтверждением
-            await _bot.send_message(message.from_user.id, text="Баттл успешно остановлен.")
+
+        except Exception as e:
+            error_message = f"Ошибка при остановке баттла: {e}"
+            logging.error(error_message)
+            await _bot.send_message(message.from_user.id, error_message)
             
-            # Отправляем уведомление в канал
-            war_message = await _bot.send_message(
-                channel_id,
-                "⚠️ Баттл был остановлен администратором."
-            )
-            await save_message_ids([war_message.message_id])
-
-
-        else:
-            await _bot.send_message(message.from_user.id,text="Не удалось остановить баттл.")
-        
-
-    except Exception as e:
-        error_message = f"Ошибка при остановке баттла: {e}"
-        logging.error(error_message)
-        await _bot.send_message(message.from_user.id, error_message)
-
+    elif message.text == "❌ Нет, отменить":
+        await message.answer(
+            "Действие отменено.",
+            reply_markup=main_keyboard
+        )
+        await state.clear()
+    
+    else:
+        await message.answer(
+            "Пожалуйста, используйте кнопки для ответа.",
+            reply_markup=main_keyboard
+        )
+        await state.clear()
 
 
 
@@ -1264,3 +1306,73 @@ async def delete_notifications(message: Message, state: FSMContext):
         await state.clear()
 
 
+@admin_router.message(Command("au"))
+async def auction_menu(message: Message):
+    await message.answer("Выберите действие:", reply_markup=get_auction_kb())
+
+@admin_router.message(F.text == "Просмотреть сообщения")
+async def view_messages(message: Message, state: FSMContext):
+    dates = await get_distinct_dates()
+    if not dates:
+        await message.answer("Нет сохраненных сообщений.")
+        return
+
+    dates_text = "Доступные даты:\n" + "\n".join([date[0] for date in dates])
+    await message.answer(
+        f"{dates_text}\n\nВведите дату в формате MM-DD:"
+    )
+    await state.set_state(DateInput.waiting_for_date)
+    await state.update_data(action="view")
+
+@admin_router.message(F.text == "Удалить сообщения")
+async def delete_messages(message: Message, state: FSMContext):
+    dates = await get_distinct_dates()
+    if not dates:
+        await message.answer("Нет сохраненных сообщений.")
+        return
+
+    dates_text = "Доступные даты:\n" + "\n".join([date[0] for date in dates])
+    await message.answer(
+        f"{dates_text}\n\nВведите дату для удаления сообщений (MM-DD):"
+    )
+    await state.set_state(DateInput.waiting_for_date)
+    await state.update_data(action="delete")
+
+@admin_router.message(DateInput.waiting_for_date)
+async def process_date_input(message: Message, state: FSMContext):
+    try:
+        input_date = f"2025-{message.text}"
+        datetime.strptime(input_date, '%Y-%m-%d')
+
+        state_data = await state.get_data()
+        action = state_data.get("action")
+
+        if action == "view":
+            messages = await get_messages_by_date(input_date)
+            if not messages:
+                await message.answer("Сообщений за эту дату не найдено.")
+            else:
+                result_text = f"Сообщения за {message.text}:\n\n"
+                for msg_text, msg_time in messages:
+                    result_text += f"[{msg_time}]\n{msg_text}\n\n"
+                
+                if len(result_text) <= 4096:
+                    await message.answer(result_text)
+                else:
+                    parts = [result_text[i:i+4096] for i in range(0, len(result_text), 4096)]
+                    for part in parts:
+                        await message.answer(part)
+
+        elif action == "delete":
+            await delete_messages_by_date(input_date)
+            await message.answer(f"Сообщения за {message.text} удалены.")
+
+        await state.clear()
+        await message.answer("Выберите действие:", reply_markup=get_main_admin_kb(message.from_user.id))
+
+    except ValueError:
+        await message.answer("Неверный формат даты. Пожалуйста, используйте формат MM-DD")
+
+@admin_router.message(F.text == "Назад")
+async def back_to_main(message: Message):
+    await message.answer("Главное меню", reply_markup=get_main_admin_kb(message.from_user.id))

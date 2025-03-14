@@ -21,7 +21,7 @@ main_admin_kb = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text="📷 Модерация"),KeyboardButton(text="✉️ Рассылка"),KeyboardButton(text="📊 Статистика")],
         [KeyboardButton(text="💣 Очистка баттла"),KeyboardButton(text="👥 Список участников")],
-        [KeyboardButton(text="⚙ Настройка баттла"),KeyboardButton(text="📧 Уведомления")]
+        [KeyboardButton(text="⚙ Настройка баттла"),KeyboardButton(text="📧 Уведомления")],
     ],
     resize_keyboard=True
 )
@@ -146,4 +146,16 @@ def get_notifications_keyboard():
         [KeyboardButton(text="Удалить уведомление"), KeyboardButton(text="Назад")]
     ]
     keyboard = ReplyKeyboardMarkup(keyboard=buttons, resize_keyboard=True)
+    return keyboard
+
+
+def get_auction_kb() -> ReplyKeyboardMarkup:
+    keyboard = ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text="Просмотреть сообщения")],
+            [KeyboardButton(text="Удалить сообщения")],
+            [KeyboardButton(text="Назад")]
+        ],
+        resize_keyboard=True
+    )
     return keyboard

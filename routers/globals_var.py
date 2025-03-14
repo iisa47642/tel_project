@@ -6,6 +6,7 @@ import logging
 from database.db import select_battle_settings
 
 # Глобальные переменные
+
 vote_states = {}
 user_clicks = {}
 pair_locks = defaultdict(asyncio.Lock)
@@ -13,6 +14,7 @@ vote_states_locks = defaultdict(asyncio.Lock)
 user_last_click = defaultdict(lambda: datetime.min)
 click_counters = defaultdict(int)
 click_reset_times = defaultdict(lambda: datetime.min)
+
 ROUND_DURATION = 0
 INITIAL_UPDATE_DELAY = 5  # Начальная задержка при ошибке
 MAX_UPDATE_DELAY = 30      # Максимальная задержка при повторных ошибках
@@ -31,7 +33,7 @@ FINAL_PHASE_UPDATE_DELAYS = (5.0, 15.0)    # Минимальные задерж
 # Константы для задержек при пошаговом обновлении счета
 INITIAL_PHASE_STEP_DELAYS = (30, 40)
 MIDDLE_PHASE_STEP_DELAYS = (20, 25)
-FINAL_PHASE_STEP_DELAYS = (5.0, 15.0)
+FINAL_PHASE_STEP_DELAYS = (20, 25)
 
 
 MIN_UPDATE_INTERVAL = 2.0  # Минимальный интервал между обновлениями в секундах
@@ -66,17 +68,6 @@ BEHAVIOR_LEAD = 'lead'
 BEHAVIOR_NORMAL = 'normal'
 PHASE_PARAMETERS = {}
 
-# async def initialize_globals():
-#     """Инициализирует глобальные переменные, связанные с настройками"""
-#     global ROUND_DURATION
-#     try:
-#         BATTLE_SETTINGS = await select_battle_settings()
-#         ROUND_DURATION = BATTLE_SETTINGS[0] // 60
-#         logging.info(f"Initialized ROUND_DURATION: {ROUND_DURATION}")
-#     except Exception as e:
-#         logging.error(f"Error initializing globals: {e}")
-
-
 async def reset_vote_states():
     """Сбрасывает глобальные переменные, связанные с голосованием"""
     try:
@@ -104,7 +95,7 @@ async def reset_vote_states():
         BATTLE_SETTINGS = await select_battle_settings()
         ROUND_DURATION = BATTLE_SETTINGS[0]
         INITIAL_UPDATE_DELAY = 20
-        MAX_UPDATE_DELAY = 120
+        MAX_UPDATE_DELAY = 60
         DELAY_INCREASE_FACTOR = 2
         END_PHASE_THRESHOLD = 0.85
         MIN_REQUIRED_VOTES = 5
@@ -116,7 +107,7 @@ async def reset_vote_states():
         INITIAL_PHASE_STEP_DELAYS = (30, 40)
         MIDDLE_PHASE_STEP_DELAYS = (20, 25)
         FINAL_PHASE_STEP_DELAYS = (5.0, 15.0)
-        MIN_UPDATE_INTERVAL = 2.0
+        MIN_UPDATE_INTERVAL = 0.5
         FLOOD_CONTROL_RESET = 10
         CLICK_COOLDOWN = 1.0
         MAX_CLICKS_PER_INTERVAL = 5

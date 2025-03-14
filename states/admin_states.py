@@ -24,4 +24,10 @@ class FSMNotification(StatesGroup):
     waiting_for_time = State()
     waiting_for_code = State()
     waiting_for_target = State()
+    
+class DateInput(StatesGroup):
+    waiting_for_date = State()
+    action = State()  # Добавляем состояние для различения действий
 
+class ClearBattleStates(StatesGroup):
+    waiting_for_confirmation = State()

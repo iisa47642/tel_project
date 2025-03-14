@@ -1,4 +1,5 @@
 # bot.py
+from logging.handlers import RotatingFileHandler
 from aiogram import Bot, Dispatcher
 from aiogram.filters import StateFilter, Command
 from aiogram.fsm.context import FSMContext
@@ -140,12 +141,28 @@ async def main():
     dp.update.outer_middleware(ModeMiddleware())
     user_router.user_router.message.middleware(UserCheckMiddleware())
 
+    class ClearFileHandler(logging.FileHandler):
+        def __init__(self, filename, max_bytes=1_000_000):
+            super().__init__(filename, 'a')
+            self.max_bytes = max_bytes
+
+        def emit(self, record):
+            if os.path.exists(self.baseFilename):
+                if os.path.getsize(self.baseFilename) >= self.max_bytes:
+                    self.close()
+                    # Очищаем файл
+                    with open(self.baseFilename, 'w'):
+                        pass
+                    self.stream = self._open()
+            super().emit(record)
+    handler = ClearFileHandler('bot.log', max_bytes=10_000_000)
     logging.basicConfig(
         level=logging.INFO,
         format='%(asctime)s - %(levelname)s - %(message)s',
         handlers=[
-        logging.FileHandler("bot.log", encoding="utf-8"),  # Логи будут записываться в файл bot.log
-        logging.StreamHandler()  # Логи также будут выводиться в консоль
+        logging.FileHandler("bot.log", encoding="utf-8"), 
+        logging.StreamHandler(),  
+        handler
     ])
     #await create_tables()
     # Запускаем бота

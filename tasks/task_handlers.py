@@ -10,7 +10,7 @@ from math import log
 import pytz
 
 from routers.channel_router import make_some_magic, send_battle_pairs, end_round, announce_winner, delete_previous_messages, get_new_participants
-from database.db import clear_users_in_batl, create_user_in_batl, delete_users_add_voices, delete_users_in_buffer, get_participants, get_users_in_buffer, remove_losers, save_message_ids, delete_users_in_batl, select_admin_photo, select_all_admins, select_battle_settings, delete_users_points, swap_user_position, swap_user_position_first, update_admin_battle_points, update_admin_photo_in_battle, update_points,users_plays_buttle_update,users_buttle_win_update
+from database.db import clear_users_in_batl, count_admin_photos, create_user_in_batl, delete_users_add_voices, delete_users_in_buffer, get_participants, get_users_in_buffer, remove_losers, save_message_ids, delete_users_in_batl, select_admin_photo, select_all_admins, select_battle_settings, delete_users_points, swap_user_position, swap_user_position_first, update_admin_battle_points, update_admin_photo_in_battle, update_points,users_plays_buttle_update,users_buttle_win_update
 
 from config.config import load_config
 from routers.channel_router import send_battle_pairs, end_round, announce_winner, delete_previous_messages
@@ -158,6 +158,20 @@ class TaskManager:
                         channel_message,
                         parse_mode='HTML'
                     )
+                    admin_photo_count = await count_admin_photos()
+                    if admin_photo_count == 3:
+                        SUPER_ADMIN_IDS = config.tg_bot.super_admin_ids
+                        ADMIN_IDS = await select_all_admins()
+                        admins_list = []
+                        if ADMIN_IDS:
+                            admins_list = [i[0] for i in ADMIN_IDS]
+                        admins_list += SUPER_ADMIN_IDS
+                        for admin_id in admins_list:
+                            try:
+                                await self.bot.send_message(admin_id, text=" Осталось 3 фотографии админа")
+                                logging.info(f"Осталась 3 фотография админа")
+                            except Exception as e:
+                                logging.error(f"Failed to send notification in admins_photo: {e}")
                     await save_message_ids([notif_mes.message_id])
                     users = await get_all_users()
                     users_id = [i[0] for i in users]
@@ -363,7 +377,20 @@ class TaskManager:
         photo_admin_id = await select_admin_photo()
         if photo_admin_id:
             await update_admin_photo_in_battle(photo_admin_id)
-
+        admin_photo_count = await count_admin_photos()
+        if admin_photo_count == 3:
+            SUPER_ADMIN_IDS = config.tg_bot.super_admin_ids
+            ADMIN_IDS = await select_all_admins()
+            admins_list = []
+            if ADMIN_IDS:
+                admins_list = [i[0] for i in ADMIN_IDS]
+            admins_list += SUPER_ADMIN_IDS
+            for admin_id in admins_list:
+                try:
+                    await self.bot.send_message(admin_id, text=" Осталось 3 фотографии админа")
+                    logging.info(f"Осталась 3 фотография админа")
+                except Exception as e:
+                    logging.error(f"Failed to send notification in admins_photo: {e}")
         BATTLE_SETTINGS = await select_battle_settings()
         self.min_votes_for_single = BATTLE_SETTINGS[2]
 

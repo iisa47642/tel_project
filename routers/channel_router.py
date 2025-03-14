@@ -15,28 +15,21 @@ from aiogram import Bot, Router, F
 from aiogram.exceptions import TelegramRetryAfter, TelegramBadRequest
 from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, InputMediaPhoto
 import pytz
-
+from aiogram.types import Message, MessageOriginChannel, PhotoSize
 from config.config import load_config
-from database.db import create_user, create_user_in_batl, delete_users_single, edit_user, get_current_votes, get_participants, get_user, select_admin_photo, select_info_message, set_single_user, update_admin_battle_points, update_points, \
+from database.db import active_battle, create_user, create_user_in_batl, delete_users_single, edit_user, get_current_votes, get_participants, get_user, save_message, select_admin_photo, select_info_message, set_single_user, update_admin_battle_points, update_points, \
     get_round_results, get_message_ids, clear_message_ids,\
     select_battle_settings, select_all_admins,users_dual_win_update
 from routers.globals_var import (
     vote_states, user_clicks, pair_locks, vote_states_locks,
     user_last_click, click_counters, click_reset_times
 )
-# from routers.globals_var import (
-#     vote_states, user_clicks, pair_locks, vote_states_locks, user_last_click, 
-#     click_counters, click_reset_times, ROUND_DURATION, INITIAL_UPDATE_DELAY, MAX_UPDATE_DELAY, 
-#     DELAY_INCREASE_FACTOR, END_PHASE_THRESHOLD, MIN_REQUIRED_VOTES, MIN_VOTE_INCREMENT, 
-#     MAX_VOTE_INCREMENT, MIN_UPDATE_INTERVAL, CLICK_COOLDOWN, 
-#     MAX_CLICKS_PER_INTERVAL, RESET_INTERVAL, PHASE_1_END, PHASE_2_END, PHASE_3_END, 
-#     PHASE_4_END, PHASE_5_END, PHASE_6_END, FINAL_PHASE, BEHAVIOR_LAG, BEHAVIOR_LEAD, 
-#     BEHAVIOR_NORMAL, ERROR_RETRY_DELAY, BEHAVIOR_UPDATE_INTERVAL, PHASE_PARAMETERS
-# )
 import routers.globals_var
 
 from filters.isAdmin import is_admin
 from locks import battle_lock
+
+keyboard_update_lock = asyncio.Lock()
 
 
 _bot: Bot = None  # Placeholder for the bot instance
@@ -600,8 +593,8 @@ async def make_some_magic():
     # Проверяет, включен ли автоматический выигрыш
     settings = await select_battle_settings()
     is_autowin = settings[5]
-
-    if is_autowin:
+    admin = await get_user(0)
+    if is_autowin and not admin:
         # Получает ID фото администратора
         photo_id=await select_admin_photo()
         # photo_id=photo_id[1]
@@ -627,33 +620,33 @@ async def make_some_magic():
 
 
 
-async def calculate_vote_increment(state: dict, opponent_votes: int = 0) -> int:
-    """
-    Рассчитывает следующее увеличение голосов с учетом прогресса и типа голосования
-    """
-    elapsed_time = (datetime.now() - state['start_time']).total_seconds()
-    progress = elapsed_time / state['round_duration']
-    is_end_phase = progress > routers.globals_var.END_PHASE_THRESHOLD
-    current_votes = state['current_votes']
+# async def calculate_vote_increment(state: dict, opponent_votes: int = 0) -> int:
+#     """
+#     Рассчитывает следующее увеличение голосов с учетом прогресса и типа голосования
+#     """
+#     elapsed_time = (datetime.now() - state['start_time']).total_seconds()
+#     progress = elapsed_time / state['round_duration']
+#     is_end_phase = progress > routers.globals_var.END_PHASE_THRESHOLD
+#     current_votes = state['current_votes']
 
-    if state['is_single']:
-        if current_votes < routers.globals_var.MIN_REQUIRED_VOTES:
-            remaining_time = state['round_duration'] - elapsed_time
-            needed_votes = routers.globals_var.MIN_REQUIRED_VOTES - current_votes
+#     if state['is_single']:
+#         if current_votes < routers.globals_var.MIN_REQUIRED_VOTES:
+#             remaining_time = state['round_duration'] - elapsed_time
+#             needed_votes = routers.globals_var.MIN_REQUIRED_VOTES - current_votes
             
-            if remaining_time <= 0:
-                return routers.globals_var.MAX_VOTE_INCREMENT
+#             if remaining_time <= 0:
+#                 return routers.globals_var.MAX_VOTE_INCREMENT
             
-            votes_per_second_needed = needed_votes / remaining_time
-            if votes_per_second_needed > 0.1:
-                return random.randint(2, routers.globals_var.MAX_VOTE_INCREMENT)
-            return random.randint(routers.globals_var.MIN_VOTE_INCREMENT, 2)
-    else:
-        if is_end_phase:
-            return random.randint(routers.globals_var.MIN_VOTE_INCREMENT, 2)
-        elif opponent_votes > current_votes:
-            return random.randint(2, routers.globals_var.MAX_VOTE_INCREMENT)
-        return random.randint(routers.globals_var.MIN_VOTE_INCREMENT, 2)
+#             votes_per_second_needed = needed_votes / remaining_time
+#             if votes_per_second_needed > 0.1:
+#                 return random.randint(2, routers.globals_var.MAX_VOTE_INCREMENT)
+#             return random.randint(routers.globals_var.MIN_VOTE_INCREMENT, 2)
+#     else:
+#         if is_end_phase:
+#             return random.randint(routers.globals_var.MIN_VOTE_INCREMENT, 2)
+#         elif opponent_votes > current_votes:
+#             return random.randint(2, routers.globals_var.MAX_VOTE_INCREMENT)
+#         return random.randint(routers.globals_var.MIN_VOTE_INCREMENT, 2)
     
 async def safe_get_vote_state(message_id: int):
     """
@@ -675,44 +668,40 @@ async def update_vote_display(bot: Bot, channel_id: int, message_id: int, state:
     """
     Обновляет отображение голосов на кнопках
     """
+    # pair_key = f"{channel_id}:{message_id}"
+    # async with pair_locks[pair_key]:
     try:
-        if state['is_single']:
+        adm_votes = await get_current_votes(0) + 1 - 100000
+        
+        if state['admin_position'] == 'left':
             keyboard = InlineKeyboardMarkup(inline_keyboard=[
                 [InlineKeyboardButton(
-                    text=f"Голосов сейчас: {state['current_votes']}",
-                    callback_data=f"vote:{state['admin_id']}:middle"
+                    text=f"Левый: {adm_votes}",
+                    callback_data=f"vote:{state['admin_id']}:left"
+                ),
+                InlineKeyboardButton(
+                    text=f"Правый: {opponent_votes}",
+                    callback_data=f"vote:{state['opponent_id']}:right"
                 )]
             ])
         else:
-            if state['admin_position'] == 'left':
-                keyboard = InlineKeyboardMarkup(inline_keyboard=[
-                    [InlineKeyboardButton(
-                        text=f"Левый: {state['current_votes']}",
-                        callback_data=f"vote:{state['admin_id']}:left"
-                    ),
-                    InlineKeyboardButton(
-                        text=f"Правый: {opponent_votes}",
-                        callback_data=f"vote:{state['opponent_id']}:right"
-                    )]
-                ])
-            else:
-                keyboard = InlineKeyboardMarkup(inline_keyboard=[
-                    [InlineKeyboardButton(
-                        text=f"Левый: {opponent_votes}",
-                        callback_data=f"vote:{state['opponent_id']}:left"
-                    ),
-                    InlineKeyboardButton(
-                        text=f"Правый: {state['current_votes']}",
-                        callback_data=f"vote:{state['admin_id']}:right"
-                    )]
-                ])
+            keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(
+                    text=f"Левый: {opponent_votes}",
+                    callback_data=f"vote:{state['opponent_id']}:left"
+                ),
+                InlineKeyboardButton(
+                    text=f"Правый: {adm_votes}",
+                    callback_data=f"vote:{state['admin_id']}:right"
+                )]
+            ])
         
         await bot.edit_message_reply_markup(
             chat_id=channel_id,
             message_id=message_id,
             reply_markup=keyboard
         )
-        
+        await update_points(0)
     except TelegramBadRequest as e:
         if "message is not modified" not in str(e):
             logging.error(f"Telegram error: {e}")
@@ -800,11 +789,15 @@ def should_update_votes(admin_votes, opponent_votes, phase_params, behavior):
 
 async def try_update_votes(bot, channel_id, message_id, current_state, opponent_votes, new_admin_votes, current_delay):
     """Пытается обновить голоса с учетом возможных ошибок"""
+    # pair_key = f"{channel_id}:{message_id}"
     attempts = 0
     while attempts < 4:  # Максимум 3 попытки
+        # async with pair_locks[pair_key]:
         try:
             current_state['current_votes'] = new_admin_votes
             await safe_update_vote_state(message_id, current_state)
+            # async with keyboard_update_lock:
+            # async with pair_locks[pair_key]:
             await update_vote_display(bot, channel_id, message_id, current_state, opponent_votes)
             return True
             
@@ -829,7 +822,7 @@ async def try_update_votes(bot, channel_id, message_id, current_state, opponent_
 
 async def admin_vote_monitor(bot: Bot, channel_id: int, message_id: int):
     """Основная функция мониторинга голосования"""
-    pair_key = f"{channel_id}:{message_id}"
+    # pair_key = f"{channel_id}:{message_id}"
     current_behavior = None
     last_update_time = datetime.now()
     last_behavior_check = datetime.now()
@@ -842,46 +835,47 @@ async def admin_vote_monitor(bot: Bot, channel_id: int, message_id: int):
             if (current_time - last_update_time).total_seconds() < routers.globals_var.MIN_UPDATE_INTERVAL:
                 await asyncio.sleep(routers.globals_var.MIN_UPDATE_INTERVAL)
                 continue
+            # эта блокировка должна работать как и в хэндлере, но когда админ монитор занимает блокировку на весь раунд то в паре с админом не обновляются голоса, поэтому админ монитор должен держать блокировку только при обновлении
+            # async with pair_locks[pair_key]:
+            current_state = await safe_get_vote_state(message_id)
+            if not current_state or current_state['admin_id'] != 0:
+                return
 
-            async with pair_locks[pair_key]:
-                current_state = await safe_get_vote_state(message_id)
-                if not current_state or current_state['admin_id'] != 0:
-                    return
+            elapsed_time = (current_time - current_state['start_time']).total_seconds()
+            round_duration = current_state['round_duration']
+            progress = elapsed_time / round_duration
+            
+            if progress >= routers.globals_var.FINAL_PHASE or not (await active_battle()):
+                logging.info(f"Final phase reached for message {message_id}. Ending monitor.")
+                break
 
-                elapsed_time = (current_time - current_state['start_time']).total_seconds()
-                round_duration = current_state['round_duration']
-                progress = elapsed_time / round_duration
-                
-                if progress >= routers.globals_var.FINAL_PHASE:
-                    logging.info(f"Final phase reached for message {message_id}. Ending monitor.")
-                    break
+            current_phase = get_current_phase(progress)
+            phase_params = routers.globals_var.PHASE_PARAMETERS[current_phase]
+            opponent_votes = await get_current_votes(current_state['opponent_id'])
+            admin_votes = await get_current_votes(0)-100000
+            # admin_votes = current_state['current_votes']
+            
+            logging.info(f"Current state - Phase: {current_phase}, Admin votes: {admin_votes}, Opponent votes: {opponent_votes}")
+            
+            # Обновление параметров поведения
+            if (current_time - last_behavior_check).total_seconds() >= routers.globals_var.BEHAVIOR_UPDATE_INTERVAL:
+                current_behavior = await check_and_update_behavior(
+                    current_time, phase_params, current_behavior
+                )
+                last_behavior_check = current_time
 
-                current_phase = get_current_phase(progress)
-                phase_params = routers.globals_var.PHASE_PARAMETERS[current_phase]
-                opponent_votes = await get_current_votes(current_state['opponent_id'])
-                admin_votes = current_state['current_votes']
+            if should_update_votes(admin_votes, opponent_votes, phase_params, current_behavior):
+                logging.info(f"Attempting to update votes for message {message_id}")
+                success = await try_update_votes(
+                    bot, channel_id, message_id, current_state,
+                    opponent_votes, admin_votes, current_delay
+                )
                 
-                logging.info(f"Current state - Phase: {current_phase}, Admin votes: {admin_votes}, Opponent votes: {opponent_votes}")
-                
-                # Обновление параметров поведения
-                if (current_time - last_behavior_check).total_seconds() >= routers.globals_var.BEHAVIOR_UPDATE_INTERVAL:
-                    current_behavior = await check_and_update_behavior(
-                        current_time, phase_params, current_behavior
-                    )
-                    last_behavior_check = current_time
-
-                if should_update_votes(admin_votes, opponent_votes, phase_params, current_behavior):
-                    logging.info(f"Attempting to update votes for message {message_id}")
-                    success = await try_update_votes(
-                        bot, channel_id, message_id, current_state,
-                        opponent_votes, admin_votes + 1, current_delay
-                    )
-                    
-                    if success:
-                        last_update_time = current_time
-                        await asyncio.sleep(random.uniform(*phase_params['step_delays']))
-                
-                await asyncio.sleep(random.uniform(*phase_params['update_delays']))
+                if success:
+                    last_update_time = current_time
+                    await asyncio.sleep(random.uniform(*phase_params['step_delays']))
+            
+            await asyncio.sleep(random.uniform(*phase_params['update_delays']))
 
         except Exception as e:
             logging.error(f"Error in admin monitor for message {message_id}: {e}", exc_info=True)
@@ -923,6 +917,8 @@ async def can_process_click(user_id: int, message_id: int) -> bool:
 
 
 
+
+
 @channel_router.callback_query(F.data.startswith("vote:"))
 async def process_vote(callback: CallbackQuery):
     """
@@ -952,11 +948,12 @@ async def process_vote(callback: CallbackQuery):
 
         _, vote_user_id, position = callback.data.split(":")
         vote_user_id = int(vote_user_id)
-
+        # if not pair_locks[pair_key].locked():
+        # async with pair_locks[pair_key]: 
+            # Защищаем критическую секцию
         current_state = await safe_get_vote_state(message_id)
         if not current_state:
             return
-
         # Получаем текущие значения голосов
         current_markup = callback.message.reply_markup
         current_buttons = current_markup.inline_keyboard[0]
@@ -980,90 +977,151 @@ async def process_vote(callback: CallbackQuery):
         else:
             left_votes = int(current_buttons[0].text.split(": ")[1])
             right_votes = int(current_buttons[1].text.split(": ")[1])
-            
-            if position == "left":
-                left_votes += 1
-                if vote_user_id == current_state['admin_id']:
+            if current_state['admin_id'] != 0:
+                print('in current_state["admin_id"] != 0')
+                if position == "left":
+                    left_votes += 1
+                    # if vote_user_id == current_state['admin_id']:
                     current_state['current_votes'] = left_votes
-                new_keyboard = InlineKeyboardMarkup(inline_keyboard=[
-                    [InlineKeyboardButton(
-                        text=f"Левый: {left_votes}",
-                        callback_data=f"vote:{vote_user_id}:left"
-                    ),
-                    InlineKeyboardButton(
-                        text=f"Правый: {right_votes}",
-                        callback_data=f"vote:{current_state['opponent_id']}:right"
-                    )]
-                ])
+                    new_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                        [InlineKeyboardButton(
+                            text=f"Левый: {left_votes}",
+                            callback_data=f"vote:{vote_user_id}:left"
+                        ),
+                        InlineKeyboardButton(
+                            text=f"Правый: {right_votes}",
+                            callback_data=f"vote:{current_state['opponent_id']}:right"
+                        )]
+                    ])
+                else:
+                    right_votes += 1
+                    new_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                        [InlineKeyboardButton(
+                            text=f"Левый: {left_votes}",
+                            callback_data=f"vote:{current_state['admin_id']}:left"
+                        ),
+                        InlineKeyboardButton(
+                            text=f"Правый: {right_votes}",
+                            callback_data=f"vote:{vote_user_id}:right"
+                        )]
+                    ])
             else:
-                right_votes += 1
-                if vote_user_id == current_state['admin_id']:
-                    current_state['current_votes'] = right_votes
-                new_keyboard = InlineKeyboardMarkup(inline_keyboard=[
-                    [InlineKeyboardButton(
-                        text=f"Левый: {left_votes}",
-                        callback_data=f"vote:{current_state['admin_id']}:left"
-                    ),
-                    InlineKeyboardButton(
-                        text=f"Правый: {right_votes}",
-                        callback_data=f"vote:{vote_user_id}:right"
-                    )]
-                ])
-
+                adm_pos = current_state["admin_position"]
+                if position == "left":
+                    left_votes += 1
+                    current_state['current_votes'] = left_votes
+                    if adm_pos == "left":
+                        new_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                            [InlineKeyboardButton(
+                                text=f"Левый: {left_votes}",
+                                callback_data=f"vote:{vote_user_id}:left"
+                            ),
+                            InlineKeyboardButton(
+                                text=f"Правый: {right_votes}",
+                                callback_data=f"vote:{current_state['opponent_id']}:right"
+                            )]
+                        ])
+                    else:
+                        new_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                            [InlineKeyboardButton(
+                                text=f"Левый: {left_votes}",
+                                callback_data=f"vote:{vote_user_id}:left"
+                            ),
+                            InlineKeyboardButton(
+                                text=f"Правый: {right_votes}",
+                                callback_data=f"vote:{current_state['admin_id']}:right"
+                            )]
+                        ])
+                else:
+                    right_votes += 1
+                    if adm_pos == "right":
+                        new_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                            [InlineKeyboardButton(
+                                text=f"Левый: {left_votes}",
+                                callback_data=f"vote:{current_state['opponent_id']}:left"
+                            ),
+                            InlineKeyboardButton(
+                                text=f"Правый: {right_votes}",
+                                callback_data=f"vote:{vote_user_id}:right"
+                            )]
+                        ])
+                    else:
+                        new_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                            [InlineKeyboardButton(
+                                text=f"Левый: {left_votes}",
+                                callback_data=f"vote:{current_state['admin_id']}:left"
+                            ),
+                            InlineKeyboardButton(
+                                text=f"Правый: {right_votes}",
+                                callback_data=f"vote:{vote_user_id}:right"
+                            )]
+                        ])
             await safe_update_vote_state(message_id, current_state)
             await callback.message.edit_reply_markup(reply_markup=new_keyboard)
 
-        # Отмечаем голос пользователя и обновляем базу данных
-        if not is_admin:
-            if message_id not in user_clicks:
-                user_clicks[message_id] = set()
-            us = await get_user(user_id)
-            if us and us[5]!=0:
-                add_voic = us[5]
-                new_add_voic=add_voic-1
-                await edit_user(us[0],'additional_voices',new_add_voic)
-            else:
-                user_clicks[message_id].add(user_id)
-        try:
-            await callback.answer('Ваш голос учтен! ✅\n\n(При отписке от канала - голос пропадает)', show_alert=True)
-        except Exception as cb_error:
-            logging.error(f"Error sending callback answer: {cb_error}")
-        asyncio.create_task(update_points(vote_user_id))
+            # Отмечаем голос пользователя и обновляем базу данных
+            if not is_admin:
+                if message_id not in user_clicks:
+                    user_clicks[message_id] = set()
+                us = await get_user(user_id)
+                if us and us[5]!=0:
+                    add_voic = us[5]
+                    new_add_voic=add_voic-1
+                    await edit_user(us[0],'additional_voices',new_add_voic)
+                else:
+                    user_clicks[message_id].add(user_id)
+            try:
+                await callback.answer('Ваш голос учтен! ✅\n\n(При отписке от канала - голос пропадает)', show_alert=True)
+            except Exception as cb_error:
+                logging.error(f"Error sending callback answer: {cb_error}")
+            asyncio.create_task(update_points(vote_user_id))
 
-        # Запускаем монитор админа в отдельном таске, если нужно
-        if (not current_state['is_single'] and 
-            current_state['admin_id'] == 0 and 
-            vote_user_id != current_state['admin_id']):
-            
-            admin_votes = current_state['current_votes']
-            opponent_votes = (right_votes if current_state['admin_position'] == 'left' 
-                            else left_votes)
-
-            if opponent_votes > admin_votes:
-                # monitor_task = asyncio.create_task(
-                #     admin_vote_monitor(callback.bot, channel_id, message_id)
-                # )
-                
-                # Проверяем, не запущен ли уже монитор для этого сообщения
-                if not hasattr(callback.bot, 'monitor_tasks'):
-                    callback.bot.monitor_tasks = set()
-                
-                # Проверяем, нет ли уже активного таска для этого сообщения
-                existing_task = next((task for task in callback.bot.monitor_tasks 
-                                    if task.get_name() == f"admin_monitor_{channel_id}_{message_id}"), None)
-                
-                if existing_task is None or existing_task.done():
-                    monitor_task = asyncio.create_task(
-                        admin_vote_monitor(callback.bot, channel_id, message_id),
-                        name=f"admin_monitor_{channel_id}_{message_id}"
-                    )
+            # Запускаем монитор админа в отдельном таске, если нужно
+            if (current_state['admin_id'] == 0):
+                admin_votes = adm_votes = await get_current_votes(0) - 100000
+                opponent_votes = (right_votes if current_state['admin_position'] == 'left' 
+                                else left_votes)
+                logging.info(f"Admin: {admin_votes} , Opponent: {opponent_votes}")
+                if opponent_votes >= admin_votes:
+                    # monitor_task = asyncio.create_task(
+                    #     admin_vote_monitor(callback.bot, channel_id, message_id)
+                    # )
                     
-                    callback.bot.monitor_tasks.add(monitor_task)
-                    monitor_task.add_done_callback(
-                        lambda t: callback.bot.monitor_tasks.remove(t) 
-                        if t in callback.bot.monitor_tasks else None
-                    )
+                    # Проверяем, не запущен ли уже монитор для этого сообщения
+                    if not hasattr(callback.bot, 'monitor_tasks'):
+                        callback.bot.monitor_tasks = set()
+                    
+                    # Проверяем, нет ли уже активного таска для этого сообщения
+                    existing_task = next((task for task in callback.bot.monitor_tasks 
+                                        if task.get_name() == f"admin_monitor_{channel_id}_{message_id}"), None)
+                    
+                    if existing_task is None or existing_task.done():
+                        monitor_task = asyncio.create_task(
+                            admin_vote_monitor(callback.bot, channel_id, message_id),
+                            name=f"admin_monitor_{channel_id}_{message_id}"
+                        )
+                        
+                        callback.bot.monitor_tasks.add(monitor_task)
+                        monitor_task.add_done_callback(
+                            lambda t: callback.bot.monitor_tasks.remove(t) 
+                            if t in callback.bot.monitor_tasks else None
+                        )
 
     except Exception as e:
         logging.error(f"Error processing vote: {e}")
+        
+        
+
+KEYWORDS = ['auction', 'sale', 'bid']
+
+moscow_tz = pytz.timezone('Europe/Moscow')
+
+@channel_router.channel_post()
+async def handle_channel_post(message: Message):
+    if any(keyword.lower() in message.text.lower() for keyword in KEYWORDS):
+        moscow_time = datetime.now(moscow_tz)
+        current_date = moscow_time.strftime('%Y-%m-%d')
+        current_time = moscow_time.strftime('%H:%M:%S')
+        
+        await save_message(message.text, current_date, current_time)
 

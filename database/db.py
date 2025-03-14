@@ -107,6 +107,14 @@ async def create_tables():
                 target TEXT NOT NULL DEFAULT 'private'
             )
         ''')
+        
+        await db.execute('''
+            CREATE TABLE IF NOT EXISTS channel_messages_for_auc
+            (id INTEGER PRIMARY KEY AUTOINCREMENT,
+             message_text TEXT,
+             date TEXT,
+             time TEXT)
+        ''')
 
         await db.commit()
         print("База данных успешно создана!")
@@ -920,9 +928,61 @@ async def get_notification_by_code(code: str):
             return None
 
 async def check_notification_code_exists(code: str) -> bool:
-    async with sq.connect('bot_database.db') as db:
+    async with('bot_database.db') as db:
         async with db.execute(
             'SELECT 1 FROM notifications WHERE code = ?', 
             (code,)
         ) as cursor:
             return bool(await cursor.fetchone())
+        
+        
+        
+        
+
+
+
+async def save_message(message_text: str, date: str, time: str):
+    async with sq.connect('bot_database.db') as db:
+        await db.execute(
+            'INSERT INTO channel_messages_for_auc (message_text, date, time) VALUES (?, ?, ?)',
+            (message_text, date, time)
+        )
+        await db.commit()
+
+async def get_distinct_dates():
+    async with sq.connect('bot_database.db') as db:
+        async with db.execute('SELECT DISTINCT date FROM channel_messages_for_auc ORDER BY date') as cursor:
+            return await cursor.fetchall()
+
+async def get_messages_by_date(date: str):
+    async with sq.connect('bot_database.db') as db:
+        async with db.execute(
+            'SELECT message_text, time FROM channel_messages_for_auc WHERE date = ? ORDER BY time',
+            (date,)
+        ) as cursor:
+            return await cursor.fetchall()
+
+async def delete_messages_by_date(date: str):
+    async with sq.connect('bot_database.db') as db:
+        await db.execute(
+            'DELETE FROM channel_messages_for_auc WHERE date = ?',
+            (date,)
+        )
+        await db.commit()
+        
+        
+async def count_admin_photos():
+    try:
+        async with sq.connect('bot_database.db') as db:
+            async with db.execute('SELECT COUNT(*) FROM admin_photo') as cursor:
+                result = await cursor.fetchone()
+                return result[0]
+    except sq.Error as e:
+        print(f"Ошибка при подсчете записей: {e}")
+        return 0  # или raise exception, в зависимости от вашей логики обработки ошибок
+
+async def active_battle():
+    async with sq.connect('bot_database.db') as db:
+        async with db.execute('SELECT COUNT(*) FROM battle') as cursor:
+            count = await cursor.fetchone()
+            return count[0] >= 2
